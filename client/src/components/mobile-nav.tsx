@@ -1,5 +1,8 @@
 import { useEffect } from "react";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2 } from "lucide-react";
+import type { MenuLink } from "@shared/schema";
 
 interface MobileNavProps {
   open: boolean;
@@ -7,6 +10,13 @@ interface MobileNavProps {
 }
 
 export default function MobileNav({ open, onClose }: MobileNavProps) {
+  // Fetch menu links
+  const { data: menuLinks, isLoading, error } = useQuery<MenuLink[]>({
+    queryKey: ["/api/menu-links"],
+    // Only fetch when the menu is open to improve performance
+    enabled: open,
+  });
+
   // Close menu when ESC key is pressed
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -29,6 +39,45 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
     };
   }, [open]);
 
+  const renderMenuLinks = () => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center py-4">
+          <Loader2 className="h-6 w-6 animate-spin text-white" />
+        </div>
+      );
+    }
+    
+    if (error) {
+      return <div className="py-2 text-red-400">Failed to load menu</div>;
+    }
+    
+    if (!menuLinks || menuLinks.length === 0) {
+      return <div className="py-2 text-gray-500">No links available</div>;
+    }
+
+    return (
+      <>
+        {menuLinks
+          .filter(link => link.active)
+          .sort((a, b) => a.order - b.order)
+          .map(link => (
+            <a 
+              key={link.id} 
+              href={link.url} 
+              className="block py-2 text-white hover:text-gray-300"
+              onClick={link.url === "#" ? (e) => e.preventDefault() : undefined}
+              target={link.url.startsWith("http") ? "_blank" : undefined}
+              rel={link.url.startsWith("http") ? "noopener noreferrer" : undefined}
+            >
+              {link.label}
+            </a>
+          ))}
+        <span className="block py-2 text-gray-500">more coming soon!</span>
+      </>
+    );
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -46,22 +95,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
         }`}
       >
         <div className="p-6 space-y-4">
-          <a href="https://birthdaybook.life" className="block py-2 text-white hover:text-gray-300">
-            birthdaybook.life
-          </a>
-          <a href="https://birthdaybook.pro" className="block py-2 text-white hover:text-gray-300">
-            birthdaybook.pro
-          </a>
-          <a href="https://entangledwiththeword.cloud" className="block py-2 text-white hover:text-gray-300">
-            entangledwiththeword.cloud
-          </a>
-          <a href="#" className="block py-2 text-white hover:text-gray-300">
-            propertystar
-          </a>
-          <a href="#" className="block py-2 text-white hover:text-gray-300">
-            acalltoaction
-          </a>
-          <span className="block py-2 text-gray-500">more coming soon!</span>
+          {renderMenuLinks()}
         </div>
       </div>
     </>

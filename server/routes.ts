@@ -14,6 +14,13 @@ async function hashPassword(password: string) {
   return `${buf.toString("hex")}.${salt}`;
 }
 
+async function comparePasswords(supplied: string, stored: string) {
+  const [hashed, salt] = stored.split(".");
+  const hashedBuf = Buffer.from(hashed, "hex");
+  const suppliedBuf = (await scryptAsync(supplied, salt, 64)) as Buffer;
+  return timingSafeEqual(hashedBuf, suppliedBuf);
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup Authentication
   setupAuth(app);
@@ -215,6 +222,55 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       await storage.deleteMenuLink(menuLinkId);
       res.status(200).json({ message: "Menu link deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // API endpoint to update owner credentials (protected, only for owner)
+  app.patch("/api/user/owner", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    }
+    
+    try {
+      const { username, currentPassword, newPassword } = req.body;
+      
+      if (!username || !currentPassword || !newPassword) {
+        return res.status(400).json({ message: "Username, current password, and new password are required" });
+      }
+      
+      // Verify the current password matches
+      const user = await storage.getUserByUsername(req.user.username);
+      if (!user) {
+        return res.status(404).json({ message: "Owner user not found" });
+      }
+      
+      const isPasswordCorrect = await comparePasswords(currentPassword, user.password);
+      if (!isPasswordCorrect) {
+        return res.status(401).json({ message: "Current password is incorrect" });
+      }
+      
+      // Check if the new username already exists (unless it's the same as the current one)
+      if (username !== req.user.username) {
+        const existingUser = await storage.getUserByUsername(username);
+        if (existingUser && existingUser.id !== user.id) {
+          return res.status(400).json({ message: "Username already exists" });
+        }
+      }
+      
+      // Hash the new password
+      const hashedPassword = await hashPassword(newPassword);
+      
+      // Update the owner's credentials
+      const updatedUser = await storage.updateOwnerCredentials(username, hashedPassword);
+      
+      // Return success
+      res.status(200).json(updatedUser);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

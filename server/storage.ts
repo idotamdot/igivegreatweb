@@ -11,6 +11,7 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getAllUsers(): Promise<User[]>;
   deleteUser(id: number): Promise<void>;
+  updateOwnerCredentials(username: string, password: string): Promise<User>;
   
   createConnection(connection: InsertConnection): Promise<Connection>;
   getAllConnections(): Promise<Connection[]>;
@@ -146,6 +147,24 @@ export class MemStorage implements IStorage {
   
   async deleteUser(id: number): Promise<void> {
     this.users.delete(id);
+  }
+  
+  async updateOwnerCredentials(username: string, password: string): Promise<User> {
+    // Find the owner user
+    const ownerUser = Array.from(this.users.values()).find(user => user.role === "owner");
+    
+    if (!ownerUser) {
+      throw new Error("Owner user not found");
+    }
+    
+    // Update the owner's credentials
+    ownerUser.username = username;
+    ownerUser.password = password;
+    
+    // Save the updated user
+    this.users.set(ownerUser.id, ownerUser);
+    
+    return ownerUser;
   }
   
   async createConnection(insertConnection: InsertConnection): Promise<Connection> {

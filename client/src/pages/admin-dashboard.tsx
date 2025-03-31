@@ -15,10 +15,11 @@ import {
   UserPlus, 
   LinkIcon, 
   PencilIcon, 
-  Globe, 
   ToggleLeft, 
   ToggleRight,
-  Move
+  Lock,
+  User as UserIcon,
+  Save
 } from "lucide-react";
 import {
   Form,
@@ -52,13 +53,32 @@ const menuLinkSchema = z.object({
   active: z.boolean(),
 });
 
+const accountSchema = z.object({
+  username: z.string().min(2, {
+    message: "username must be at least 2 characters.",
+  }),
+  currentPassword: z.string().min(4, {
+    message: "current password must be at least 4 characters.",
+  }),
+  newPassword: z.string().min(4, {
+    message: "new password must be at least 4 characters.",
+  }),
+  confirmPassword: z.string().min(4, {
+    message: "confirm password must be at least 4 characters.",
+  }),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "passwords don't match",
+  path: ["confirmPassword"],
+});
+
 type StaffFormValues = z.infer<typeof staffSchema>;
 type MenuLinkFormValues = z.infer<typeof menuLinkSchema>;
+type AccountFormValues = z.infer<typeof accountSchema>;
 
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  const [tab, setTab] = useState<"connections" | "staff" | "menu-links">("connections");
+  const [tab, setTab] = useState<"connections" | "staff" | "menu-links" | "account">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
@@ -103,6 +123,16 @@ export default function AdminDashboard() {
       url: "",
       order: 0,
       active: true
+    }
+  });
+  
+  const accountForm = useForm<AccountFormValues>({
+    resolver: zodResolver(accountSchema),
+    defaultValues: {
+      username: user?.username || "",
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: ""
     }
   });
   
@@ -249,6 +279,40 @@ export default function AdminDashboard() {
   const handleRemoveMenuLink = (menuLinkId: number) => {
     removeMenuLinkMutation.mutate(menuLinkId);
   };
+  
+  // Account update mutation
+  const updateAccountMutation = useMutation({
+    mutationFn: async (values: AccountFormValues) => {
+      const res = await apiRequest("PATCH", "/api/user/owner", {
+        username: values.username,
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Account updated",
+        description: "Your credentials have been updated successfully. You will be logged out now.",
+      });
+      
+      // Logout after successful update
+      setTimeout(() => {
+        logoutMutation.mutate();
+      }, 2000);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update account",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const onAccountSubmit = (values: AccountFormValues) => {
+    updateAccountMutation.mutate(values);
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -282,6 +346,12 @@ export default function AdminDashboard() {
               onClick={() => setTab("menu-links")}
             >
               menu links
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "account" ? "border-b-2 border-white" : ""}`}
+              onClick={() => setTab("account")}
+            >
+              my account
             </button>
           </div>
         </div>
@@ -406,6 +476,120 @@ export default function AdminDashboard() {
               ) : (
                 <p className="text-gray-400 py-4">No staff members found.</p>
               )}
+            </div>
+          </div>
+        )}
+        
+        {tab === "account" && (
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <h2 className="text-xl mb-4">update owner credentials</h2>
+            
+            <div className="max-w-md">
+              <Form {...accountForm}>
+                <form onSubmit={accountForm.handleSubmit(onAccountSubmit)} className="space-y-4">
+                  <FormField
+                    control={accountForm.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>new username</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder="owner" 
+                            className="bg-gray-800 text-white border-gray-700" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={accountForm.control}
+                    name="currentPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>current password</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password"
+                            placeholder="your current password" 
+                            className="bg-gray-800 text-white border-gray-700" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={accountForm.control}
+                    name="newPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>new password</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password"
+                            placeholder="your new password" 
+                            className="bg-gray-800 text-white border-gray-700" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={accountForm.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>confirm new password</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="password"
+                            placeholder="confirm new password" 
+                            className="bg-gray-800 text-white border-gray-700" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="pt-4">
+                    <GlowButton 
+                      type="submit"
+                      disabled={updateAccountMutation.isPending}
+                      className="w-full"
+                    >
+                      {updateAccountMutation.isPending ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          updating credentials...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="mr-2 h-4 w-4" />
+                          update credentials
+                        </>
+                      )}
+                    </GlowButton>
+                  </div>
+                </form>
+              </Form>
+              
+              <div className="mt-6 p-4 border border-yellow-500/20 bg-yellow-500/10 rounded text-yellow-300 text-sm">
+                <p className="flex items-start">
+                  <Lock className="mr-2 h-4 w-4 mt-0.5 flex-shrink-0" />
+                  <span>After updating your credentials, you'll be logged out and will need to log in again with your new username and password.</span>
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -542,7 +726,7 @@ export default function AdminDashboard() {
                 <div className="flex justify-center p-8">
                   <Loader2 className="h-8 w-8 animate-spin text-white" />
                 </div>
-              ) : menuLinks?.length > 0 ? (
+              ) : menuLinks && menuLinks.length > 0 ? (
                 <div className="space-y-3">
                   {menuLinks.map((menuLink: MenuLink) => (
                     <div key={menuLink.id} className="grid grid-cols-12 gap-2 border border-gray-700 p-3 rounded">

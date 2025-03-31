@@ -32,7 +32,8 @@ export default function SiteHeader({ onMenuClick, onConnectClick }: SiteHeaderPr
         <GlowButton size="sm" onClick={onConnectClick}>
           let's connect
         </GlowButton>
-        <GlowButton size="sm" onClick={() => navigate("/auth")}>
+        {/* Temporarily navigate directly to admin page instead of auth page */}
+        <GlowButton size="sm" onClick={() => navigate("/admin")}>
           staff login
         </GlowButton>
       </div>

@@ -1205,7 +1205,11 @@ export default function AdminDashboard() {
         )}
         
         <div className="mt-8 text-center text-gray-500 text-sm">
-          <p>logged in as: {user?.username} ({user?.role})</p>
+          {user ? (
+            <p>logged in as: {user.username} ({user.role})</p>
+          ) : (
+            <p>development mode: no user authentication</p>
+          )}
           <Link href="/" className="text-gray-400 hover:text-white">
             back to home
           </Link>

@@ -19,7 +19,12 @@ import {
   ToggleRight,
   Lock,
   User as UserIcon,
-  Save
+  Save,
+  FileText,
+  FileSignature,
+  CheckSquare,
+  Square,
+  Plus
 } from "lucide-react";
 import {
   Form,
@@ -31,7 +36,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { User, MenuLink } from "@shared/schema";
+import { User, MenuLink, Agreement, UserAgreement } from "@shared/schema";
 
 const staffSchema = z.object({
   username: z.string().min(2, {
@@ -50,6 +55,19 @@ const menuLinkSchema = z.object({
     message: "url is required.",
   }),
   order: z.number().min(0),
+  active: z.boolean(),
+});
+
+const agreementSchema = z.object({
+  title: z.string().min(2, {
+    message: "title must be at least 2 characters.",
+  }),
+  content: z.string().min(10, {
+    message: "content must be at least 10 characters.",
+  }),
+  version: z.string().min(1, {
+    message: "version is required.",
+  }),
   active: z.boolean(),
 });
 
@@ -73,13 +91,15 @@ const accountSchema = z.object({
 
 type StaffFormValues = z.infer<typeof staffSchema>;
 type MenuLinkFormValues = z.infer<typeof menuLinkSchema>;
+type AgreementFormValues = z.infer<typeof agreementSchema>;
 type AccountFormValues = z.infer<typeof accountSchema>;
 
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  const [tab, setTab] = useState<"connections" | "staff" | "menu-links" | "account">("connections");
+  const [tab, setTab] = useState<"connections" | "staff" | "menu-links" | "agreements" | "account">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
+  const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null);
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
     queryKey: ["/api/connections"],
@@ -108,6 +128,16 @@ export default function AdminDashboard() {
     enabled: tab === "menu-links",
   });
   
+  const { data: agreements, isLoading: isLoadingAgreements } = useQuery<Agreement[]>({
+    queryKey: ["/api/agreements"],
+    enabled: tab === "agreements",
+  });
+  
+  const { data: userAgreements, isLoading: isLoadingUserAgreements } = useQuery<UserAgreement[]>({
+    queryKey: ["/api/user-agreements"],
+    enabled: tab === "agreements",
+  });
+  
   const form = useForm<StaffFormValues>({
     resolver: zodResolver(staffSchema),
     defaultValues: {
@@ -133,6 +163,16 @@ export default function AdminDashboard() {
       currentPassword: "",
       newPassword: "",
       confirmPassword: ""
+    }
+  });
+  
+  const agreementForm = useForm<AgreementFormValues>({
+    resolver: zodResolver(agreementSchema),
+    defaultValues: {
+      title: "",
+      content: "",
+      version: "1.0",
+      active: true
     }
   });
   
@@ -313,6 +353,125 @@ export default function AdminDashboard() {
   const onAccountSubmit = (values: AccountFormValues) => {
     updateAccountMutation.mutate(values);
   };
+  
+  // Agreement mutations
+  const addAgreementMutation = useMutation({
+    mutationFn: async (values: AgreementFormValues) => {
+      const res = await apiRequest("POST", "/api/agreements", values);
+      return await res.json();
+    },
+    onSuccess: () => {
+      agreementForm.reset();
+      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
+      toast({
+        title: "Agreement created",
+        description: "New agreement has been created successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to create agreement",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const updateAgreementMutation = useMutation({
+    mutationFn: async (values: AgreementFormValues & { id: number }) => {
+      const { id, ...agreementData } = values;
+      const res = await apiRequest("PATCH", `/api/agreements/${id}`, agreementData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      setEditingAgreement(null);
+      agreementForm.reset();
+      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
+      toast({
+        title: "Agreement updated",
+        description: "Agreement has been updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update agreement",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const removeAgreementMutation = useMutation({
+    mutationFn: async (agreementId: number) => {
+      const res = await apiRequest("DELETE", `/api/agreements/${agreementId}`);
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
+      toast({
+        title: "Agreement removed",
+        description: "Agreement has been removed successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to remove agreement",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const assignAgreementMutation = useMutation({
+    mutationFn: async ({ userId, agreementId }: { userId: number, agreementId: number }) => {
+      const res = await apiRequest("POST", "/api/user-agreements", {
+        userId,
+        agreementId,
+        signed: false
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/user-agreements"] });
+      toast({
+        title: "Agreement assigned",
+        description: "Agreement has been assigned to staff member successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to assign agreement",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const onAgreementSubmit = (values: AgreementFormValues) => {
+    if (editingAgreement) {
+      updateAgreementMutation.mutate({ ...values, id: editingAgreement.id });
+    } else {
+      addAgreementMutation.mutate(values);
+    }
+  };
+  
+  const handleEditAgreement = (agreement: Agreement) => {
+    setEditingAgreement(agreement);
+    agreementForm.reset({
+      title: agreement.title,
+      content: agreement.content,
+      version: agreement.version,
+      active: agreement.active
+    });
+  };
+  
+  const handleRemoveAgreement = (agreementId: number) => {
+    removeAgreementMutation.mutate(agreementId);
+  };
+  
+  const handleAssignAgreement = (userId: number, agreementId: number) => {
+    assignAgreementMutation.mutate({ userId, agreementId });
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -346,6 +505,12 @@ export default function AdminDashboard() {
               onClick={() => setTab("menu-links")}
             >
               menu links
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "agreements" ? "border-b-2 border-white" : ""}`}
+              onClick={() => setTab("agreements")}
+            >
+              agreements
             </button>
             <button
               className={`px-4 py-2 ${tab === "account" ? "border-b-2 border-white" : ""}`}
@@ -475,6 +640,271 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <p className="text-gray-400 py-4">No staff members found.</p>
+              )}
+            </div>
+          </div>
+        )}
+        
+        {tab === "agreements" && (
+          <div className="grid gap-8">
+            <div className="bg-gray-900 p-6 rounded-lg">
+              <h2 className="text-xl mb-4">
+                {editingAgreement ? "edit agreement" : "create agreement"}
+                {editingAgreement && (
+                  <button 
+                    onClick={() => {
+                      setEditingAgreement(null);
+                      agreementForm.reset({
+                        title: "",
+                        content: "",
+                        version: "1.0",
+                        active: true
+                      });
+                    }}
+                    className="ml-4 text-sm text-gray-400 hover:text-white"
+                  >
+                    (cancel)
+                  </button>
+                )}
+              </h2>
+              
+              <Form {...agreementForm}>
+                <form onSubmit={agreementForm.handleSubmit(onAgreementSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <FormField
+                      control={agreementForm.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>title</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Employee Handbook" 
+                              className="bg-gray-800 text-white border-gray-700" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={agreementForm.control}
+                      name="content"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>content</FormLabel>
+                          <FormControl>
+                            <textarea 
+                              placeholder="Agreement content..." 
+                              className="w-full h-40 px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-white"
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={agreementForm.control}
+                        name="version"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>version</FormLabel>
+                            <FormControl>
+                              <Input 
+                                placeholder="1.0" 
+                                className="bg-gray-800 text-white border-gray-700" 
+                                {...field} 
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={agreementForm.control}
+                        name="active"
+                        render={({ field }) => (
+                          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
+                            <div className="space-y-0.5">
+                              <FormLabel>active</FormLabel>
+                            </div>
+                            <FormControl>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  </div>
+                  
+                  <GlowButton 
+                    type="submit"
+                    disabled={addAgreementMutation.isPending || updateAgreementMutation.isPending}
+                    className="mt-2"
+                  >
+                    {(addAgreementMutation.isPending || updateAgreementMutation.isPending) ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {editingAgreement ? "updating..." : "creating..."}
+                      </>
+                    ) : (
+                      <>
+                        {editingAgreement ? (
+                          <PencilIcon className="mr-2 h-4 w-4" />
+                        ) : (
+                          <FileText className="mr-2 h-4 w-4" />
+                        )}
+                        {editingAgreement ? "update agreement" : "create agreement"}
+                      </>
+                    )}
+                  </GlowButton>
+                </form>
+              </Form>
+            </div>
+            
+            <div className="bg-gray-900 p-6 rounded-lg">
+              <h2 className="text-xl mb-4">active agreements</h2>
+              
+              {isLoadingAgreements ? (
+                <div className="flex justify-center p-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                </div>
+              ) : agreements && agreements.length > 0 ? (
+                <div className="space-y-4">
+                  {agreements.filter(agreement => agreement.active).map((agreement: Agreement) => (
+                    <div key={agreement.id} className="border border-gray-700 p-4 rounded">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="text-lg font-medium">{agreement.title}</h3>
+                          <div className="flex items-center mt-1 space-x-2 text-sm text-gray-400">
+                            <span>Version: {agreement.version}</span>
+                            <span>•</span>
+                            <span>Created: {new Date(agreement.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            className="text-blue-500 hover:text-blue-400"
+                            onClick={() => handleEditAgreement(agreement)}
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            className="text-red-500 hover:text-red-400"
+                            onClick={() => handleRemoveAgreement(agreement.id)}
+                            disabled={removeAgreementMutation.isPending}
+                          >
+                            {removeAgreementMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-300 mt-2">{agreement.content.length > 150 ? `${agreement.content.substring(0, 150)}...` : agreement.content}</p>
+                      
+                      {staff && staff.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-gray-700">
+                          <h4 className="text-sm font-medium mb-2">Assign to staff:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {staff.filter(s => s.role !== "owner").map((staffMember: User) => {
+                              const isAssigned = userAgreements?.some(ua => 
+                                ua.userId === staffMember.id && 
+                                ua.agreementId === agreement.id
+                              );
+                              
+                              return (
+                                <button
+                                  key={staffMember.id}
+                                  onClick={() => !isAssigned && handleAssignAgreement(staffMember.id, agreement.id)}
+                                  disabled={isAssigned || assignAgreementMutation.isPending}
+                                  className={`px-3 py-1.5 text-xs rounded-full flex items-center ${
+                                    isAssigned 
+                                      ? 'bg-green-900/30 text-green-400 border border-green-600/30'
+                                      : 'bg-gray-800 hover:bg-gray-700 text-white'
+                                  }`}
+                                >
+                                  {isAssigned ? (
+                                    <>
+                                      <CheckSquare className="h-3 w-3 mr-1" />
+                                      {staffMember.username}
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Square className="h-3 w-3 mr-1" />
+                                      {staffMember.username}
+                                    </>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 py-4">No active agreements found.</p>
+              )}
+            </div>
+            
+            <div className="bg-gray-900 p-6 rounded-lg">
+              <h2 className="text-xl mb-4">inactive agreements</h2>
+              
+              {isLoadingAgreements ? (
+                <div className="flex justify-center p-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                </div>
+              ) : agreements && agreements.filter(a => !a.active).length > 0 ? (
+                <div className="space-y-4">
+                  {agreements.filter(agreement => !agreement.active).map((agreement: Agreement) => (
+                    <div key={agreement.id} className="border border-gray-700/50 p-4 rounded opacity-70">
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <h3 className="text-lg font-medium">{agreement.title}</h3>
+                          <div className="flex items-center mt-1 space-x-2 text-sm text-gray-400">
+                            <span>Version: {agreement.version}</span>
+                            <span>•</span>
+                            <span>Created: {new Date(agreement.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            className="text-blue-500 hover:text-blue-400"
+                            onClick={() => handleEditAgreement(agreement)}
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            className="text-red-500 hover:text-red-400"
+                            onClick={() => handleRemoveAgreement(agreement.id)}
+                            disabled={removeAgreementMutation.isPending}
+                          >
+                            {removeAgreementMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-400 mt-2">{agreement.content.length > 150 ? `${agreement.content.substring(0, 150)}...` : agreement.content}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 py-4">No inactive agreements found.</p>
               )}
             </div>
           </div>

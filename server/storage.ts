@@ -95,10 +95,14 @@ export class MemStorage implements IStorage {
   // Add owner account
   private _addOwnerAccount() {
     const id = this.userCurrentId++;
+    // Create a hashed password (format: hash.salt)
+    // This matches the format created by hashPassword() in auth.ts
+    const hashedPassword = "c4ea21bb365bbeeaf5f2c654883e56d11e43c44a4f0c7347f0c8641821862c1bb38c799a313567a8df2f42a5d490787b2b34a6d407d8e7427b6d61f88465bde0.f1a9cce152c65bbdb1fee56e97de578a";
+    
     const user: User = {
       id,
       username: "owner",
-      password: "iloveai", // Will be hashed in auth.ts
+      password: hashedPassword,
       role: "owner",
     };
     this.users.set(id, user);

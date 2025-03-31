@@ -780,7 +780,7 @@ export default function AdminDashboard() {
                 </div>
               ) : agreements && agreements.length > 0 ? (
                 <div className="space-y-4">
-                  {agreements.filter(agreement => agreement.active).map((agreement: Agreement) => (
+                  {agreements.filter((agreement: Agreement) => agreement.active).map((agreement: Agreement) => (
                     <div key={agreement.id} className="border border-gray-700 p-4 rounded">
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -817,8 +817,8 @@ export default function AdminDashboard() {
                         <div className="mt-4 pt-4 border-t border-gray-700">
                           <h4 className="text-sm font-medium mb-2">Assign to staff:</h4>
                           <div className="flex flex-wrap gap-2">
-                            {staff.filter(s => s.role !== "owner").map((staffMember: User) => {
-                              const isAssigned = userAgreements?.some(ua => 
+                            {staff.filter((s: User) => s.role !== "owner").map((staffMember: User) => {
+                              const isAssigned = userAgreements?.some((ua: UserAgreement) => 
                                 ua.userId === staffMember.id && 
                                 ua.agreementId === agreement.id
                               );
@@ -866,9 +866,9 @@ export default function AdminDashboard() {
                 <div className="flex justify-center p-8">
                   <Loader2 className="h-8 w-8 animate-spin text-white" />
                 </div>
-              ) : agreements && agreements.filter(a => !a.active).length > 0 ? (
+              ) : agreements && agreements.filter((a: Agreement) => !a.active).length > 0 ? (
                 <div className="space-y-4">
-                  {agreements.filter(agreement => !agreement.active).map((agreement: Agreement) => (
+                  {agreements.filter((agreement: Agreement) => !agreement.active).map((agreement: Agreement) => (
                     <div key={agreement.id} className="border border-gray-700/50 p-4 rounded opacity-70">
                       <div className="flex justify-between items-start mb-2">
                         <div>

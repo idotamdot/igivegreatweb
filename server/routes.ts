@@ -145,6 +145,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       .catch(error => res.status(500).json({ message: error.message }));
   });
   
+  // API endpoint to get a specific menu link by ID
+  app.get("/api/menu-links/:id", async (req, res) => {
+    const menuLinkId = parseInt(req.params.id);
+    if (isNaN(menuLinkId)) {
+      return res.status(400).json({ message: "Invalid menu link ID" });
+    }
+    
+    try {
+      const menuLink = await storage.getMenuLink(menuLinkId);
+      
+      if (!menuLink) {
+        return res.status(404).json({ message: "Menu link not found" });
+      }
+      
+      res.json(menuLink);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
   // API endpoint to create a new menu link (protected, only for owner)
   app.post("/api/menu-links", async (req, res) => {
     if (!req.isAuthenticated()) {
@@ -197,6 +217,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.url !== undefined) updateData.url = req.body.url;
       if (req.body.order !== undefined) updateData.order = req.body.order;
       if (req.body.active !== undefined) updateData.active = req.body.active;
+      if (req.body.hasPage !== undefined) updateData.hasPage = req.body.hasPage;
+      if (req.body.pageContent !== undefined) updateData.pageContent = req.body.pageContent;
       
       const updatedMenuLink = await storage.updateMenuLink(menuLinkId, updateData);
       

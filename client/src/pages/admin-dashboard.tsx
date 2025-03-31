@@ -29,6 +29,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -54,6 +55,8 @@ const menuLinkSchema = z.object({
   url: z.string().min(1, {
     message: "url is required.",
   }),
+  hasPage: z.boolean().optional().default(false),
+  pageContent: z.string().optional(),
   order: z.number().min(0),
   active: z.boolean(),
 });
@@ -151,6 +154,8 @@ export default function AdminDashboard() {
     defaultValues: {
       label: "",
       url: "",
+      hasPage: false,
+      pageContent: "",
       order: 0,
       active: true
     }
@@ -311,6 +316,8 @@ export default function AdminDashboard() {
     menuLinkForm.reset({
       label: menuLink.label,
       url: menuLink.url,
+      hasPage: menuLink.hasPage,
+      pageContent: menuLink.pageContent || "",
       order: menuLink.order,
       active: menuLink.active
     });
@@ -1036,6 +1043,8 @@ export default function AdminDashboard() {
                       menuLinkForm.reset({
                         label: "",
                         url: "",
+                        hasPage: false,
+                        pageContent: "",
                         order: 0,
                         active: true
                       });
@@ -1088,6 +1097,29 @@ export default function AdminDashboard() {
                     
                     <FormField
                       control={menuLinkForm.control}
+                      name="hasPage"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <FormLabel>create simple page</FormLabel>
+                            <p className="text-xs text-gray-400">
+                              {field.value 
+                                ? "Will create a simple page instead of linking to external site" 
+                                : "Will link to external URL"}
+                            </p>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={menuLinkForm.control}
                       name="order"
                       render={({ field }) => (
                         <FormItem>
@@ -1122,6 +1154,39 @@ export default function AdminDashboard() {
                         </FormItem>
                       )}
                     />
+                    
+                    {/* Conditional page content field - only show when hasPage is true */}
+                    {menuLinkForm.watch("hasPage") && (
+                      <div className="col-span-1 md:col-span-2">
+                        <FormField
+                          control={menuLinkForm.control}
+                          name="pageContent"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>page content (markdown)</FormLabel>
+                              <FormControl>
+                                <textarea 
+                                  placeholder="# Page Title 
+                                  
+Write content for this page using markdown formatting. 
+                                  
+- Bullet points work
+- **Bold** and *italic* formatting supported
+                                  
+Add any content you want for this simple page."
+                                  className="w-full h-60 px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-white"
+                                  {...field} 
+                                />
+                              </FormControl>
+                              <FormDescription>
+                                Use markdown to format your page content. Markdown is a simple formatting syntax that allows you to add headings, links, and basic formatting.
+                              </FormDescription>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    )}
                   </div>
                   
                   <GlowButton 
@@ -1163,15 +1228,20 @@ export default function AdminDashboard() {
                       <div className="col-span-1 flex items-center">
                         <span className="text-gray-500 text-sm">{menuLink.order}</span>
                       </div>
-                      <div className="col-span-3 flex items-center">
+                      <div className="col-span-2 flex items-center">
                         <span className={`${!menuLink.active ? "line-through text-gray-500" : ""}`}>{menuLink.label}</span>
                       </div>
-                      <div className="col-span-4 flex items-center">
+                      <div className="col-span-3 flex items-center">
                         <span className="text-blue-400">{menuLink.url}</span>
                       </div>
                       <div className="col-span-1 flex items-center justify-center">
                         <span className={`text-sm ${menuLink.active ? "text-green-500" : "text-gray-500"}`}>
                           {menuLink.active ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
+                        </span>
+                      </div>
+                      <div className="col-span-2 flex items-center">
+                        <span className={`text-sm ${menuLink.hasPage ? "text-purple-400" : "text-gray-400"}`}>
+                          {menuLink.hasPage ? "Simple Page" : "External Link"}
                         </span>
                       </div>
                       <div className="col-span-3 flex items-center justify-end space-x-2">

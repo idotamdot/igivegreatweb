@@ -20,6 +20,8 @@ export const menuLinks = pgTable("menu_links", {
   id: serial("id").primaryKey(),
   label: text("label").notNull(),
   url: text("url").notNull(),
+  pageContent: text("page_content"),  // Optional page content for simple pages
+  hasPage: boolean("has_page").notNull().default(false),  // Flag to indicate if this is a page vs external link
   order: integer("order").notNull().default(0),
   active: boolean("active").notNull().default(true),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -52,6 +54,8 @@ export const insertConnectionSchema = createInsertSchema(connections).pick({
 export const insertMenuLinkSchema = createInsertSchema(menuLinks).pick({
   label: true,
   url: true,
+  pageContent: true,
+  hasPage: true,
   order: true,
   active: true,
 });

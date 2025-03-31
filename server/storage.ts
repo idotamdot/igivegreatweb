@@ -115,6 +115,8 @@ export class MemStorage implements IStorage {
         id: this.menuLinkCurrentId++,
         label: "birthdaybook.life",
         url: "https://birthdaybook.life",
+        pageContent: null,
+        hasPage: false,
         order: 1,
         active: true,
         createdAt: new Date()
@@ -123,6 +125,8 @@ export class MemStorage implements IStorage {
         id: this.menuLinkCurrentId++,
         label: "birthdaybook.pro",
         url: "https://birthdaybook.pro",
+        pageContent: null,
+        hasPage: false,
         order: 2,
         active: true,
         createdAt: new Date()
@@ -131,6 +135,8 @@ export class MemStorage implements IStorage {
         id: this.menuLinkCurrentId++,
         label: "entangledwiththeword.cloud",
         url: "https://entangledwiththeword.cloud",
+        pageContent: null,
+        hasPage: false,
         order: 3,
         active: true,
         createdAt: new Date()
@@ -139,6 +145,8 @@ export class MemStorage implements IStorage {
         id: this.menuLinkCurrentId++,
         label: "propertystar",
         url: "#",
+        pageContent: "# PropertyStar\n\nComing soon - an innovative property management solution.",
+        hasPage: true,
         order: 4,
         active: true,
         createdAt: new Date()
@@ -147,6 +155,8 @@ export class MemStorage implements IStorage {
         id: this.menuLinkCurrentId++,
         label: "acalltoaction",
         url: "#",
+        pageContent: "# A Call To Action\n\nThis page is under development. Stay tuned for updates!",
+        hasPage: true,
         order: 5,
         active: true,
         createdAt: new Date()
@@ -224,12 +234,16 @@ export class MemStorage implements IStorage {
     // Set default values if not provided
     const order = insertMenuLink.order ?? 0; // Default to 0 if not provided
     const active = insertMenuLink.active ?? true; // Default to true if not provided
+    const hasPage = insertMenuLink.hasPage ?? false; // Default to false if not provided
+    const pageContent = hasPage ? (insertMenuLink.pageContent || "") : null; // Default to empty string for pages, null otherwise
     
     const menuLink: MenuLink = {
       ...insertMenuLink,
       id,
       order,
       active,
+      hasPage,
+      pageContent,
       createdAt: new Date()
     };
     this.menuLinks.set(id, menuLink);
@@ -251,9 +265,26 @@ export class MemStorage implements IStorage {
       return undefined;
     }
     
+    // Process hasPage and pageContent separately to handle the relationship between them
+    const hasPage = menuLinkUpdate.hasPage !== undefined ? menuLinkUpdate.hasPage : existingMenuLink.hasPage;
+    let pageContent = menuLinkUpdate.pageContent !== undefined ? menuLinkUpdate.pageContent : existingMenuLink.pageContent;
+    
+    // If switching to hasPage=true and pageContent is null, set default empty content
+    if (hasPage && pageContent === null) {
+      pageContent = "";
+    }
+    
+    // If switching to hasPage=false, set pageContent to null
+    if (!hasPage) {
+      pageContent = null;
+    }
+    
+    // Create updated menu link with processed values
     const updatedMenuLink: MenuLink = {
       ...existingMenuLink,
-      ...menuLinkUpdate
+      ...menuLinkUpdate,
+      hasPage,
+      pageContent
     };
     
     this.menuLinks.set(id, updatedMenuLink);

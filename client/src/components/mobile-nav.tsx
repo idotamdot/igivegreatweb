@@ -61,18 +61,32 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
         {menuLinks
           .filter(link => link.active)
           .sort((a, b) => a.order - b.order)
-          .map(link => (
-            <a 
-              key={link.id} 
-              href={link.url} 
-              className="block py-2 text-white hover:text-gray-300"
-              onClick={link.url === "#" ? (e) => e.preventDefault() : undefined}
-              target={link.url.startsWith("http") ? "_blank" : undefined}
-              rel={link.url.startsWith("http") ? "noopener noreferrer" : undefined}
-            >
-              {link.label}
-            </a>
-          ))}
+          .map(link => {
+            return link.hasPage ? (
+              <Link 
+                key={link.id} 
+                href={`/page/${link.label.toLowerCase().replace(/\s+/g, '-')}`}
+                className="block py-2 text-white hover:text-gray-300"
+                onClick={() => onClose()}
+              >
+                {link.label}
+              </Link>
+            ) : (
+              <a 
+                key={link.id} 
+                href={link.url} 
+                className="block py-2 text-white hover:text-gray-300"
+                onClick={(e) => {
+                  if (link.url === "#") e.preventDefault();
+                  onClose();
+                }}
+                target={link.url.startsWith("http") ? "_blank" : undefined}
+                rel={link.url.startsWith("http") ? "noopener noreferrer" : undefined}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         <span className="block py-2 text-gray-500">more coming soon!</span>
       </>
     );

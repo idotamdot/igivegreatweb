@@ -94,6 +94,8 @@ export class MemStorage implements IStorage {
         hasPage: false,
         order: 1,
         active: true,
+        images: [],
+        showImageGallery: false,
         createdAt: new Date()
       },
       {
@@ -104,6 +106,8 @@ export class MemStorage implements IStorage {
         hasPage: false,
         order: 2,
         active: true,
+        images: [],
+        showImageGallery: false,
         createdAt: new Date()
       },
       {
@@ -114,6 +118,8 @@ export class MemStorage implements IStorage {
         hasPage: false,
         order: 3,
         active: true,
+        images: [],
+        showImageGallery: false,
         createdAt: new Date()
       },
       {
@@ -124,6 +130,8 @@ export class MemStorage implements IStorage {
         hasPage: true,
         order: 4,
         active: true,
+        images: [],
+        showImageGallery: false,
         createdAt: new Date()
       },
       {
@@ -134,6 +142,8 @@ export class MemStorage implements IStorage {
         hasPage: true,
         order: 5,
         active: true,
+        images: [],
+        showImageGallery: false,
         createdAt: new Date()
       }
     ];
@@ -211,6 +221,8 @@ export class MemStorage implements IStorage {
     const active = insertMenuLink.active ?? true; // Default to true if not provided
     const hasPage = insertMenuLink.hasPage ?? false; // Default to false if not provided
     const pageContent = hasPage ? (insertMenuLink.pageContent || "") : null; // Default to empty string for pages, null otherwise
+    const images = insertMenuLink.images ?? []; // Default to empty array if not provided
+    const showImageGallery = insertMenuLink.showImageGallery ?? false; // Default to false if not provided
     
     const menuLink: MenuLink = {
       ...insertMenuLink,
@@ -219,6 +231,8 @@ export class MemStorage implements IStorage {
       active,
       hasPage,
       pageContent,
+      images,
+      showImageGallery,
       createdAt: new Date()
     };
     this.menuLinks.set(id, menuLink);
@@ -254,12 +268,20 @@ export class MemStorage implements IStorage {
       pageContent = null;
     }
     
+    // Process images and showImageGallery
+    const images = menuLinkUpdate.images !== undefined ? menuLinkUpdate.images : existingMenuLink.images;
+    const showImageGallery = menuLinkUpdate.showImageGallery !== undefined 
+      ? menuLinkUpdate.showImageGallery 
+      : existingMenuLink.showImageGallery;
+    
     // Create updated menu link with processed values
     const updatedMenuLink: MenuLink = {
       ...existingMenuLink,
       ...menuLinkUpdate,
       hasPage,
-      pageContent
+      pageContent,
+      images,
+      showImageGallery
     };
     
     this.menuLinks.set(id, updatedMenuLink);

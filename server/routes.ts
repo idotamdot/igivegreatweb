@@ -215,6 +215,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.active !== undefined) updateData.active = req.body.active;
       if (req.body.hasPage !== undefined) updateData.hasPage = req.body.hasPage;
       if (req.body.pageContent !== undefined) updateData.pageContent = req.body.pageContent;
+      if (req.body.images !== undefined) updateData.images = req.body.images;
+      if (req.body.showImageGallery !== undefined) updateData.showImageGallery = req.body.showImageGallery;
       
       const updatedMenuLink = await storage.updateMenuLink(menuLinkId, updateData);
       
@@ -253,6 +255,96 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // API endpoint to update menu link images (protected, only for owner)
+  app.post("/api/menu-links/:id/images", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    }
+    
+    const menuLinkId = parseInt(req.params.id);
+    if (isNaN(menuLinkId)) {
+      return res.status(400).json({ message: "Invalid menu link ID" });
+    }
+    
+    try {
+      const menuLink = await storage.getMenuLink(menuLinkId);
+      
+      if (!menuLink) {
+        return res.status(404).json({ message: "Menu link not found" });
+      }
+      
+      const { imageUrl } = req.body;
+      
+      if (!imageUrl) {
+        return res.status(400).json({ message: "Image URL is required" });
+      }
+      
+      // Add the new image URL to the images array
+      const currentImages = menuLink.images || [];
+      const updatedImages = [...currentImages, imageUrl];
+      
+      const updatedMenuLink = await storage.updateMenuLink(menuLinkId, {
+        images: updatedImages
+      });
+      
+      res.status(200).json(updatedMenuLink);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // API endpoint to delete an image from menu link (protected, only for owner)
+  app.delete("/api/menu-links/:id/images/:imageIndex", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    }
+    
+    const menuLinkId = parseInt(req.params.id);
+    const imageIndex = parseInt(req.params.imageIndex);
+    
+    if (isNaN(menuLinkId)) {
+      return res.status(400).json({ message: "Invalid menu link ID" });
+    }
+    
+    if (isNaN(imageIndex) || imageIndex < 0) {
+      return res.status(400).json({ message: "Invalid image index" });
+    }
+    
+    try {
+      const menuLink = await storage.getMenuLink(menuLinkId);
+      
+      if (!menuLink) {
+        return res.status(404).json({ message: "Menu link not found" });
+      }
+      
+      const currentImages = menuLink.images || [];
+      
+      if (imageIndex >= currentImages.length) {
+        return res.status(404).json({ message: "Image not found" });
+      }
+      
+      // Remove the image at the specified index
+      const updatedImages = [...currentImages];
+      updatedImages.splice(imageIndex, 1);
+      
+      const updatedMenuLink = await storage.updateMenuLink(menuLinkId, {
+        images: updatedImages
+      });
+      
+      res.status(200).json(updatedMenuLink);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // API endpoint to update owner credentials (protected, only for owner)
   app.patch("/api/user/owner", async (req, res) => {
     if (!req.isAuthenticated()) {

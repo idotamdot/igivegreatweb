@@ -24,6 +24,8 @@ export const menuLinks = pgTable("menu_links", {
   hasPage: boolean("has_page").notNull().default(false),  // Flag to indicate if this is a page vs external link
   order: integer("order").notNull().default(0),
   active: boolean("active").notNull().default(true),
+  images: text("images").array(),  // Array of image paths or URLs
+  showImageGallery: boolean("show_image_gallery").notNull().default(false),  // Flag to display images as gallery
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -39,6 +41,8 @@ export const insertMenuLinkSchema = createInsertSchema(menuLinks).pick({
   hasPage: true,
   order: true,
   active: true,
+  images: true,
+  showImageGallery: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

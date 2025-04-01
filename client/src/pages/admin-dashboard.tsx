@@ -46,7 +46,7 @@ const menuLinkSchema = z.object({
   hasPage: z.boolean().optional().default(false),
   pageContent: z.string().optional(),
   order: z.number().min(0),
-  active: z.boolean(),
+  active: z.boolean().optional().default(true),
 });
 
 const accountSchema = z.object({
@@ -207,6 +207,34 @@ export default function AdminDashboard() {
   
   const handleRemoveMenuLink = (menuLinkId: number) => {
     removeMenuLinkMutation.mutate(menuLinkId);
+  };
+  
+  const toggleMenuLinkActiveMutation = useMutation({
+    mutationFn: async ({ id, active }: { id: number, active: boolean }) => {
+      const res = await apiRequest("PATCH", `/api/menu-links/${id}`, { active });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/menu-links"] });
+      toast({
+        title: "Menu link updated",
+        description: "Link visibility has been updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update menu link",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleToggleActive = (menuLink: MenuLink) => {
+    toggleMenuLinkActiveMutation.mutate({ 
+      id: menuLink.id, 
+      active: !menuLink.active 
+    });
   };
   
   // Account update mutation
@@ -447,26 +475,7 @@ This is a paragraph of text.
                     />
                   )}
                   
-                  <FormField
-                    control={menuLinkForm.control}
-                    name="active"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
-                        <div className="space-y-0.5">
-                          <FormLabel>active</FormLabel>
-                          <FormDescription className="text-gray-400">
-                            Show this link in the menu
-                          </FormDescription>
-                        </div>
-                        <FormControl>
-                          <Switch
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+
                   
                   <GlowButton 
                     type="submit"
@@ -508,27 +517,36 @@ This is a paragraph of text.
                         <span className="font-medium">{menuLink.label}</span>
                         <span className="text-sm text-gray-400">
                           {menuLink.hasPage ? `Page: /page/${menuLink.url}` : menuLink.url}
-                          {!menuLink.active && " (inactive)"}
                         </span>
                       </div>
-                      <div className="flex space-x-2">
-                        <button
-                          className="text-blue-500 hover:text-blue-400"
-                          onClick={() => handleEditMenuLink(menuLink)}
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          className="text-red-500 hover:text-red-400"
-                          onClick={() => handleRemoveMenuLink(menuLink.id)}
-                          disabled={removeMenuLinkMutation.isPending}
-                        >
-                          {removeMenuLinkMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </button>
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm text-gray-400">show in menu</span>
+                          <Switch
+                            checked={menuLink.active}
+                            onCheckedChange={() => handleToggleActive(menuLink)}
+                            disabled={toggleMenuLinkActiveMutation.isPending}
+                          />
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            className="text-blue-500 hover:text-blue-400"
+                            onClick={() => handleEditMenuLink(menuLink)}
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            className="text-red-500 hover:text-red-400"
+                            onClick={() => handleRemoveMenuLink(menuLink.id)}
+                            disabled={removeMenuLinkMutation.isPending}
+                          >
+                            {removeMenuLinkMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Trash2 className="h-4 w-4" />
+                            )}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}

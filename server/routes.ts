@@ -7,9 +7,10 @@ import {
   insertMenuLinkSchema, 
   insertAgreementSchema,
   insertUserAgreementSchema,
+  userAgreements,
   type InsertMenuLink,
   type InsertAgreement,
-  type InsertUserAgreement 
+  type InsertUserAgreement
 } from "@shared/schema";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -439,6 +440,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API endpoint to get all user-agreement relationships
+  app.get("/api/user-agreements", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    }
+    
+    try {
+      // For owner, we need to get all user agreements
+      const allUsers = await storage.getAllUsers();
+      let allAgreements = [];
+      
+      for (const user of allUsers) {
+        const userAgreements = await storage.getUserAgreements(user.id);
+        allAgreements = [...allAgreements, ...userAgreements];
+      }
+      
+      res.json(allAgreements);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
   // API endpoint to get user-agreement relationships for a user
   app.get("/api/user-agreements/user/:userId", (req, res) => {
     if (!req.isAuthenticated()) {
@@ -568,14 +595,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Update the user-agreement relationship
-      const { signed } = req.body;
+      const { signed, comments } = req.body;
       if (typeof signed !== "boolean") {
         return res.status(400).json({ message: "Signed status must be a boolean" });
       }
       
       const updatedUserAgreement = await storage.updateUserAgreement(
         userAgreementId, 
-        signed, 
+        signed,
+        comments,
         signed ? new Date() : undefined
       );
       

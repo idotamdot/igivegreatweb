@@ -45,7 +45,7 @@ export interface IStorage {
   getUserAgreement(userId: number, agreementId: number): Promise<UserAgreement | undefined>;
   getUserAgreements(userId: number): Promise<UserAgreement[]>;
   getAgreementUsers(agreementId: number): Promise<UserAgreement[]>;
-  updateUserAgreement(id: number, signed: boolean, signedAt?: Date): Promise<UserAgreement | undefined>;
+  updateUserAgreement(id: number, signed: boolean, comments?: string, signedAt?: Date): Promise<UserAgreement | undefined>;
   
   sessionStore: session.Store;
 }
@@ -300,10 +300,19 @@ export class MemStorage implements IStorage {
     const id = this.agreementCurrentId++;
     const now = new Date();
     
+    // Get all active team members
+    const activeTeamMembers = Array.from(this.users.values())
+      .filter(user => user.role !== "owner")
+      .map(user => ({ id: user.id, username: user.username }));
+    
     const agreement: Agreement = {
       ...insertAgreement,
       id,
       active: insertAgreement.active ?? true,
+      proposalDate: insertAgreement.proposalDate ?? now,
+      activeMembers: insertAgreement.activeMembers ?? JSON.stringify(activeTeamMembers),
+      masterCopy: insertAgreement.masterCopy ?? true,
+      compiledComments: insertAgreement.compiledComments ?? "",
       createdAt: now,
       updatedAt: now
     };
@@ -357,6 +366,7 @@ export class MemStorage implements IStorage {
       id,
       signed: insertUserAgreement.signed ?? false,
       signedAt: insertUserAgreement.signed ? (insertUserAgreement.signedAt || now) : null,
+      comments: insertUserAgreement.comments || null,
       createdAt: now
     };
     
@@ -382,7 +392,12 @@ export class MemStorage implements IStorage {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
   
-  async updateUserAgreement(id: number, signed: boolean, signedAt?: Date): Promise<UserAgreement | undefined> {
+  async updateUserAgreement(
+    id: number, 
+    signed: boolean, 
+    comments?: string, 
+    signedAt?: Date
+  ): Promise<UserAgreement | undefined> {
     const existingUserAgreement = this.userAgreements.get(id);
     if (!existingUserAgreement) {
       return undefined;
@@ -391,10 +406,34 @@ export class MemStorage implements IStorage {
     const updatedUserAgreement: UserAgreement = {
       ...existingUserAgreement,
       signed,
+      comments: comments || existingUserAgreement.comments,
       signedAt: signed ? (signedAt || new Date()) : null
     };
     
     this.userAgreements.set(id, updatedUserAgreement);
+    
+    // If agreement is signed and there are comments, update the master agreement's compiled comments
+    if (signed && comments) {
+      const agreement = this.agreements.get(existingUserAgreement.agreementId);
+      if (agreement && agreement.masterCopy) {
+        const user = this.users.get(existingUserAgreement.userId);
+        const username = user ? user.username : `User #${existingUserAgreement.userId}`;
+        
+        // Get existing compiled comments or initialize with empty string
+        const existingComments = agreement.compiledComments || '';
+        
+        // Add this comment with username and timestamp
+        const commentWithMeta = `\n\n--- Comment from ${username} on ${new Date().toLocaleString()} ---\n${comments}`;
+        
+        // Update the agreement with the new compiled comments
+        this.agreements.set(existingUserAgreement.agreementId, {
+          ...agreement,
+          compiledComments: existingComments + commentWithMeta,
+          updatedAt: new Date()
+        });
+      }
+    }
+    
     return updatedUserAgreement;
   }
 }

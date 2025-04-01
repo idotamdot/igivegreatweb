@@ -24,7 +24,9 @@ import {
   FileSignature,
   CheckSquare,
   Square,
-  Plus
+  Plus,
+  MessageSquare,
+  MessageCircle
 } from "lucide-react";
 import {
   Form,
@@ -38,6 +40,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { User, MenuLink, Agreement, UserAgreement } from "@shared/schema";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 const staffSchema = z.object({
   username: z.string().min(2, {
@@ -103,6 +115,9 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState<"connections" | "staff" | "menu-links" | "agreements" | "account">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
   const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null);
+  const [signDialogOpen, setSignDialogOpen] = useState(false);
+  const [signingAgreement, setSigningAgreement] = useState<UserAgreement | null>(null);
+  const [commentText, setCommentText] = useState("");
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
     queryKey: ["/api/connections"],
@@ -479,6 +494,51 @@ export default function AdminDashboard() {
   const handleAssignAgreement = (userId: number, agreementId: number) => {
     assignAgreementMutation.mutate({ userId, agreementId });
   };
+  
+  // Sign agreement mutation
+  const signAgreementMutation = useMutation({
+    mutationFn: async ({ userAgreementId, signed, comments }: { userAgreementId: number, signed: boolean, comments?: string }) => {
+      const res = await apiRequest("PATCH", `/api/user-agreements/${userAgreementId}`, {
+        signed,
+        comments
+      });
+      return await res.json();
+    },
+    onSuccess: () => {
+      setSignDialogOpen(false);
+      setSigningAgreement(null);
+      setCommentText("");
+      queryClient.invalidateQueries({ queryKey: ["/api/user-agreements"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
+      toast({
+        title: "Agreement signed",
+        description: "Agreement has been signed successfully with your comments.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to sign agreement",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const handleOpenSignDialog = (userAgreement: UserAgreement) => {
+    setSigningAgreement(userAgreement);
+    setCommentText(userAgreement.comments || "");
+    setSignDialogOpen(true);
+  };
+  
+  const handleSignAgreement = () => {
+    if (signingAgreement) {
+      signAgreementMutation.mutate({ 
+        userAgreementId: signingAgreement.id, 
+        signed: true,
+        comments: commentText
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -825,34 +885,52 @@ export default function AdminDashboard() {
                           <h4 className="text-sm font-medium mb-2">Assign to team:</h4>
                           <div className="flex flex-wrap gap-2">
                             {staff.filter((s: User) => s.role !== "owner").map((staffMember: User) => {
-                              const isAssigned = userAgreements?.some((ua: UserAgreement) => 
+                              const userAgreement = userAgreements?.find((ua: UserAgreement) => 
                                 ua.userId === staffMember.id && 
                                 ua.agreementId === agreement.id
                               );
                               
+                              const isAssigned = !!userAgreement;
+                              const isSigned = userAgreement?.signed;
+                              
                               return (
-                                <button
-                                  key={staffMember.id}
-                                  onClick={() => !isAssigned && handleAssignAgreement(staffMember.id, agreement.id)}
-                                  disabled={isAssigned || assignAgreementMutation.isPending}
-                                  className={`px-3 py-1.5 text-xs rounded-full flex items-center ${
-                                    isAssigned 
-                                      ? 'bg-green-900/30 text-green-400 border border-green-600/30'
-                                      : 'bg-gray-800 hover:bg-gray-700 text-white'
-                                  }`}
-                                >
-                                  {isAssigned ? (
-                                    <>
-                                      <CheckSquare className="h-3 w-3 mr-1" />
-                                      {staffMember.username}
-                                    </>
-                                  ) : (
-                                    <>
-                                      <Square className="h-3 w-3 mr-1" />
-                                      {staffMember.username}
-                                    </>
+                                <div key={staffMember.id} className="inline-flex">
+                                  <button
+                                    onClick={() => !isAssigned && handleAssignAgreement(staffMember.id, agreement.id)}
+                                    disabled={isAssigned || assignAgreementMutation.isPending}
+                                    className={`px-3 py-1.5 text-xs rounded-l-full flex items-center ${
+                                      isAssigned 
+                                        ? isSigned 
+                                          ? 'bg-green-900/30 text-green-400 border border-green-600/30' 
+                                          : 'bg-yellow-900/30 text-yellow-400 border border-yellow-600/30'
+                                        : 'bg-gray-800 hover:bg-gray-700 text-white'
+                                    }`}
+                                  >
+                                    {isAssigned ? (
+                                      <>
+                                        {isSigned ? (
+                                          <CheckSquare className="h-3 w-3 mr-1" />
+                                        ) : (
+                                          <Square className="h-3 w-3 mr-1" />
+                                        )}
+                                        {staffMember.username}
+                                      </>
+                                    ) : (
+                                      <>
+                                        <Square className="h-3 w-3 mr-1" />
+                                        {staffMember.username}
+                                      </>
+                                    )}
+                                  </button>
+                                  {isAssigned && !isSigned && (
+                                    <button
+                                      onClick={() => userAgreement && handleOpenSignDialog(userAgreement)}
+                                      className="px-2 py-1.5 text-xs rounded-r-full bg-blue-900/30 text-blue-400 border border-blue-600/30 hover:bg-blue-800/30"
+                                    >
+                                      <FileSignature className="h-3 w-3" />
+                                    </button>
                                   )}
-                                </button>
+                                </div>
                               );
                             })}
                           </div>
@@ -1285,6 +1363,69 @@ Add any content you want for this simple page."
           </Link>
         </div>
       </div>
+      
+      {/* Sign Agreement Dialog */}
+      <Dialog open={signDialogOpen} onOpenChange={setSignDialogOpen}>
+        <DialogContent className="bg-gray-900 border-gray-700 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-white">Sign Agreement</DialogTitle>
+            <DialogDescription className="text-gray-400">
+              {signingAgreement && (
+                <span>Sign the "{agreements?.find(a => a.id === signingAgreement.agreementId)?.title}" agreement.</span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="rounded bg-black/40 p-4 max-h-40 overflow-y-auto text-sm">
+              {signingAgreement && (
+                <p className="text-gray-300">
+                  {agreements?.find(a => a.id === signingAgreement.agreementId)?.content}
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <label htmlFor="comments" className="text-sm font-medium text-gray-300">
+                Comments or feedback
+              </label>
+              <Textarea
+                id="comments"
+                placeholder="Add any comments or feedback about this agreement..."
+                className="bg-gray-800 text-white border-gray-700"
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setSignDialogOpen(false)}
+              className="px-4 py-2 rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700"
+            >
+              Cancel
+            </button>
+            <GlowButton
+              onClick={handleSignAgreement}
+              disabled={signAgreementMutation.isPending}
+            >
+              {signAgreementMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing...
+                </>
+              ) : (
+                <>
+                  <FileSignature className="mr-2 h-4 w-4" />
+                  Sign Agreement
+                </>
+              )}
+            </GlowButton>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

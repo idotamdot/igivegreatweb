@@ -33,6 +33,10 @@ export const agreements = pgTable("agreements", {
   content: text("content").notNull(),
   version: text("version").notNull(),
   active: boolean("active").notNull().default(true),
+  proposalDate: timestamp("proposal_date").defaultNow().notNull(),
+  activeMembers: text("active_members").notNull(), // JSON stringified list of active team members at creation
+  masterCopy: boolean("master_copy").notNull().default(true),
+  compiledComments: text("compiled_comments"), // Combined comments from team members
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
@@ -43,6 +47,7 @@ export const userAgreements = pgTable("user_agreements", {
   agreementId: integer("agreement_id").notNull(),
   signed: boolean("signed").notNull().default(false),
   signedAt: timestamp("signed_at"),
+  comments: text("comments"), // Team member comments when agreeing
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -64,12 +69,17 @@ export const insertAgreementSchema = createInsertSchema(agreements).pick({
   content: true,
   version: true,
   active: true,
+  proposalDate: true,
+  activeMembers: true,
+  masterCopy: true,
+  compiledComments: true,
 });
 export const insertUserAgreementSchema = createInsertSchema(userAgreements).pick({
   userId: true,
   agreementId: true,
   signed: true,
   signedAt: true,
+  comments: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

@@ -9,6 +9,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ThemeSelector } from "@/components/theme-selector";
+import AnimatedText from "@/components/animated-text";
 import { GlowButton } from "@/components/ui/glow-button";
 import { 
   Loader2, 
@@ -75,7 +76,7 @@ type AccountFormValues = z.infer<typeof accountSchema>;
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  const [tab, setTab] = useState<"connections" | "menu-links" | "account" | "themes">("connections");
+  const [tab, setTab] = useState<"connections" | "menu-links" | "account" | "themes" | "animations">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
@@ -273,7 +274,7 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="container mx-auto p-6">
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-2xl">owner dashboard</h1>
@@ -285,28 +286,34 @@ export default function AdminDashboard() {
         </header>
         
         <div className="mb-6">
-          <div className="flex border-b border-gray-700 mb-6">
+          <div className="flex border-b border-accent/30 mb-6">
             <button
-              className={`px-4 py-2 ${tab === "connections" ? "border-b-2 border-white" : ""}`}
+              className={`px-4 py-2 ${tab === "connections" ? "border-b-2 border-primary" : ""}`}
               onClick={() => setTab("connections")}
             >
               recent connections
             </button>
 
             <button
-              className={`px-4 py-2 ${tab === "menu-links" ? "border-b-2 border-white" : ""}`}
+              className={`px-4 py-2 ${tab === "menu-links" ? "border-b-2 border-primary" : ""}`}
               onClick={() => setTab("menu-links")}
             >
               menu links
             </button>
             <button
-              className={`px-4 py-2 ${tab === "themes" ? "border-b-2 border-white" : ""}`}
+              className={`px-4 py-2 ${tab === "themes" ? "border-b-2 border-primary" : ""}`}
               onClick={() => setTab("themes")}
             >
               themes
             </button>
             <button
-              className={`px-4 py-2 ${tab === "account" ? "border-b-2 border-white" : ""}`}
+              className={`px-4 py-2 ${tab === "animations" ? "border-b-2 border-primary" : ""}`}
+              onClick={() => setTab("animations")}
+            >
+              animations
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "account" ? "border-b-2 border-primary" : ""}`}
               onClick={() => setTab("account")}
             >
               my account
@@ -315,7 +322,7 @@ export default function AdminDashboard() {
         </div>
         
         {tab === "connections" && (
-          <div className="bg-gray-900 p-6 rounded-lg">
+          <div className="bg-card p-6 rounded-lg border border-accent/20">
             <h2 className="text-xl mb-4">recent connections</h2>
             
             {isLoadingConnections ? (
@@ -342,7 +349,7 @@ export default function AdminDashboard() {
         
         {tab === "menu-links" && (
           <div className="grid gap-8">
-            <div className="bg-gray-900 p-6 rounded-lg">
+            <div className="bg-card p-6 rounded-lg border border-accent/20">
               <h2 className="text-xl mb-4">
                 {editingMenuLink ? "edit menu link" : "add menu link"}
                 {editingMenuLink && (
@@ -377,7 +384,7 @@ export default function AdminDashboard() {
                           <FormControl>
                             <Input 
                               placeholder="about us" 
-                              className="bg-gray-800 text-white border-gray-700" 
+                              className="bg-input border-input" 
                               {...field} 
                             />
                           </FormControl>
@@ -396,7 +403,7 @@ export default function AdminDashboard() {
                             <Input 
                               type="number"
                               min="0"
-                              className="bg-gray-800 text-white border-gray-700" 
+                              className="bg-input border-input" 
                               {...field}
                               onChange={(e) => field.onChange(parseInt(e.target.value))}
                             />
@@ -411,10 +418,10 @@ export default function AdminDashboard() {
                     control={menuLinkForm.control}
                     name="hasPage"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-input/20 p-3 shadow-sm">
                         <div className="space-y-0.5">
                           <FormLabel>create a simple page</FormLabel>
-                          <FormDescription className="text-gray-400">
+                          <FormDescription className="text-muted-foreground">
                             Create a simple page instead of linking to external site
                           </FormDescription>
                         </div>
@@ -437,11 +444,11 @@ export default function AdminDashboard() {
                         <FormControl>
                           <Input 
                             placeholder={menuLinkForm.watch("hasPage") ? "about" : "https://example.com"} 
-                            className="bg-gray-800 text-white border-gray-700" 
+                            className="bg-input border-input" 
                             {...field} 
                           />
                         </FormControl>
-                        <FormDescription className="text-gray-400">
+                        <FormDescription className="text-muted-foreground">
                           {menuLinkForm.watch("hasPage") 
                             ? "This will be accessible at /page/your-slug" 
                             : "Enter the full URL including https://"}
@@ -468,11 +475,11 @@ This is a paragraph of text.
 
 * List item 1
 * List item 2" 
-                              className="h-40 bg-gray-800 text-white border-gray-700" 
+                              className="h-40 bg-input border-input" 
                               {...field} 
                             />
                           </FormControl>
-                          <FormDescription className="text-gray-400">
+                          <FormDescription className="text-muted-foreground">
                             Use markdown syntax for formatting
                           </FormDescription>
                           <FormMessage />
@@ -508,7 +515,7 @@ This is a paragraph of text.
               </Form>
             </div>
             
-            <div className="bg-gray-900 p-6 rounded-lg">
+            <div className="bg-card p-6 rounded-lg border border-accent/20">
               <h2 className="text-xl mb-4">menu links</h2>
               
               {isLoadingMenuLinks ? (
@@ -518,16 +525,16 @@ This is a paragraph of text.
               ) : menuLinks && menuLinks.length > 0 ? (
                 <div className="space-y-3">
                   {menuLinks.map((menuLink: MenuLink) => (
-                    <div key={menuLink.id} className="flex justify-between items-center border border-gray-700 p-3 rounded">
+                    <div key={menuLink.id} className="flex justify-between items-center border border-input/20 p-3 rounded">
                       <div className="flex flex-col">
                         <span className="font-medium">{menuLink.label}</span>
-                        <span className="text-sm text-gray-400">
+                        <span className="text-sm text-muted-foreground">
                           {menuLink.hasPage ? `Page: /page/${menuLink.url}` : menuLink.url}
                         </span>
                       </div>
                       <div className="flex items-center space-x-4">
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-400">show in menu</span>
+                          <span className="text-sm text-muted-foreground">show in menu</span>
                           <Switch
                             checked={menuLink.active}
                             onCheckedChange={() => handleToggleActive(menuLink)}
@@ -558,14 +565,14 @@ This is a paragraph of text.
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 py-4">No menu links found.</p>
+                <p className="text-muted-foreground py-4">No menu links found.</p>
               )}
             </div>
           </div>
         )}
         
         {tab === "themes" && (
-          <div className="bg-gray-900 p-6 rounded-lg">
+          <div className="bg-card p-6 rounded-lg border border-accent/20">
             <h2 className="text-xl mb-6">theme settings</h2>
             
             <div className="space-y-6">
@@ -573,14 +580,14 @@ This is a paragraph of text.
                 <h3 className="text-lg mb-3">current theme</h3>
                 <div className="flex items-center gap-4">
                   <ThemeToggle />
-                  <p className="text-sm text-gray-400">Switch between light and dark mode</p>
+                  <p className="text-sm text-muted-foreground">Switch between light and dark mode</p>
                 </div>
               </div>
               
               <div>
                 <h3 className="text-lg mb-3">theme colors</h3>
                 <div className="mb-2">
-                  <p className="text-sm text-gray-400 mb-4">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Choose from various seasonal, holiday, and custom themes. 
                     Changes will apply sitewide for all visitors.
                   </p>
@@ -590,9 +597,9 @@ This is a paragraph of text.
                 </div>
               </div>
               
-              <div className="border-t border-gray-700 pt-6">
+              <div className="border-t border-input/20 pt-6">
                 <h3 className="text-lg mb-3">theme guidelines</h3>
-                <ul className="text-sm text-gray-400 space-y-2 list-disc pl-5">
+                <ul className="text-sm text-muted-foreground space-y-2 list-disc pl-5">
                   <li>Theme changes apply to everyone visiting your site</li>
                   <li>Consider choosing themes that match your brand or current season</li>
                   <li>Dark/light mode preference is set per visitor's device</li>
@@ -603,8 +610,139 @@ This is a paragraph of text.
           </div>
         )}
         
+        {tab === "animations" && (
+          <div className="bg-card p-6 rounded-lg border border-accent/20">
+            <h2 className="text-xl mb-6">animation settings</h2>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg mb-3">site title animation</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Choose how the site title "igivegreatweb.com" animates on the homepage.
+                </p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                  <div className="border border-input/20 p-4 rounded-lg">
+                    <h4 className="mb-2">fade in</h4>
+                    <div className="h-12 flex items-center">
+                      <AnimatedText 
+                        text="igivegreatweb.com" 
+                        animationStyle="fade" 
+                        hoverTrigger={true}
+                        className="text-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Text fades in gradually when page loads
+                    </p>
+                  </div>
+                  
+                  <div className="border border-input/20 p-4 rounded-lg">
+                    <h4 className="mb-2">slide in</h4>
+                    <div className="h-12 flex items-center">
+                      <AnimatedText 
+                        text="igivegreatweb.com" 
+                        animationStyle="slide" 
+                        hoverTrigger={true}
+                        className="text-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Text slides up smoothly into position
+                    </p>
+                  </div>
+                  
+                  <div className="border border-input/20 p-4 rounded-lg">
+                    <h4 className="mb-2">bounce</h4>
+                    <div className="h-12 flex items-center">
+                      <AnimatedText 
+                        text="igivegreatweb.com" 
+                        animationStyle="bounce" 
+                        hoverTrigger={true}
+                        className="text-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Text bounces playfully when displayed
+                    </p>
+                  </div>
+                  
+                  <div className="border border-input/20 p-4 rounded-lg">
+                    <h4 className="mb-2">typing</h4>
+                    <div className="h-12 flex items-center">
+                      <AnimatedText 
+                        text="igivegreatweb.com" 
+                        animationStyle="typing" 
+                        hoverTrigger={true}
+                        className="text-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Text appears as if being typed
+                    </p>
+                  </div>
+                  
+                  <div className="border border-input/20 p-4 rounded-lg">
+                    <h4 className="mb-2">glow</h4>
+                    <div className="h-12 flex items-center">
+                      <AnimatedText 
+                        text="igivegreatweb.com" 
+                        animationStyle="glow" 
+                        hoverTrigger={true}
+                        className="text-lg"
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Text glows with pulsing light effects
+                    </p>
+                  </div>
+                  
+                  <div className="border border-input/20 p-4 rounded-lg">
+                    <h4 className="mb-2">none</h4>
+                    <div className="h-12 flex items-center">
+                      <span className="text-lg">igivegreatweb.com</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-2">
+                      No animation effect (static text)
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="mt-6 border-t border-input/20 pt-6">
+                  <h3 className="text-lg mb-3">animation options</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Configure additional animation settings.
+                  </p>
+                  
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between rounded-lg border border-input/20 p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <h4 className="font-medium">hover animation</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Trigger animation when visitors hover over the site title
+                        </p>
+                      </div>
+                      <Switch defaultChecked={true} />
+                    </div>
+                    
+                    <div className="flex items-center justify-between rounded-lg border border-input/20 p-3 shadow-sm">
+                      <div className="space-y-0.5">
+                        <h4 className="font-medium">repeat animation</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Repeat animation periodically while on the site
+                        </p>
+                      </div>
+                      <Switch defaultChecked={false} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
         {tab === "account" && (
-          <div className="bg-gray-900 p-6 rounded-lg">
+          <div className="bg-card p-6 rounded-lg border border-accent/20">
             <h2 className="text-xl mb-4">update owner credentials</h2>
             
             <div className="max-w-md">
@@ -619,7 +757,7 @@ This is a paragraph of text.
                         <FormControl>
                           <Input 
                             placeholder="owner" 
-                            className="bg-gray-800 text-white border-gray-700" 
+                            className="bg-input border-input" 
                             {...field} 
                           />
                         </FormControl>
@@ -638,7 +776,7 @@ This is a paragraph of text.
                           <Input 
                             type="password"
                             placeholder="your current password" 
-                            className="bg-gray-800 text-white border-gray-700" 
+                            className="bg-input border-input" 
                             {...field} 
                           />
                         </FormControl>
@@ -657,7 +795,7 @@ This is a paragraph of text.
                           <Input 
                             type="password"
                             placeholder="your new password" 
-                            className="bg-gray-800 text-white border-gray-700" 
+                            className="bg-input border-input" 
                             {...field} 
                           />
                         </FormControl>
@@ -676,7 +814,7 @@ This is a paragraph of text.
                           <Input 
                             type="password"
                             placeholder="confirm your new password" 
-                            className="bg-gray-800 text-white border-gray-700" 
+                            className="bg-input border-input" 
                             {...field} 
                           />
                         </FormControl>

@@ -79,10 +79,38 @@ export default {
             height: "0",
           },
         },
+        "fadeIn": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+        "slideIn": {
+          "0%": { transform: "translateY(20px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "typing": {
+          "0%": { width: "0" },
+          "100%": { width: "100%" },
+        },
+        "blink": {
+          "50%": { borderColor: "transparent" },
+        },
+        "glow": {
+          "0%": { textShadow: "0 0 5px currentColor, 0 0 10px currentColor" },
+          "100%": { textShadow: "0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fadeIn 1s ease-in forwards",
+        "slide-in": "slideIn 1s ease-out forwards",
+        "bounce": "bounce 1s ease infinite",
+        "typing": "typing 2s steps(30, end), blink 1s step-end infinite",
+        "glow": "glow 1.5s ease-in-out infinite alternate",
       },
     },
   },

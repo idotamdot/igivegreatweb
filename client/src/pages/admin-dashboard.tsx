@@ -20,13 +20,7 @@ import {
   Lock,
   User as UserIcon,
   Save,
-  FileText,
-  FileSignature,
-  CheckSquare,
-  Square,
-  Plus,
-  MessageSquare,
-  MessageCircle
+  FileText
 } from "lucide-react";
 import {
   Form,
@@ -39,16 +33,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { User, MenuLink, Agreement, UserAgreement } from "@shared/schema";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { User, MenuLink } from "@shared/schema";
 import { Textarea } from "@/components/ui/textarea";
 
 const staffSchema = z.object({
@@ -73,19 +58,6 @@ const menuLinkSchema = z.object({
   active: z.boolean(),
 });
 
-const agreementSchema = z.object({
-  title: z.string().min(2, {
-    message: "title must be at least 2 characters.",
-  }),
-  content: z.string().min(10, {
-    message: "content must be at least 10 characters.",
-  }),
-  version: z.string().min(1, {
-    message: "version is required.",
-  }),
-  active: z.boolean(),
-});
-
 const accountSchema = z.object({
   username: z.string().min(2, {
     message: "username must be at least 2 characters.",
@@ -106,18 +78,13 @@ const accountSchema = z.object({
 
 type StaffFormValues = z.infer<typeof staffSchema>;
 type MenuLinkFormValues = z.infer<typeof menuLinkSchema>;
-type AgreementFormValues = z.infer<typeof agreementSchema>;
 type AccountFormValues = z.infer<typeof accountSchema>;
 
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  const [tab, setTab] = useState<"connections" | "staff" | "menu-links" | "agreements" | "account">("connections");
+  const [tab, setTab] = useState<"connections" | "staff" | "menu-links" | "account">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
-  const [editingAgreement, setEditingAgreement] = useState<Agreement | null>(null);
-  const [signDialogOpen, setSignDialogOpen] = useState(false);
-  const [signingAgreement, setSigningAgreement] = useState<UserAgreement | null>(null);
-  const [commentText, setCommentText] = useState("");
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
     queryKey: ["/api/connections"],
@@ -144,16 +111,6 @@ export default function AdminDashboard() {
   const { data: menuLinks, isLoading: isLoadingMenuLinks } = useQuery<MenuLink[]>({
     queryKey: ["/api/menu-links"],
     enabled: tab === "menu-links",
-  });
-  
-  const { data: agreements, isLoading: isLoadingAgreements } = useQuery<Agreement[]>({
-    queryKey: ["/api/agreements"],
-    enabled: tab === "agreements",
-  });
-  
-  const { data: userAgreements, isLoading: isLoadingUserAgreements } = useQuery<UserAgreement[]>({
-    queryKey: ["/api/user-agreements"],
-    enabled: tab === "agreements",
   });
   
   const form = useForm<StaffFormValues>({
@@ -183,16 +140,6 @@ export default function AdminDashboard() {
       currentPassword: "",
       newPassword: "",
       confirmPassword: ""
-    }
-  });
-  
-  const agreementForm = useForm<AgreementFormValues>({
-    resolver: zodResolver(agreementSchema),
-    defaultValues: {
-      title: "",
-      content: "",
-      version: "1.0",
-      active: true
     }
   });
   
@@ -375,170 +322,6 @@ export default function AdminDashboard() {
   const onAccountSubmit = (values: AccountFormValues) => {
     updateAccountMutation.mutate(values);
   };
-  
-  // Agreement mutations
-  const addAgreementMutation = useMutation({
-    mutationFn: async (values: AgreementFormValues) => {
-      const res = await apiRequest("POST", "/api/agreements", values);
-      return await res.json();
-    },
-    onSuccess: () => {
-      agreementForm.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
-      toast({
-        title: "Agreement created",
-        description: "New agreement has been created successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to create agreement",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-  
-  const updateAgreementMutation = useMutation({
-    mutationFn: async (values: AgreementFormValues & { id: number }) => {
-      const { id, ...agreementData } = values;
-      const res = await apiRequest("PATCH", `/api/agreements/${id}`, agreementData);
-      return await res.json();
-    },
-    onSuccess: () => {
-      setEditingAgreement(null);
-      agreementForm.reset();
-      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
-      toast({
-        title: "Agreement updated",
-        description: "Agreement has been updated successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to update agreement",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-  
-  const removeAgreementMutation = useMutation({
-    mutationFn: async (agreementId: number) => {
-      const res = await apiRequest("DELETE", `/api/agreements/${agreementId}`);
-      return res;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
-      toast({
-        title: "Agreement removed",
-        description: "Agreement has been removed successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to remove agreement",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-  
-  const assignAgreementMutation = useMutation({
-    mutationFn: async ({ userId, agreementId }: { userId: number, agreementId: number }) => {
-      const res = await apiRequest("POST", "/api/user-agreements", {
-        userId,
-        agreementId,
-        signed: false
-      });
-      return await res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user-agreements"] });
-      toast({
-        title: "Agreement assigned",
-        description: "Agreement has been assigned to staff member successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to assign agreement",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-  
-  const onAgreementSubmit = (values: AgreementFormValues) => {
-    if (editingAgreement) {
-      updateAgreementMutation.mutate({ ...values, id: editingAgreement.id });
-    } else {
-      addAgreementMutation.mutate(values);
-    }
-  };
-  
-  const handleEditAgreement = (agreement: Agreement) => {
-    setEditingAgreement(agreement);
-    agreementForm.reset({
-      title: agreement.title,
-      content: agreement.content,
-      version: agreement.version,
-      active: agreement.active
-    });
-  };
-  
-  const handleRemoveAgreement = (agreementId: number) => {
-    removeAgreementMutation.mutate(agreementId);
-  };
-  
-  const handleAssignAgreement = (userId: number, agreementId: number) => {
-    assignAgreementMutation.mutate({ userId, agreementId });
-  };
-  
-  // Sign agreement mutation
-  const signAgreementMutation = useMutation({
-    mutationFn: async ({ userAgreementId, signed, comments }: { userAgreementId: number, signed: boolean, comments?: string }) => {
-      const res = await apiRequest("PATCH", `/api/user-agreements/${userAgreementId}`, {
-        signed,
-        comments
-      });
-      return await res.json();
-    },
-    onSuccess: () => {
-      setSignDialogOpen(false);
-      setSigningAgreement(null);
-      setCommentText("");
-      queryClient.invalidateQueries({ queryKey: ["/api/user-agreements"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/agreements"] });
-      toast({
-        title: "Agreement signed",
-        description: "Agreement has been signed successfully with your comments.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Failed to sign agreement",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-  
-  const handleOpenSignDialog = (userAgreement: UserAgreement) => {
-    setSigningAgreement(userAgreement);
-    setCommentText(userAgreement.comments || "");
-    setSignDialogOpen(true);
-  };
-  
-  const handleSignAgreement = () => {
-    if (signingAgreement) {
-      signAgreementMutation.mutate({ 
-        userAgreementId: signingAgreement.id, 
-        signed: true,
-        comments: commentText
-      });
-    }
-  };
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -572,12 +355,6 @@ export default function AdminDashboard() {
               onClick={() => setTab("menu-links")}
             >
               menu links
-            </button>
-            <button
-              className={`px-4 py-2 ${tab === "agreements" ? "border-b-2 border-white" : ""}`}
-              onClick={() => setTab("agreements")}
-            >
-              agreements
             </button>
             <button
               className={`px-4 py-2 ${tab === "account" ? "border-b-2 border-white" : ""}`}
@@ -712,19 +489,21 @@ export default function AdminDashboard() {
           </div>
         )}
         
-        {tab === "agreements" && (
+        {tab === "menu-links" && (
           <div className="grid gap-8">
             <div className="bg-gray-900 p-6 rounded-lg">
               <h2 className="text-xl mb-4">
-                {editingAgreement ? "edit agreement" : "create agreement"}
-                {editingAgreement && (
+                {editingMenuLink ? "edit menu link" : "add menu link"}
+                {editingMenuLink && (
                   <button 
                     onClick={() => {
-                      setEditingAgreement(null);
-                      agreementForm.reset({
-                        title: "",
-                        content: "",
-                        version: "1.0",
+                      setEditingMenuLink(null);
+                      menuLinkForm.reset({
+                        label: "",
+                        url: "",
+                        hasPage: false,
+                        pageContent: "",
+                        order: 0,
                         active: true
                       });
                     }}
@@ -735,18 +514,18 @@ export default function AdminDashboard() {
                 )}
               </h2>
               
-              <Form {...agreementForm}>
-                <form onSubmit={agreementForm.handleSubmit(onAgreementSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
+              <Form {...menuLinkForm}>
+                <form onSubmit={menuLinkForm.handleSubmit(onMenuLinkSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
-                      control={agreementForm.control}
-                      name="title"
+                      control={menuLinkForm.control}
+                      name="label"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>title</FormLabel>
+                          <FormLabel>label</FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="Employee Handbook" 
+                              placeholder="about us" 
                               className="bg-gray-800 text-white border-gray-700" 
                               {...field} 
                             />
@@ -757,80 +536,139 @@ export default function AdminDashboard() {
                     />
                     
                     <FormField
-                      control={agreementForm.control}
-                      name="content"
+                      control={menuLinkForm.control}
+                      name="order"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>content</FormLabel>
+                          <FormLabel>display order</FormLabel>
                           <FormControl>
-                            <textarea 
-                              placeholder="Agreement content..." 
-                              className="w-full h-40 px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-white"
-                              {...field} 
+                            <Input 
+                              type="number"
+                              min="0"
+                              className="bg-gray-800 text-white border-gray-700" 
+                              {...field}
+                              onChange={(e) => field.onChange(parseInt(e.target.value))}
                             />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={agreementForm.control}
-                        name="version"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>version</FormLabel>
-                            <FormControl>
-                              <Input 
-                                placeholder="1.0" 
-                                className="bg-gray-800 text-white border-gray-700" 
-                                {...field} 
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={agreementForm.control}
-                        name="active"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
-                            <div className="space-y-0.5">
-                              <FormLabel>active</FormLabel>
-                            </div>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
                   </div>
+                  
+                  <FormField
+                    control={menuLinkForm.control}
+                    name="hasPage"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>create a simple page</FormLabel>
+                          <FormDescription className="text-gray-400">
+                            Create a simple page instead of linking to external site
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={menuLinkForm.control}
+                    name="url"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{menuLinkForm.watch("hasPage") ? "page url (slug)" : "external url"}</FormLabel>
+                        <FormControl>
+                          <Input 
+                            placeholder={menuLinkForm.watch("hasPage") ? "about" : "https://example.com"} 
+                            className="bg-gray-800 text-white border-gray-700" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription className="text-gray-400">
+                          {menuLinkForm.watch("hasPage") 
+                            ? "This will be accessible at /page/your-slug" 
+                            : "Enter the full URL including https://"}
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  {menuLinkForm.watch("hasPage") && (
+                    <FormField
+                      control={menuLinkForm.control}
+                      name="pageContent"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>page content</FormLabel>
+                          <FormControl>
+                            <Textarea 
+                              placeholder="# My Page Title
+                              
+This is a paragraph of text.
+
+## Subtitle
+
+* List item 1
+* List item 2" 
+                              className="h-40 bg-gray-800 text-white border-gray-700" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription className="text-gray-400">
+                            Use markdown syntax for formatting
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+                  
+                  <FormField
+                    control={menuLinkForm.control}
+                    name="active"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
+                        <div className="space-y-0.5">
+                          <FormLabel>active</FormLabel>
+                          <FormDescription className="text-gray-400">
+                            Show this link in the menu
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                   
                   <GlowButton 
                     type="submit"
-                    disabled={addAgreementMutation.isPending || updateAgreementMutation.isPending}
+                    disabled={addMenuLinkMutation.isPending || updateMenuLinkMutation.isPending}
                     className="mt-2"
                   >
-                    {(addAgreementMutation.isPending || updateAgreementMutation.isPending) ? (
+                    {(addMenuLinkMutation.isPending || updateMenuLinkMutation.isPending) ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {editingAgreement ? "updating..." : "creating..."}
+                        {editingMenuLink ? "updating..." : "adding..."}
                       </>
                     ) : (
                       <>
-                        {editingAgreement ? (
+                        {editingMenuLink ? (
                           <PencilIcon className="mr-2 h-4 w-4" />
                         ) : (
-                          <FileText className="mr-2 h-4 w-4" />
+                          <LinkIcon className="mr-2 h-4 w-4" />
                         )}
-                        {editingAgreement ? "update agreement" : "create agreement"}
+                        {editingMenuLink ? "update menu link" : "add menu link"}
                       </>
                     )}
                   </GlowButton>
@@ -839,157 +677,47 @@ export default function AdminDashboard() {
             </div>
             
             <div className="bg-gray-900 p-6 rounded-lg">
-              <h2 className="text-xl mb-4">active agreements</h2>
+              <h2 className="text-xl mb-4">menu links</h2>
               
-              {isLoadingAgreements ? (
+              {isLoadingMenuLinks ? (
                 <div className="flex justify-center p-8">
                   <Loader2 className="h-8 w-8 animate-spin text-white" />
                 </div>
-              ) : agreements && agreements.length > 0 ? (
-                <div className="space-y-4">
-                  {agreements.filter((agreement: Agreement) => agreement.active).map((agreement: Agreement) => (
-                    <div key={agreement.id} className="border border-gray-700 p-4 rounded">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="text-lg font-medium">{agreement.title}</h3>
-                          <div className="flex items-center mt-1 space-x-2 text-sm text-gray-400">
-                            <span>Version: {agreement.version}</span>
-                            <span>•</span>
-                            <span>Created: {new Date(agreement.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            className="text-blue-500 hover:text-blue-400"
-                            onClick={() => handleEditAgreement(agreement)}
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                          <button
-                            className="text-red-500 hover:text-red-400"
-                            onClick={() => handleRemoveAgreement(agreement.id)}
-                            disabled={removeAgreementMutation.isPending}
-                          >
-                            {removeAgreementMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
+              ) : menuLinks?.length > 0 ? (
+                <div className="space-y-3">
+                  {menuLinks.map((menuLink: MenuLink) => (
+                    <div key={menuLink.id} className="flex justify-between items-center border border-gray-700 p-3 rounded">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{menuLink.label}</span>
+                        <span className="text-sm text-gray-400">
+                          {menuLink.hasPage ? `Page: /page/${menuLink.url}` : menuLink.url}
+                          {!menuLink.active && " (inactive)"}
+                        </span>
                       </div>
-                      <p className="text-sm text-gray-300 mt-2">{agreement.content.length > 150 ? `${agreement.content.substring(0, 150)}...` : agreement.content}</p>
-                      
-                      {staff && staff.length > 0 && (
-                        <div className="mt-4 pt-4 border-t border-gray-700">
-                          <h4 className="text-sm font-medium mb-2">Assign to team:</h4>
-                          <div className="flex flex-wrap gap-2">
-                            {staff.filter((s: User) => s.role !== "owner").map((staffMember: User) => {
-                              const userAgreement = userAgreements?.find((ua: UserAgreement) => 
-                                ua.userId === staffMember.id && 
-                                ua.agreementId === agreement.id
-                              );
-                              
-                              const isAssigned = !!userAgreement;
-                              const isSigned = userAgreement?.signed;
-                              
-                              return (
-                                <div key={staffMember.id} className="inline-flex">
-                                  <button
-                                    onClick={() => !isAssigned && handleAssignAgreement(staffMember.id, agreement.id)}
-                                    disabled={isAssigned || assignAgreementMutation.isPending}
-                                    className={`px-3 py-1.5 text-xs rounded-l-full flex items-center ${
-                                      isAssigned 
-                                        ? isSigned 
-                                          ? 'bg-green-900/30 text-green-400 border border-green-600/30' 
-                                          : 'bg-yellow-900/30 text-yellow-400 border border-yellow-600/30'
-                                        : 'bg-gray-800 hover:bg-gray-700 text-white'
-                                    }`}
-                                  >
-                                    {isAssigned ? (
-                                      <>
-                                        {isSigned ? (
-                                          <CheckSquare className="h-3 w-3 mr-1" />
-                                        ) : (
-                                          <Square className="h-3 w-3 mr-1" />
-                                        )}
-                                        {staffMember.username}
-                                      </>
-                                    ) : (
-                                      <>
-                                        <Square className="h-3 w-3 mr-1" />
-                                        {staffMember.username}
-                                      </>
-                                    )}
-                                  </button>
-                                  {isAssigned && !isSigned && (
-                                    <button
-                                      onClick={() => userAgreement && handleOpenSignDialog(userAgreement)}
-                                      className="px-2 py-1.5 text-xs rounded-r-full bg-blue-900/30 text-blue-400 border border-blue-600/30 hover:bg-blue-800/30"
-                                    >
-                                      <FileSignature className="h-3 w-3" />
-                                    </button>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
+                      <div className="flex space-x-2">
+                        <button
+                          className="text-blue-500 hover:text-blue-400"
+                          onClick={() => handleEditMenuLink(menuLink)}
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          className="text-red-500 hover:text-red-400"
+                          onClick={() => handleRemoveMenuLink(menuLink.id)}
+                          disabled={removeMenuLinkMutation.isPending}
+                        >
+                          {removeMenuLinkMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 py-4">No active agreements found.</p>
-              )}
-            </div>
-            
-            <div className="bg-gray-900 p-6 rounded-lg">
-              <h2 className="text-xl mb-4">inactive agreements</h2>
-              
-              {isLoadingAgreements ? (
-                <div className="flex justify-center p-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-white" />
-                </div>
-              ) : agreements && agreements.filter((a: Agreement) => !a.active).length > 0 ? (
-                <div className="space-y-4">
-                  {agreements.filter((agreement: Agreement) => !agreement.active).map((agreement: Agreement) => (
-                    <div key={agreement.id} className="border border-gray-700/50 p-4 rounded opacity-70">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="text-lg font-medium">{agreement.title}</h3>
-                          <div className="flex items-center mt-1 space-x-2 text-sm text-gray-400">
-                            <span>Version: {agreement.version}</span>
-                            <span>•</span>
-                            <span>Created: {new Date(agreement.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        </div>
-                        <div className="flex space-x-2">
-                          <button
-                            className="text-blue-500 hover:text-blue-400"
-                            onClick={() => handleEditAgreement(agreement)}
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
-                          <button
-                            className="text-red-500 hover:text-red-400"
-                            onClick={() => handleRemoveAgreement(agreement.id)}
-                            disabled={removeAgreementMutation.isPending}
-                          >
-                            {removeAgreementMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-sm text-gray-400 mt-2">{agreement.content.length > 150 ? `${agreement.content.substring(0, 150)}...` : agreement.content}</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-400 py-4">No inactive agreements found.</p>
+                <p className="text-gray-400 py-4">No menu links found.</p>
               )}
             </div>
           </div>
@@ -1067,7 +795,7 @@ export default function AdminDashboard() {
                         <FormControl>
                           <Input 
                             type="password"
-                            placeholder="confirm new password" 
+                            placeholder="confirm your new password" 
                             className="bg-gray-800 text-white border-gray-700" 
                             {...field} 
                           />
@@ -1077,355 +805,29 @@ export default function AdminDashboard() {
                     )}
                   />
                   
-                  <div className="pt-4">
-                    <GlowButton 
-                      type="submit"
-                      disabled={updateAccountMutation.isPending}
-                      className="w-full"
-                    >
-                      {updateAccountMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          updating credentials...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="mr-2 h-4 w-4" />
-                          update credentials
-                        </>
-                      )}
-                    </GlowButton>
-                  </div>
-                </form>
-              </Form>
-              
-              <div className="mt-6 p-4 border border-yellow-500/20 bg-yellow-500/10 rounded text-yellow-300 text-sm">
-                <p className="flex items-start">
-                  <Lock className="mr-2 h-4 w-4 mt-0.5 flex-shrink-0" />
-                  <span>After updating your credentials, you'll be logged out and will need to log in again with your new username and password.</span>
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {tab === "menu-links" && (
-          <div className="grid gap-8">
-            <div className="bg-gray-900 p-6 rounded-lg">
-              <h2 className="text-xl mb-4">
-                {editingMenuLink ? "edit menu link" : "add menu link"}
-                {editingMenuLink && (
-                  <button 
-                    onClick={() => {
-                      setEditingMenuLink(null);
-                      menuLinkForm.reset({
-                        label: "",
-                        url: "",
-                        hasPage: false,
-                        pageContent: "",
-                        order: 0,
-                        active: true
-                      });
-                    }}
-                    className="ml-4 text-sm text-gray-400 hover:text-white"
-                  >
-                    (cancel)
-                  </button>
-                )}
-              </h2>
-              
-              <Form {...menuLinkForm}>
-                <form onSubmit={menuLinkForm.handleSubmit(onMenuLinkSubmit)} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <FormField
-                      control={menuLinkForm.control}
-                      name="label"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>label</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="home" 
-                              className="bg-gray-800 text-white border-gray-700" 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={menuLinkForm.control}
-                      name="url"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>url</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="/" 
-                              className="bg-gray-800 text-white border-gray-700" 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={menuLinkForm.control}
-                      name="hasPage"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
-                          <div className="space-y-0.5">
-                            <FormLabel>create simple page</FormLabel>
-                            <p className="text-xs text-gray-400">
-                              {field.value 
-                                ? "Will create a simple page instead of linking to external site" 
-                                : "Will link to external URL"}
-                            </p>
-                          </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={menuLinkForm.control}
-                      name="order"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>order</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="number"
-                              className="bg-gray-800 text-white border-gray-700" 
-                              {...field} 
-                              onChange={(e) => field.onChange(parseInt(e.target.value))}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={menuLinkForm.control}
-                      name="active"
-                      render={({ field }) => (
-                        <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-700 p-3 shadow-sm">
-                          <div className="space-y-0.5">
-                            <FormLabel>active</FormLabel>
-                          </div>
-                          <FormControl>
-                            <Switch
-                              checked={field.value}
-                              onCheckedChange={field.onChange}
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                    
-                    {/* Conditional page content field - only show when hasPage is true */}
-                    {menuLinkForm.watch("hasPage") && (
-                      <div className="col-span-1 md:col-span-2">
-                        <FormField
-                          control={menuLinkForm.control}
-                          name="pageContent"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>page content (markdown)</FormLabel>
-                              <FormControl>
-                                <textarea 
-                                  placeholder="# Page Title 
-                                  
-Write content for this page using markdown formatting. 
-                                  
-- Bullet points work
-- **Bold** and *italic* formatting supported
-                                  
-Add any content you want for this simple page."
-                                  className="w-full h-60 px-3 py-2 bg-gray-800 text-white border border-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-white"
-                                  {...field} 
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Use markdown to format your page content. Markdown is a simple formatting syntax that allows you to add headings, links, and basic formatting.
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    )}
-                  </div>
-                  
                   <GlowButton 
                     type="submit"
-                    disabled={addMenuLinkMutation.isPending || updateMenuLinkMutation.isPending}
-                    className="mt-2"
+                    disabled={updateAccountMutation.isPending}
+                    className="mt-4"
                   >
-                    {(addMenuLinkMutation.isPending || updateMenuLinkMutation.isPending) ? (
+                    {updateAccountMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        {editingMenuLink ? "updating..." : "adding..."}
+                        updating...
                       </>
                     ) : (
                       <>
-                        {editingMenuLink ? (
-                          <PencilIcon className="mr-2 h-4 w-4" />
-                        ) : (
-                          <LinkIcon className="mr-2 h-4 w-4" />
-                        )}
-                        {editingMenuLink ? "update menu link" : "add menu link"}
+                        <Lock className="mr-2 h-4 w-4" />
+                        update credentials
                       </>
                     )}
                   </GlowButton>
                 </form>
               </Form>
             </div>
-            
-            <div className="bg-gray-900 p-6 rounded-lg">
-              <h2 className="text-xl mb-4">current menu links</h2>
-              
-              {isLoadingMenuLinks ? (
-                <div className="flex justify-center p-8">
-                  <Loader2 className="h-8 w-8 animate-spin text-white" />
-                </div>
-              ) : menuLinks && menuLinks.length > 0 ? (
-                <div className="space-y-3">
-                  {menuLinks.map((menuLink: MenuLink) => (
-                    <div key={menuLink.id} className="grid grid-cols-12 gap-2 border border-gray-700 p-3 rounded">
-                      <div className="col-span-1 flex items-center">
-                        <span className="text-gray-500 text-sm">{menuLink.order}</span>
-                      </div>
-                      <div className="col-span-2 flex items-center">
-                        <span className={`${!menuLink.active ? "line-through text-gray-500" : ""}`}>{menuLink.label}</span>
-                      </div>
-                      <div className="col-span-3 flex items-center">
-                        <span className="text-blue-400">{menuLink.url}</span>
-                      </div>
-                      <div className="col-span-1 flex items-center justify-center">
-                        <span className={`text-sm ${menuLink.active ? "text-green-500" : "text-gray-500"}`}>
-                          {menuLink.active ? <ToggleRight className="h-4 w-4" /> : <ToggleLeft className="h-4 w-4" />}
-                        </span>
-                      </div>
-                      <div className="col-span-2 flex items-center">
-                        <span className={`text-sm ${menuLink.hasPage ? "text-purple-400" : "text-gray-400"}`}>
-                          {menuLink.hasPage ? "Simple Page" : "External Link"}
-                        </span>
-                      </div>
-                      <div className="col-span-3 flex items-center justify-end space-x-2">
-                        <button
-                          className="text-yellow-500 hover:text-yellow-400"
-                          onClick={() => handleEditMenuLink(menuLink)}
-                          disabled={updateMenuLinkMutation.isPending}
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          className="text-red-500 hover:text-red-400"
-                          onClick={() => handleRemoveMenuLink(menuLink.id)}
-                          disabled={removeMenuLinkMutation.isPending}
-                        >
-                          {removeMenuLinkMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            <Trash2 className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-400 py-4">No menu links found.</p>
-              )}
-            </div>
           </div>
         )}
-        
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          {user ? (
-            <p>logged in as: {user.username} ({user.role})</p>
-          ) : (
-            <p>development mode: no user authentication</p>
-          )}
-          <Link href="/" className="text-gray-400 hover:text-white">
-            back to home
-          </Link>
-        </div>
       </div>
-      
-      {/* Sign Agreement Dialog */}
-      <Dialog open={signDialogOpen} onOpenChange={setSignDialogOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-xl text-white">Sign Agreement</DialogTitle>
-            <DialogDescription className="text-gray-400">
-              {signingAgreement && (
-                <span>Sign the "{agreements?.find(a => a.id === signingAgreement.agreementId)?.title}" agreement.</span>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div className="rounded bg-black/40 p-4 max-h-40 overflow-y-auto text-sm">
-              {signingAgreement && (
-                <p className="text-gray-300">
-                  {agreements?.find(a => a.id === signingAgreement.agreementId)?.content}
-                </p>
-              )}
-            </div>
-            
-            <div className="space-y-2">
-              <label htmlFor="comments" className="text-sm font-medium text-gray-300">
-                Comments or feedback
-              </label>
-              <Textarea
-                id="comments"
-                placeholder="Add any comments or feedback about this agreement..."
-                className="bg-gray-800 text-white border-gray-700"
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-              />
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <button
-              type="button"
-              onClick={() => setSignDialogOpen(false)}
-              className="px-4 py-2 rounded-md text-gray-300 bg-gray-800 hover:bg-gray-700"
-            >
-              Cancel
-            </button>
-            <GlowButton
-              onClick={handleSignAgreement}
-              disabled={signAgreementMutation.isPending}
-            >
-              {signAgreementMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing...
-                </>
-              ) : (
-                <>
-                  <FileSignature className="mr-2 h-4 w-4" />
-                  Sign Agreement
-                </>
-              )}
-            </GlowButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

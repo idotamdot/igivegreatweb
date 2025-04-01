@@ -1,10 +1,8 @@
 import { 
-  users, connections, menuLinks, agreements, userAgreements,
+  users, connections, menuLinks,
   type User, type InsertUser, 
   type Connection, type InsertConnection, 
-  type MenuLink, type InsertMenuLink,
-  type Agreement, type InsertAgreement,
-  type UserAgreement, type InsertUserAgreement 
+  type MenuLink, type InsertMenuLink
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -32,21 +30,6 @@ export interface IStorage {
   updateMenuLink(id: number, menuLink: Partial<InsertMenuLink>): Promise<MenuLink | undefined>;
   deleteMenuLink(id: number): Promise<void>;
   
-  // Agreement methods
-  createAgreement(agreement: InsertAgreement): Promise<Agreement>;
-  getAgreement(id: number): Promise<Agreement | undefined>;
-  getAllAgreements(): Promise<Agreement[]>;
-  getActiveAgreements(): Promise<Agreement[]>;
-  updateAgreement(id: number, agreement: Partial<InsertAgreement>): Promise<Agreement | undefined>;
-  deleteAgreement(id: number): Promise<void>;
-  
-  // User Agreement methods
-  createUserAgreement(userAgreement: InsertUserAgreement): Promise<UserAgreement>;
-  getUserAgreement(userId: number, agreementId: number): Promise<UserAgreement | undefined>;
-  getUserAgreements(userId: number): Promise<UserAgreement[]>;
-  getAgreementUsers(agreementId: number): Promise<UserAgreement[]>;
-  updateUserAgreement(id: number, signed: boolean, comments?: string, signedAt?: Date): Promise<UserAgreement | undefined>;
-  
   sessionStore: session.Store;
 }
 
@@ -54,26 +37,18 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private connections: Map<number, Connection>;
   private menuLinks: Map<number, MenuLink>;
-  private agreements: Map<number, Agreement>;
-  private userAgreements: Map<number, UserAgreement>;
   private userCurrentId: number;
   private connectionCurrentId: number;
   private menuLinkCurrentId: number;
-  private agreementCurrentId: number;
-  private userAgreementCurrentId: number;
   sessionStore: session.Store;
 
   constructor() {
     this.users = new Map();
     this.connections = new Map();
     this.menuLinks = new Map();
-    this.agreements = new Map();
-    this.userAgreements = new Map();
     this.userCurrentId = 1;
     this.connectionCurrentId = 1;
     this.menuLinkCurrentId = 1;
-    this.agreementCurrentId = 1;
-    this.userAgreementCurrentId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
@@ -180,8 +155,8 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.userCurrentId++;
-    // Set default role to "staff" if not provided
-    const role = insertUser.role || "staff";
+    // Set default role to "admin" 
+    const role = insertUser.role || "admin";
     const user: User = { ...insertUser, id, role };
     this.users.set(id, user);
     return user;
@@ -293,148 +268,6 @@ export class MemStorage implements IStorage {
   
   async deleteMenuLink(id: number): Promise<void> {
     this.menuLinks.delete(id);
-  }
-  
-  // Agreement methods
-  async createAgreement(insertAgreement: InsertAgreement): Promise<Agreement> {
-    const id = this.agreementCurrentId++;
-    const now = new Date();
-    
-    // Get all active team members
-    const activeTeamMembers = Array.from(this.users.values())
-      .filter(user => user.role !== "owner")
-      .map(user => ({ id: user.id, username: user.username }));
-    
-    const agreement: Agreement = {
-      ...insertAgreement,
-      id,
-      active: insertAgreement.active ?? true,
-      proposalDate: insertAgreement.proposalDate ?? now,
-      activeMembers: insertAgreement.activeMembers ?? JSON.stringify(activeTeamMembers),
-      masterCopy: insertAgreement.masterCopy ?? true,
-      compiledComments: insertAgreement.compiledComments ?? "",
-      createdAt: now,
-      updatedAt: now
-    };
-    
-    this.agreements.set(id, agreement);
-    return agreement;
-  }
-  
-  async getAgreement(id: number): Promise<Agreement | undefined> {
-    return this.agreements.get(id);
-  }
-  
-  async getAllAgreements(): Promise<Agreement[]> {
-    return Array.from(this.agreements.values())
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-  
-  async getActiveAgreements(): Promise<Agreement[]> {
-    return Array.from(this.agreements.values())
-      .filter(agreement => agreement.active)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-  
-  async updateAgreement(id: number, agreementUpdate: Partial<InsertAgreement>): Promise<Agreement | undefined> {
-    const existingAgreement = this.agreements.get(id);
-    if (!existingAgreement) {
-      return undefined;
-    }
-    
-    const updatedAgreement: Agreement = {
-      ...existingAgreement,
-      ...agreementUpdate,
-      updatedAt: new Date()
-    };
-    
-    this.agreements.set(id, updatedAgreement);
-    return updatedAgreement;
-  }
-  
-  async deleteAgreement(id: number): Promise<void> {
-    this.agreements.delete(id);
-  }
-  
-  // User Agreement methods
-  async createUserAgreement(insertUserAgreement: InsertUserAgreement): Promise<UserAgreement> {
-    const id = this.userAgreementCurrentId++;
-    const now = new Date();
-    
-    const userAgreement: UserAgreement = {
-      ...insertUserAgreement,
-      id,
-      signed: insertUserAgreement.signed ?? false,
-      signedAt: insertUserAgreement.signed ? (insertUserAgreement.signedAt || now) : null,
-      comments: insertUserAgreement.comments || null,
-      createdAt: now
-    };
-    
-    this.userAgreements.set(id, userAgreement);
-    return userAgreement;
-  }
-  
-  async getUserAgreement(userId: number, agreementId: number): Promise<UserAgreement | undefined> {
-    return Array.from(this.userAgreements.values()).find(
-      ua => ua.userId === userId && ua.agreementId === agreementId
-    );
-  }
-  
-  async getUserAgreements(userId: number): Promise<UserAgreement[]> {
-    return Array.from(this.userAgreements.values())
-      .filter(ua => ua.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-  
-  async getAgreementUsers(agreementId: number): Promise<UserAgreement[]> {
-    return Array.from(this.userAgreements.values())
-      .filter(ua => ua.agreementId === agreementId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-  }
-  
-  async updateUserAgreement(
-    id: number, 
-    signed: boolean, 
-    comments?: string, 
-    signedAt?: Date
-  ): Promise<UserAgreement | undefined> {
-    const existingUserAgreement = this.userAgreements.get(id);
-    if (!existingUserAgreement) {
-      return undefined;
-    }
-    
-    const updatedUserAgreement: UserAgreement = {
-      ...existingUserAgreement,
-      signed,
-      comments: comments || existingUserAgreement.comments,
-      signedAt: signed ? (signedAt || new Date()) : null
-    };
-    
-    this.userAgreements.set(id, updatedUserAgreement);
-    
-    // If agreement is signed and there are comments, update the master agreement's compiled comments
-    if (signed && comments) {
-      const agreement = this.agreements.get(existingUserAgreement.agreementId);
-      if (agreement && agreement.masterCopy) {
-        const user = this.users.get(existingUserAgreement.userId);
-        const username = user ? user.username : `User #${existingUserAgreement.userId}`;
-        
-        // Get existing compiled comments or initialize with empty string
-        const existingComments = agreement.compiledComments || '';
-        
-        // Add this comment with username and timestamp
-        const commentWithMeta = `\n\n--- Comment from ${username} on ${new Date().toLocaleString()} ---\n${comments}`;
-        
-        // Update the agreement with the new compiled comments
-        this.agreements.set(existingUserAgreement.agreementId, {
-          ...agreement,
-          compiledComments: existingComments + commentWithMeta,
-          updatedAt: new Date()
-        });
-      }
-    }
-    
-    return updatedUserAgreement;
   }
 }
 

@@ -505,7 +505,7 @@ export default function AdminDashboard() {
               className={`px-4 py-2 ${tab === "staff" ? "border-b-2 border-white" : ""}`}
               onClick={() => setTab("staff")}
             >
-              staff management
+              team management
             </button>
             <button
               className={`px-4 py-2 ${tab === "menu-links" ? "border-b-2 border-white" : ""}`}
@@ -555,7 +555,7 @@ export default function AdminDashboard() {
         {tab === "staff" && (
           <div className="grid gap-8">
             <div className="bg-gray-900 p-6 rounded-lg">
-              <h2 className="text-xl mb-4">add staff member</h2>
+              <h2 className="text-xl mb-4">add team member</h2>
               
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -568,7 +568,7 @@ export default function AdminDashboard() {
                           <FormLabel>username</FormLabel>
                           <FormControl>
                             <Input 
-                              placeholder="staff username" 
+                              placeholder="team member username" 
                               className="bg-gray-800 text-white border-gray-700" 
                               {...field} 
                             />
@@ -587,7 +587,7 @@ export default function AdminDashboard() {
                           <FormControl>
                             <Input 
                               type="password"
-                              placeholder="staff password" 
+                              placeholder="team member password" 
                               className="bg-gray-800 text-white border-gray-700" 
                               {...field} 
                             />
@@ -611,7 +611,7 @@ export default function AdminDashboard() {
                     ) : (
                       <>
                         <UserPlus className="mr-2 h-4 w-4" />
-                        add staff member
+                        add team member
                       </>
                     )}
                   </GlowButton>
@@ -620,7 +620,7 @@ export default function AdminDashboard() {
             </div>
             
             <div className="bg-gray-900 p-6 rounded-lg">
-              <h2 className="text-xl mb-4">current staff</h2>
+              <h2 className="text-xl mb-4">current team</h2>
               
               {isLoadingStaff ? (
                 <div className="flex justify-center p-8">
@@ -646,7 +646,7 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 py-4">No staff members found.</p>
+                <p className="text-gray-400 py-4">No team members found.</p>
               )}
             </div>
           </div>
@@ -822,7 +822,7 @@ export default function AdminDashboard() {
                       
                       {staff && staff.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-gray-700">
-                          <h4 className="text-sm font-medium mb-2">Assign to staff:</h4>
+                          <h4 className="text-sm font-medium mb-2">Assign to team:</h4>
                           <div className="flex flex-wrap gap-2">
                             {staff.filter((s: User) => s.role !== "owner").map((staffMember: User) => {
                               const isAssigned = userAgreements?.some((ua: UserAgreement) => 

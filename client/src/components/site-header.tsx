@@ -22,7 +22,7 @@ export default function SiteHeader({ onMenuClick, onConnectClick }: SiteHeaderPr
         <Menu className="h-6 w-6 text-white" />
       </button>
 
-      {/* Theme Toggle */}
+      {/* Theme Controls */}
       <div className="absolute left-1/2 -translate-x-1/2">
         <ThemeToggle />
       </div>

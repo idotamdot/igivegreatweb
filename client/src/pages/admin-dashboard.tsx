@@ -8,6 +8,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { Link } from "wouter";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeSelector } from "@/components/theme-selector";
 import { GlowButton } from "@/components/ui/glow-button";
 import { 
   Loader2, 
@@ -74,7 +75,7 @@ type AccountFormValues = z.infer<typeof accountSchema>;
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  const [tab, setTab] = useState<"connections" | "menu-links" | "account">("connections");
+  const [tab, setTab] = useState<"connections" | "menu-links" | "account" | "themes">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
@@ -277,7 +278,6 @@ export default function AdminDashboard() {
         <header className="flex justify-between items-center mb-8">
           <h1 className="text-2xl">owner dashboard</h1>
           <div className="flex items-center space-x-4">
-            <ThemeToggle />
             <GlowButton onClick={() => logoutMutation.mutate()}>
               logout
             </GlowButton>
@@ -298,6 +298,12 @@ export default function AdminDashboard() {
               onClick={() => setTab("menu-links")}
             >
               menu links
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "themes" ? "border-b-2 border-white" : ""}`}
+              onClick={() => setTab("themes")}
+            >
+              themes
             </button>
             <button
               className={`px-4 py-2 ${tab === "account" ? "border-b-2 border-white" : ""}`}
@@ -554,6 +560,45 @@ This is a paragraph of text.
               ) : (
                 <p className="text-gray-400 py-4">No menu links found.</p>
               )}
+            </div>
+          </div>
+        )}
+        
+        {tab === "themes" && (
+          <div className="bg-gray-900 p-6 rounded-lg">
+            <h2 className="text-xl mb-6">theme settings</h2>
+            
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg mb-3">current theme</h3>
+                <div className="flex items-center gap-4">
+                  <ThemeToggle />
+                  <p className="text-sm text-gray-400">Switch between light and dark mode</p>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-lg mb-3">theme colors</h3>
+                <div className="mb-2">
+                  <p className="text-sm text-gray-400 mb-4">
+                    Choose from various seasonal, holiday, and custom themes. 
+                    Changes will apply sitewide for all visitors.
+                  </p>
+                  <div className="w-full md:w-1/2">
+                    <ThemeSelector />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="border-t border-gray-700 pt-6">
+                <h3 className="text-lg mb-3">theme guidelines</h3>
+                <ul className="text-sm text-gray-400 space-y-2 list-disc pl-5">
+                  <li>Theme changes apply to everyone visiting your site</li>
+                  <li>Consider choosing themes that match your brand or current season</li>
+                  <li>Dark/light mode preference is set per visitor's device</li>
+                  <li>Custom themes have unique color combinations not tied to specific seasons</li>
+                </ul>
+              </div>
             </div>
           </div>
         )}

@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --primary: #FFFFFF;
-    --background: #000000;
-    --foreground: #FFFFFF;
-    --accent: #FFFFFF;
+    --primary: #000000;
+    --background: #FFFFFF;
+    --foreground: #1A1A1A;
+    --accent: #333333;
     
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
@@ -61,12 +61,29 @@
 @layer components {
   .menu-indicator-text {
     @apply font-medium tracking-wide;
+  }
+  
+  /* Light mode menu indicator */
+  :root .menu-indicator-text {
+    text-shadow: 0 0 5px rgba(0,0,0,0.3),
+                 0 0 10px rgba(0,0,0,0.2);
+    @apply text-black;
+  }
+  
+  :root .menu-indicator-arrow {
+    filter: drop-shadow(0 0 5px rgba(0,0,0,0.3))
+           drop-shadow(0 0 10px rgba(0,0,0,0.2));
+  }
+  
+  /* Dark mode menu indicator */
+  .dark .menu-indicator-text {
     text-shadow: 0 0 5px rgba(255,255,255,0.8),
                  0 0 10px rgba(255,255,255,0.5),
                  0 0 15px rgba(255,255,255,0.4);
+    @apply text-white;
   }
   
-  .menu-indicator-arrow {
+  .dark .menu-indicator-arrow {
     filter: drop-shadow(0 0 5px rgba(255,255,255,0.8))
            drop-shadow(0 0 10px rgba(255,255,255,0.5));
   }

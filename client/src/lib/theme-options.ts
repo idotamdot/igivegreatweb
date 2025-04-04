@@ -187,8 +187,8 @@ export const defaultLightTheme: ThemeType = {
   name: "default light",
   primary: "#000000",
   background: "#FFFFFF",
-  text: "#000000",
-  accent: "#000000",
+  text: "#1A1A1A",
+  accent: "#333333",
   variant: "professional",
-  description: "Default light theme with black on white"
+  description: "Default light theme with dark text on white"
 };

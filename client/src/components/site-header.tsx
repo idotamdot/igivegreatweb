@@ -19,7 +19,7 @@ export default function SiteHeader({ onMenuClick, onConnectClick }: SiteHeaderPr
         className="flex flex-col justify-center items-center space-y-1.5 w-8 h-8 z-50"
         aria-label="Menu"
       >
-        <Menu className="h-6 w-6 text-white" />
+        <Menu className="h-6 w-6 text-black dark:text-white" />
       </button>
 
       {/* Theme Controls */}

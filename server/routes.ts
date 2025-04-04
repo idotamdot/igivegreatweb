@@ -9,6 +9,13 @@ import {
 } from "@shared/schema";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import Stripe from "stripe";
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const scryptAsync = promisify(scrypt);
 
@@ -391,6 +398,123 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(200).json(updatedUser);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // API endpoint to get all available services
+  app.get("/api/services", (req, res) => {
+    const services = [
+      {
+        id: 'web-basic',
+        name: 'Basic Website',
+        description: 'A responsive website with up to 5 pages, including contact form and basic SEO.',
+        price: 1499,
+        features: [
+          '5 Page Website',
+          'Mobile Responsive Design',
+          'Contact Form',
+          'Basic SEO Setup',
+          '1 Round of Revisions',
+          '2 Weeks Delivery'
+        ]
+      },
+      {
+        id: 'web-premium',
+        name: 'Premium Website',
+        description: 'A comprehensive website with up to 10 pages, custom design, and enhanced features.',
+        price: 2999,
+        features: [
+          '10 Page Website',
+          'Custom Design',
+          'Contact Form & Newsletter',
+          'Advanced SEO Setup',
+          'Social Media Integration',
+          '3 Rounds of Revisions',
+          '4 Weeks Delivery'
+        ]
+      },
+      {
+        id: 'web-ecommerce',
+        name: 'E-Commerce Website',
+        description: 'A full-featured online store with product management, payment processing, and order tracking.',
+        price: 4999,
+        features: [
+          'Full E-Commerce Functionality',
+          'Up to 50 Product Listings',
+          'Secure Payment Processing',
+          'Inventory Management',
+          'Order Tracking',
+          'Customer Account Creation',
+          'Mobile Shopping Experience',
+          '6 Weeks Delivery'
+        ]
+      },
+      {
+        id: 'design-logo',
+        name: 'Logo Design',
+        description: 'Professional logo design with multiple concepts and iterations.',
+        price: 499,
+        features: [
+          '3 Initial Concepts',
+          '3 Rounds of Revisions',
+          'Final Files in All Formats',
+          'Full Copyright Ownership',
+          '1 Week Delivery'
+        ]
+      },
+      {
+        id: 'design-brand',
+        name: 'Brand Identity Package',
+        description: 'Complete brand identity including logo, color palette, typography, and brand guidelines.',
+        price: 1299,
+        features: [
+          'Logo Design',
+          'Color Palette',
+          'Typography Selection',
+          'Brand Guidelines Document',
+          'Business Card Design',
+          'Letterhead Design',
+          '2 Weeks Delivery'
+        ]
+      },
+      {
+        id: 'marketing-seo',
+        name: 'SEO Package',
+        description: 'Comprehensive SEO optimization to improve your search engine rankings.',
+        price: 899,
+        features: [
+          'Keyword Research',
+          'On-Page SEO Optimization',
+          'Content Recommendations',
+          'Technical SEO Audit',
+          'Monthly Performance Report',
+          'Ongoing Support for 3 Months'
+        ]
+      }
+    ];
+    
+    res.json(services);
+  });
+  
+  // Stripe payment route for service payments
+  app.post("/api/create-payment-intent", async (req, res) => {
+    try {
+      const { amount, serviceId, serviceName } = req.body;
+      
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount, // Amount should be in cents (e.g., 1499 for $14.99)
+        currency: "usd",
+        metadata: {
+          serviceId,
+          serviceName
+        }
+      });
+      
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      res
+        .status(500)
+        .json({ message: "Error creating payment intent: " + error.message });
     }
   });
 

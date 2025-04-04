@@ -32,6 +32,9 @@ export default function SiteHeader({ onMenuClick, onConnectClick }: SiteHeaderPr
         <GlowButton size="sm" onClick={onConnectClick}>
           let's connect
         </GlowButton>
+        <GlowButton size="sm" onClick={() => navigate("/services")}>
+          our services
+        </GlowButton>
         <GlowButton size="sm" onClick={() => navigate("/client")}>
           client login
         </GlowButton>

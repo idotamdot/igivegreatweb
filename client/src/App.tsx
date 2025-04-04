@@ -9,6 +9,8 @@ import ClientDashboard from "@/pages/client-dashboard";
 import ProjectDetails from "@/pages/project-details";
 import MessageDetails from "@/pages/message-details";
 import ContentPage from "@/pages/content-page";
+import ServicesPage from "@/pages/services-page";
+import Checkout from "@/pages/checkout";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
 // Temporarily commenting out protected route for development
@@ -25,6 +27,9 @@ function Router() {
       <Route path="/client" component={ClientDashboard} />
       <Route path="/project/:id" component={ProjectDetails} />
       <Route path="/message/:id" component={MessageDetails} />
+      {/* Services and checkout routes */}
+      <Route path="/services" component={ServicesPage} />
+      <Route path="/checkout" component={Checkout} />
       {/* Route for content pages created from menu links */}
       <Route path="/page/:slug" component={ContentPage} />
       <Route component={NotFound} />

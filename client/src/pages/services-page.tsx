@@ -71,7 +71,7 @@ export default function ServicesPage() {
       <div className="text-center mb-8 md:mb-12">
         <AnimatedText 
           text="our services" 
-          className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 title-glow"
           animationStyle="fade"
         />
         <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
@@ -82,9 +82,9 @@ export default function ServicesPage() {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {services?.map((service) => (
-          <Card key={service.id} className="flex flex-col h-full card-glow">
+          <Card key={service.id} className="flex flex-col h-full card-glow-enhanced">
             <CardHeader className="p-4 md:p-6">
-              <CardTitle className="text-lg sm:text-xl">{service.name}</CardTitle>
+              <CardTitle className="text-lg sm:text-xl price-glow">{service.name}</CardTitle>
               <CardDescription className="text-sm">{service.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow p-4 md:p-6 pt-0 md:pt-0">

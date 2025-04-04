@@ -160,4 +160,51 @@
     text-shadow: 0 0 5px rgba(255,255,255,0.5),
                  0 0 10px rgba(255,255,255,0.3);
   }
+  
+  /* Title glow effects */
+  .title-glow {
+    position: relative;
+  }
+  
+  /* Light theme title glow */
+  :root .title-glow {
+    text-shadow: 0 0 5px rgba(0,0,0,0.4),
+                 0 0 15px rgba(0,0,0,0.2);
+  }
+  
+  /* Dark theme title glow */
+  .dark .title-glow {
+    text-shadow: 0 0 10px rgba(255,255,255,0.7),
+                 0 0 20px rgba(255,255,255,0.4),
+                 0 0 30px rgba(255,255,255,0.2);
+  }
+  
+  /* Enhanced card glow effects */
+  /* Light theme enhanced card glow */
+  :root .card-glow-enhanced {
+    box-shadow: 0 0 10px rgba(0,0,0,0.2),
+                0 0 20px rgba(0,0,0,0.1);
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: all 0.4s ease;
+  }
+  
+  :root .card-glow-enhanced:hover {
+    box-shadow: 0 0 20px rgba(0,0,0,0.3),
+                0 0 40px rgba(0,0,0,0.15);
+    transform: translateY(-8px);
+  }
+  
+  /* Dark theme enhanced card glow */
+  .dark .card-glow-enhanced {
+    box-shadow: 0 0 10px rgba(255,255,255,0.15),
+                0 0 20px rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: all 0.4s ease;
+  }
+  
+  .dark .card-glow-enhanced:hover {
+    box-shadow: 0 0 20px rgba(255,255,255,0.25),
+                0 0 40px rgba(255,255,255,0.12);
+    transform: translateY(-8px);
+  }
 }

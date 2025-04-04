@@ -102,6 +102,16 @@ export default {
           "0%": { textShadow: "0 0 5px currentColor, 0 0 10px currentColor" },
           "100%": { textShadow: "0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor" },
         },
+        "pulse": {
+          "0%, 100%": { 
+            opacity: "1",
+            transform: "scale(1)" 
+          },
+          "50%": { 
+            opacity: "0.8",
+            transform: "scale(1.05)" 
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -111,6 +121,7 @@ export default {
         "bounce": "bounce 1s ease infinite",
         "typing": "typing 2s steps(30, end), blink 1s step-end infinite",
         "glow": "glow 1.5s ease-in-out infinite alternate",
+        "pulse": "pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

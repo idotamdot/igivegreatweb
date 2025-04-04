@@ -56,3 +56,18 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* Menu indicator styling */
+@layer components {
+  .menu-indicator-text {
+    @apply font-medium tracking-wide;
+    text-shadow: 0 0 5px rgba(255,255,255,0.8),
+                 0 0 10px rgba(255,255,255,0.5),
+                 0 0 15px rgba(255,255,255,0.4);
+  }
+  
+  .menu-indicator-arrow {
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.8))
+           drop-shadow(0 0 10px rgba(255,255,255,0.5));
+  }
+}

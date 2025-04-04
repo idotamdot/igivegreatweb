@@ -145,7 +145,7 @@ export default function ClientDashboard() {
                           </div>
                           
                           <div className="mt-3">
-                            <div className="w-full bg-background rounded-full h-2.5">
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                               <div 
                                 className="bg-primary h-2.5 rounded-full" 
                                 style={{ width: `${project.completion}%` }}

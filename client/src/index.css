@@ -87,4 +87,77 @@
     filter: drop-shadow(0 0 5px rgba(255,255,255,0.8))
            drop-shadow(0 0 10px rgba(255,255,255,0.5));
   }
+  
+  /* Glow button effects */
+  .glow-button {
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* Light theme glow effect (black glow) */
+  :root .glow-button {
+    box-shadow: 0 0 5px rgba(0,0,0,0.3),
+                0 0 10px rgba(0,0,0,0.2);
+  }
+  
+  :root .glow-button:hover {
+    box-shadow: 0 0 10px rgba(0,0,0,0.4),
+                0 0 20px rgba(0,0,0,0.2);
+  }
+  
+  /* Dark theme glow effect (white glow) */
+  .dark .glow-button {
+    box-shadow: 0 0 5px rgba(255,255,255,0.3),
+                0 0 10px rgba(255,255,255,0.2);
+  }
+  
+  .dark .glow-button:hover {
+    box-shadow: 0 0 15px rgba(255,255,255,0.4),
+                0 0 30px rgba(255,255,255,0.2);
+  }
+  
+  /* Card glow effects */
+  .card-glow {
+    transition: all 0.3s ease;
+  }
+  
+  /* Light theme card glow */
+  :root .card-glow {
+    box-shadow: 0 0 5px rgba(0,0,0,0.1),
+                0 0 10px rgba(0,0,0,0.05);
+  }
+  
+  :root .card-glow:hover {
+    box-shadow: 0 0 15px rgba(0,0,0,0.2),
+                0 0 30px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+  }
+  
+  /* Dark theme card glow */
+  .dark .card-glow {
+    box-shadow: 0 0 5px rgba(255,255,255,0.1),
+                0 0 10px rgba(255,255,255,0.05);
+  }
+  
+  .dark .card-glow:hover {
+    box-shadow: 0 0 15px rgba(255,255,255,0.2),
+                0 0 30px rgba(255,255,255,0.1);
+    transform: translateY(-5px);
+  }
+  
+  /* Price glow effects */
+  .price-glow {
+    position: relative;
+  }
+  
+  /* Light theme price glow */
+  :root .price-glow {
+    text-shadow: 0 0 2px rgba(0,0,0,0.2);
+  }
+  
+  /* Dark theme price glow */
+  .dark .price-glow {
+    text-shadow: 0 0 5px rgba(255,255,255,0.5),
+                 0 0 10px rgba(255,255,255,0.3);
+  }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, ArrowLeft } from "lucide-react";
 import { 
   Card, 
   CardContent, 
@@ -58,7 +58,17 @@ export default function ServicesPage() {
   
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 min-h-screen">
-      <div className="text-center mb-8 md:mb-12 pt-10 sm:pt-16">
+      <div className="mb-6 pt-10">
+        <GlowButton 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-1 hover:bg-black/10 dark:hover:bg-white/10" 
+          onClick={() => navigate("/")}
+        >
+          <ArrowLeft className="h-4 w-4" /> back to home
+        </GlowButton>
+      </div>
+      <div className="text-center mb-8 md:mb-12">
         <AnimatedText 
           text="our services" 
           className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4"
@@ -72,13 +82,13 @@ export default function ServicesPage() {
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {services?.map((service) => (
-          <Card key={service.id} className="flex flex-col h-full hover:shadow-lg transition-shadow">
+          <Card key={service.id} className="flex flex-col h-full card-glow">
             <CardHeader className="p-4 md:p-6">
               <CardTitle className="text-lg sm:text-xl">{service.name}</CardTitle>
               <CardDescription className="text-sm">{service.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow p-4 md:p-6 pt-0 md:pt-0">
-              <p className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">${(service.price / 100).toFixed(2)}</p>
+              <p className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 price-glow">${(service.price / 100).toFixed(2)}</p>
               <ul className="space-y-2 text-sm sm:text-base">
                 {service.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
@@ -89,12 +99,12 @@ export default function ServicesPage() {
               </ul>
             </CardContent>
             <CardFooter className="p-4 md:p-6">
-              <Button 
+              <GlowButton 
                 className="w-full" 
                 onClick={() => handleSelectService(service)}
               >
                 select this service
-              </Button>
+              </GlowButton>
             </CardFooter>
           </Card>
         ))}

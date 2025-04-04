@@ -93,13 +93,12 @@ export default function ConnectDialog({ open, onOpenChange }: ConnectDialogProps
       >
         <DialogHeader className="flex flex-row justify-between items-center">
           <DialogTitle className="text-white text-left title-glow">let's connect</DialogTitle>
-          <button 
-            className="text-white hover:text-primary transition-colors" 
+          <DialogClose 
+            className="text-white hover:text-primary transition-colors cursor-pointer" 
             aria-label="Close"
-            onClick={() => onOpenChange(false)}
           >
             <X className="h-6 w-6" />
-          </button>
+          </DialogClose>
         </DialogHeader>
         
         <Form {...form}>
@@ -163,7 +162,7 @@ export default function ConnectDialog({ open, onOpenChange }: ConnectDialogProps
               className="w-full pulse-glow"
               disabled={submitMutation.isPending}
             >
-              {submitMutation.isPending ? "submitting..." : "push to upgrade my life"}
+              {submitMutation.isPending ? "connecting..." : "push to get connected"}
             </GlowButton>
           </form>
         </Form>

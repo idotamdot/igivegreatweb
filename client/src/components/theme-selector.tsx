@@ -116,7 +116,7 @@ export function ThemeSelector() {
           <span className="sr-only">toggle theme selector</span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent className="w-80" align="start" sideOffset={5} alignOffset={0}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="font-medium leading-none">theme selector</h4>

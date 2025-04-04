@@ -127,7 +127,7 @@ export default function ClientDashboard() {
             <div className="bg-card p-6 rounded-lg border border-accent/20">
               {tab === "projects" && (
                 <>
-                  <h2 className="text-xl mb-4">your projects</h2>
+                  <h2 className="text-xl mb-4 text-foreground">your projects</h2>
                   
                   {isLoadingProjects ? (
                     <div className="flex justify-center p-8">
@@ -172,7 +172,7 @@ export default function ClientDashboard() {
               
               {tab === "messages" && (
                 <>
-                  <h2 className="text-xl mb-4">messages</h2>
+                  <h2 className="text-xl mb-4 text-foreground">messages</h2>
                   
                   {isLoadingMessages ? (
                     <div className="flex justify-center p-8">
@@ -207,7 +207,7 @@ export default function ClientDashboard() {
               {tab === "files" && (
                 <div className="text-center py-10">
                   <ImageIcon className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <h2 className="text-xl mb-2">file repository</h2>
+                  <h2 className="text-xl mb-2 text-foreground">file repository</h2>
                   <p className="text-muted-foreground mb-6">Access your project files and assets</p>
                   <GlowButton>upload new file</GlowButton>
                 </div>
@@ -216,7 +216,7 @@ export default function ClientDashboard() {
               {tab === "calendar" && (
                 <div className="text-center py-10">
                   <Calendar className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <h2 className="text-xl mb-2">project timeline</h2>
+                  <h2 className="text-xl mb-2 text-foreground">project timeline</h2>
                   <p className="text-muted-foreground mb-6">View upcoming milestones and deadlines</p>
                   <GlowButton>view calendar</GlowButton>
                 </div>

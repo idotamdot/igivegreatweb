@@ -104,12 +104,44 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
       
       {/* Menu */}
       <div 
-        className={`fixed top-0 left-0 w-64 h-full bg-gray-900 transform transition-transform duration-300 ease-in-out z-50 ${
+        className={`fixed top-0 left-0 w-72 h-full bg-gray-900 transform transition-transform duration-300 ease-in-out z-50 ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-6 space-y-4">
-          {renderMenuLinks()}
+        {/* Close button */}
+        <button 
+          className="absolute top-4 right-4 text-white hover:text-gray-300"
+          onClick={onClose}
+          aria-label="Close menu"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+        
+        <div className="p-6 pt-12 space-y-4">
+          {/* Mobile actions */}
+          <div className="flex flex-col space-y-3 mb-6 border-b border-gray-800 pb-6">
+            <Link href="/" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
+              home
+            </Link>
+            <Link href="/services" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
+              our services
+            </Link>
+            <Link href="/client" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
+              client login
+            </Link>
+            <Link href="/admin" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
+              staff login
+            </Link>
+          </div>
+          
+          {/* Menu links */}
+          <div className="space-y-1">
+            <h3 className="text-sm uppercase text-gray-500 mb-2">our work</h3>
+            {renderMenuLinks()}
+          </div>
         </div>
       </div>
     </>

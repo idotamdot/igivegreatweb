@@ -136,19 +136,21 @@ export default function Checkout() {
   }, [serviceId, amount, serviceName, toast, navigate]);
 
   return (
-    <div className="container mx-auto py-10 max-w-md">
-      <Card>
-        <CardHeader>
+    <div className="container mx-auto py-10 px-4 sm:px-6 md:max-w-md pt-14 sm:pt-20">
+      <Card className="shadow-lg">
+        <CardHeader className="p-4 sm:p-6">
           <CardTitle>
             <AnimatedText 
               text="checkout" 
-              className="text-2xl font-bold"
+              className="text-xl sm:text-2xl font-bold"
               animationStyle="fade"
             />
           </CardTitle>
-          <CardDescription>Complete your purchase for {decodeURIComponent(serviceName)}</CardDescription>
+          <CardDescription className="text-sm sm:text-base">
+            Complete your purchase for {decodeURIComponent(serviceName)}
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
           {!clientSecret ? (
             <div className="flex justify-center p-6">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -163,7 +165,7 @@ export default function Checkout() {
             </Elements>
           )}
         </CardContent>
-        <CardFooter className="flex justify-between">
+        <CardFooter className="p-4 sm:p-6 flex justify-between">
           <Button variant="outline" onClick={() => navigate("/services")}>back to services</Button>
         </CardFooter>
       </Card>

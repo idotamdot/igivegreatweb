@@ -57,38 +57,38 @@ export default function ServicesPage() {
   }
   
   return (
-    <div className="container mx-auto py-10 min-h-screen">
-      <div className="text-center mb-12">
+    <div className="container mx-auto py-10 px-4 sm:px-6 min-h-screen">
+      <div className="text-center mb-8 md:mb-12 pt-10 sm:pt-16">
         <AnimatedText 
           text="our services" 
-          className="text-4xl md:text-5xl font-bold mb-4"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4"
           animationStyle="fade"
         />
-        <p className="text-muted-foreground max-w-2xl mx-auto">
+        <p className="text-muted-foreground max-w-2xl mx-auto text-sm sm:text-base">
           we offer a range of web design and development services to help your business succeed online.
           select a service below to get started on your next project.
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
         {services?.map((service) => (
           <Card key={service.id} className="flex flex-col h-full hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle>{service.name}</CardTitle>
-              <CardDescription>{service.description}</CardDescription>
+            <CardHeader className="p-4 md:p-6">
+              <CardTitle className="text-lg sm:text-xl">{service.name}</CardTitle>
+              <CardDescription className="text-sm">{service.description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
-              <p className="text-3xl font-bold mb-6">${(service.price / 100).toFixed(2)}</p>
-              <ul className="space-y-2">
+            <CardContent className="flex-grow p-4 md:p-6 pt-0 md:pt-0">
+              <p className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">${(service.price / 100).toFixed(2)}</p>
+              <ul className="space-y-2 text-sm sm:text-base">
                 {service.features.map((feature, index) => (
                   <li key={index} className="flex items-start">
-                    <CheckCircle2 className="h-5 w-5 text-primary mr-2 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary mr-2 flex-shrink-0" />
                     <span>{feature}</span>
                   </li>
                 ))}
               </ul>
             </CardContent>
-            <CardFooter>
+            <CardFooter className="p-4 md:p-6">
               <Button 
                 className="w-full" 
                 onClick={() => handleSelectService(service)}

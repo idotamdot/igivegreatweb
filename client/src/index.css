@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global animation keyframes */
+@keyframes smooth-glow {
+  0% { box-shadow: 0 0 15px rgba(255,255,255,0.3), 0 0 30px rgba(255,255,255,0.15); }
+  25% { box-shadow: 0 0 20px rgba(255,255,255,0.4), 0 0 40px rgba(255,255,255,0.2); }
+  50% { box-shadow: 0 0 25px rgba(255,255,255,0.5), 0 0 50px rgba(255,255,255,0.25); }
+  75% { box-shadow: 0 0 20px rgba(255,255,255,0.4), 0 0 40px rgba(255,255,255,0.2); }
+  100% { box-shadow: 0 0 15px rgba(255,255,255,0.3), 0 0 30px rgba(255,255,255,0.15); }
+}
+
 @layer base {
   :root {
     --primary: #000000;
@@ -209,33 +218,7 @@
   }
   
   /* Smooth glow animation for dialog */
-  @keyframes smooth-glow {
-    0% {
-      box-shadow: 0 0 15px rgba(255,255,255,0.3),
-                  0 0 30px rgba(255,255,255,0.15);
-      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-    }
-    25% {
-      box-shadow: 0 0 20px rgba(255,255,255,0.4),
-                  0 0 40px rgba(255,255,255,0.2);
-      filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
-    }
-    50% {
-      box-shadow: 0 0 25px rgba(255,255,255,0.5),
-                  0 0 50px rgba(255,255,255,0.25);
-      filter: drop-shadow(0 0 20px rgba(255,255,255,0.35));
-    }
-    75% {
-      box-shadow: 0 0 20px rgba(255,255,255,0.4),
-                  0 0 40px rgba(255,255,255,0.2);
-      filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
-    }
-    100% {
-      box-shadow: 0 0 15px rgba(255,255,255,0.3),
-                  0 0 30px rgba(255,255,255,0.15);
-      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
-    }
-  }
+  /* Animation keyframes moved to root level */
   
   @keyframes smooth-glow-light {
     0% {

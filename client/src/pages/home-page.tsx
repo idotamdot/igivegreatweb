@@ -17,10 +17,7 @@ export default function HomePage() {
       {/* Menu Arrow Indicator */}
       <div className="fixed top-20 left-5 flex items-center z-40 animate-pulse">
         <div className="flex flex-col items-center">
-          <div className="text-white text-lg md:text-xl menu-indicator-text animate-glow">
-            see our work here
-          </div>
-          <div className="w-6 h-10 mt-2 transform -rotate-45">
+          <div className="w-6 h-10 mb-2 transform rotate-[225deg]">
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
               viewBox="0 0 24 24" 
@@ -34,6 +31,9 @@ export default function HomePage() {
               <line x1="5" y1="12" x2="19" y2="12"></line>
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
+          </div>
+          <div className="text-white text-lg md:text-xl menu-indicator-text animate-glow">
+            see our work here
           </div>
         </div>
       </div>

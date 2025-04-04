@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import AdminDashboard from "@/pages/admin-dashboard";
+import ClientDashboard from "@/pages/client-dashboard";
 import ContentPage from "@/pages/content-page";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       {/* Temporarily bypassing authentication for development */}
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/client" component={ClientDashboard} />
       {/* Route for content pages created from menu links */}
       <Route path="/page/:slug" component={ContentPage} />
       <Route component={NotFound} />

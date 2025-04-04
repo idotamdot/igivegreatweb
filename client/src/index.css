@@ -208,7 +208,64 @@
     transform: translateY(-8px);
   }
   
-  /* Pulse glow animation */
+  /* Smooth glow animation for dialog */
+  @keyframes smooth-glow {
+    0% {
+      box-shadow: 0 0 15px rgba(255,255,255,0.3),
+                  0 0 30px rgba(255,255,255,0.15);
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    }
+    25% {
+      box-shadow: 0 0 20px rgba(255,255,255,0.4),
+                  0 0 40px rgba(255,255,255,0.2);
+      filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(255,255,255,0.5),
+                  0 0 50px rgba(255,255,255,0.25);
+      filter: drop-shadow(0 0 20px rgba(255,255,255,0.35));
+    }
+    75% {
+      box-shadow: 0 0 20px rgba(255,255,255,0.4),
+                  0 0 40px rgba(255,255,255,0.2);
+      filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+    }
+    100% {
+      box-shadow: 0 0 15px rgba(255,255,255,0.3),
+                  0 0 30px rgba(255,255,255,0.15);
+      filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    }
+  }
+  
+  @keyframes smooth-glow-light {
+    0% {
+      box-shadow: 0 0 15px rgba(0,0,0,0.2),
+                  0 0 30px rgba(0,0,0,0.1);
+      filter: drop-shadow(0 0 10px rgba(0,0,0,0.15));
+    }
+    25% {
+      box-shadow: 0 0 20px rgba(0,0,0,0.25),
+                  0 0 40px rgba(0,0,0,0.12);
+      filter: drop-shadow(0 0 15px rgba(0,0,0,0.2));
+    }
+    50% {
+      box-shadow: 0 0 25px rgba(0,0,0,0.3),
+                  0 0 50px rgba(0,0,0,0.15);
+      filter: drop-shadow(0 0 20px rgba(0,0,0,0.25));
+    }
+    75% {
+      box-shadow: 0 0 20px rgba(0,0,0,0.25),
+                  0 0 40px rgba(0,0,0,0.12);
+      filter: drop-shadow(0 0 15px rgba(0,0,0,0.2));
+    }
+    100% {
+      box-shadow: 0 0 15px rgba(0,0,0,0.2),
+                  0 0 30px rgba(0,0,0,0.1);
+      filter: drop-shadow(0 0 10px rgba(0,0,0,0.15));
+    }
+  }
+  
+  /* Button pulse glow animation */
   @keyframes pulse-glow {
     0% {
       box-shadow: 0 0 5px rgba(255,255,255,0.3),
@@ -245,5 +302,50 @@
   
   :root .pulse-glow {
     animation: pulse-glow-light 2s infinite ease-in-out;
+  }
+  
+  .smooth-glow {
+    animation: smooth-glow 6s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  :root .smooth-glow {
+    animation: smooth-glow-light 6s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Glow trail for dialog */
+  .glow-dialog {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .glow-dialog::before,
+  .glow-dialog::after {
+    content: '';
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    width: calc(100% + 6px);
+    height: calc(100% + 6px);
+    border-radius: 10px;
+    background: transparent;
+    z-index: -1;
+    transition: all 0.6s ease;
+  }
+  
+  .dark .glow-dialog::before {
+    box-shadow: 0 0 15px rgba(255,255,255,0.3),
+                0 0 30px rgba(255,255,255,0.15);
+    animation: smooth-glow 6s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dark .glow-dialog::after {
+    box-shadow: 0 0 25px rgba(255,255,255,0.2),
+                0 0 50px rgba(255,255,255,0.1);
+    animation: smooth-glow 6s infinite cubic-bezier(0.4, 0, 0.2, 1) reverse;
   }
 }

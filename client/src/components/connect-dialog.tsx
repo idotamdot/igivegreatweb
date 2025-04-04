@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { GlowButton } from "@/components/ui/glow-button";
 import { X } from "lucide-react";
 
@@ -29,6 +30,11 @@ const formSchema = z.object({
   }),
   email: z.string().email({
     message: "please enter a valid email address.",
+  }),
+  message: z.string().min(5, {
+    message: "message must be at least 5 characters.",
+  }).max(500, {
+    message: "message cannot exceed 500 characters."
   }),
 });
 
@@ -47,6 +53,7 @@ export default function ConnectDialog({ open, onOpenChange }: ConnectDialogProps
     defaultValues: {
       name: "",
       email: "",
+      message: "",
     },
   });
 
@@ -82,7 +89,7 @@ export default function ConnectDialog({ open, onOpenChange }: ConnectDialogProps
       <div className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
       
       <div 
-        className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-black border-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg card-glow-enhanced dark:shadow-[0_0_30px_rgba(255,255,255,0.25),0_0_60px_rgba(255,255,255,0.15)]"
+        className="fixed left-[50%] top-[50%] z-50 grid w-full max-w-md translate-x-[-50%] translate-y-[-50%] gap-4 border bg-black border-white p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg glow-dialog"
       >
         <DialogHeader className="flex flex-row justify-between items-center">
           <DialogTitle className="text-white text-left title-glow">let's connect</DialogTitle>
@@ -125,6 +132,24 @@ export default function ConnectDialog({ open, onOpenChange }: ConnectDialogProps
                     <Input 
                       placeholder="your email" 
                       className="bg-gray-900 text-white border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all" 
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-white">message</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="tell us about your project" 
+                      className="bg-gray-900 text-white border-gray-700 min-h-[120px] focus:border-primary focus:ring-2 focus:ring-primary/30 transition-all" 
                       {...field} 
                     />
                   </FormControl>

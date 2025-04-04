@@ -80,7 +80,7 @@ export default function ConnectDialog({ open, onOpenChange }: ConnectDialogProps
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-black border border-white sm:max-w-md">
+      <DialogContent className="bg-black border border-white sm:max-w-md [&>button[data-state=open]]:hidden">
         <DialogHeader className="flex flex-row justify-between items-center">
           <DialogTitle className="text-white text-left">let's connect</DialogTitle>
           <DialogClose asChild>

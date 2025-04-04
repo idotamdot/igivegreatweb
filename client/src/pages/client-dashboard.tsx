@@ -56,7 +56,7 @@ export default function ClientDashboard() {
           <div className="flex items-center">
             <AnimatedText 
               text="client dashboard" 
-              className="text-2xl" 
+              className="text-2xl text-foreground" 
               animationStyle="fade"
             />
             <div className="ml-4">
@@ -81,28 +81,44 @@ export default function ClientDashboard() {
             <div className="bg-card p-6 rounded-lg border border-accent/20">
               <div className="space-y-2">
                 <button
-                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${tab === "projects" ? "bg-primary/10 text-primary" : "hover:bg-primary/5"}`}
+                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${
+                    tab === "projects" 
+                      ? "bg-primary/10 text-primary dark:text-white dark:shadow-[0_0_10px_rgba(255,255,255,0.7)]" 
+                      : "hover:bg-primary/5"
+                  }`}
                   onClick={() => setTab("projects")}
                 >
                   <FileText className="h-5 w-5" />
                   <span>projects</span>
                 </button>
                 <button
-                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${tab === "files" ? "bg-primary/10 text-primary" : "hover:bg-primary/5"}`}
+                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${
+                    tab === "files" 
+                      ? "bg-primary/10 text-primary dark:text-white dark:shadow-[0_0_10px_rgba(255,255,255,0.7)]" 
+                      : "hover:bg-primary/5"
+                  }`}
                   onClick={() => setTab("files")}
                 >
                   <ImageIcon className="h-5 w-5" />
                   <span>files & assets</span>
                 </button>
                 <button
-                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${tab === "calendar" ? "bg-primary/10 text-primary" : "hover:bg-primary/5"}`}
+                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${
+                    tab === "calendar" 
+                      ? "bg-primary/10 text-primary dark:text-white dark:shadow-[0_0_10px_rgba(255,255,255,0.7)]" 
+                      : "hover:bg-primary/5"
+                  }`}
                   onClick={() => setTab("calendar")}
                 >
                   <Calendar className="h-5 w-5" />
                   <span>calendar</span>
                 </button>
                 <button
-                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${tab === "messages" ? "bg-primary/10 text-primary" : "hover:bg-primary/5"}`}
+                  className={`w-full text-left px-4 py-2 rounded-md flex items-center space-x-2 ${
+                    tab === "messages" 
+                      ? "bg-primary/10 text-primary dark:text-white dark:shadow-[0_0_10px_rgba(255,255,255,0.7)]" 
+                      : "hover:bg-primary/5"
+                  }`}
                   onClick={() => setTab("messages")}
                 >
                   <MessageSquare className="h-5 w-5" />
@@ -116,7 +132,7 @@ export default function ClientDashboard() {
               </div>
               
               <div className="mt-10">
-                <h3 className="text-sm font-medium mb-3">customize theme</h3>
+                <h3 className="text-sm font-medium mb-3 text-foreground">customize theme</h3>
                 <ThemeSelector />
               </div>
             </div>
@@ -131,14 +147,14 @@ export default function ClientDashboard() {
                   
                   {isLoadingProjects ? (
                     <div className="flex justify-center p-8">
-                      <Loader2 className="h-8 w-8 animate-spin text-white" />
+                      <Loader2 className="h-8 w-8 animate-spin text-foreground" />
                     </div>
                   ) : projects && projects.length > 0 ? (
                     <div className="space-y-4">
                       {projects.map((project: any) => (
                         <div key={project.id} className="border border-accent/20 p-4 rounded-lg">
                           <div className="flex justify-between items-center">
-                            <h3 className="text-lg font-medium">{project.name}</h3>
+                            <h3 className="text-lg font-medium text-foreground">{project.name}</h3>
                             <span className={`px-2 py-1 rounded text-sm ${getStatusColor(project.status)}`}>
                               {project.status}
                             </span>
@@ -147,7 +163,7 @@ export default function ClientDashboard() {
                           <div className="mt-3">
                             <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                               <div 
-                                className="bg-primary h-2.5 rounded-full" 
+                                className="bg-primary dark:bg-white dark:shadow-[0_0_10px_rgba(255,255,255,0.7)] h-2.5 rounded-full" 
                                 style={{ width: `${project.completion}%` }}
                               ></div>
                             </div>
@@ -176,7 +192,7 @@ export default function ClientDashboard() {
                   
                   {isLoadingMessages ? (
                     <div className="flex justify-center p-8">
-                      <Loader2 className="h-8 w-8 animate-spin text-white" />
+                      <Loader2 className="h-8 w-8 animate-spin text-foreground" />
                     </div>
                   ) : messages && messages.length > 0 ? (
                     <div className="space-y-2">
@@ -186,7 +202,7 @@ export default function ClientDashboard() {
                           className={`border ${message.read ? 'border-accent/20' : 'border-primary'} p-4 rounded-lg`}
                         >
                           <div className="flex justify-between items-center">
-                            <h3 className={`text-lg ${message.read ? '' : 'font-bold'}`}>{message.subject}</h3>
+                            <h3 className={`text-lg text-foreground ${message.read ? '' : 'font-bold'}`}>{message.subject}</h3>
                             <span className="text-sm text-muted-foreground">{message.date}</span>
                           </div>
                           <p className="text-sm text-muted-foreground mt-1">From: {message.sender}</p>

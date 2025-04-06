@@ -103,26 +103,30 @@
     z-index: 1;
   }
   
-  /* Light theme glow effect (black glow) */
+  /* Light theme glow effect (black button with black glow) */
   :root .glow-button {
-    box-shadow: 0 0 5px rgba(0,0,0,0.3),
-                0 0 10px rgba(0,0,0,0.2);
+    box-shadow: 0 0 5px rgba(0,0,0,0.5),
+                0 0 10px rgba(0,0,0,0.3);
+    border-color: rgba(0,0,0,0.5);
   }
   
   :root .glow-button:hover {
-    box-shadow: 0 0 10px rgba(0,0,0,0.4),
-                0 0 20px rgba(0,0,0,0.2);
+    box-shadow: 0 0 10px rgba(0,0,0,0.6),
+                0 0 20px rgba(0,0,0,0.4);
+    border-color: rgba(0,0,0,0.7);
   }
   
-  /* Dark theme glow effect (white glow) */
+  /* Dark theme glow effect (white button with white glow) */
   .dark .glow-button {
-    box-shadow: 0 0 5px rgba(255,255,255,0.3),
-                0 0 10px rgba(255,255,255,0.2);
+    box-shadow: 0 0 5px rgba(255,255,255,0.5),
+                0 0 10px rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.5);
   }
   
   .dark .glow-button:hover {
-    box-shadow: 0 0 15px rgba(255,255,255,0.4),
-                0 0 30px rgba(255,255,255,0.2);
+    box-shadow: 0 0 15px rgba(255,255,255,0.6),
+                0 0 30px rgba(255,255,255,0.4);
+    border-color: rgba(255,255,255,0.7);
   }
   
   /* Card glow effects */

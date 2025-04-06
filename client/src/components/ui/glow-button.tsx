@@ -7,7 +7,7 @@ const glowButtonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-white text-black hover:bg-gray-100 active:bg-gray-200 dark:text-black",
+        default: "bg-black text-white hover:bg-gray-900 active:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 dark:active:bg-gray-200",
         outline: "border border-white bg-transparent text-foreground hover:bg-accent/10",
         subtle: "bg-accent/20 text-foreground hover:bg-accent/30",
       },

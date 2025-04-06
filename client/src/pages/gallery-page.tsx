@@ -105,15 +105,15 @@ export default function GalleryPage() {
         </div>
       )}
       
-      {/* Return to homepage button */}
-      <div className="container mx-auto px-4 py-4">
+      {/* Return to homepage button - positioned in the top right corner */}
+      <div className="fixed top-4 right-4 z-50">
         <GlowButton
           className="flex items-center" 
           size="sm"
           onClick={() => setLocation("/")}
         >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          return to homepage
+          <Home className="mr-2 h-4 w-4" />
+          return home
         </GlowButton>
       </div>
         

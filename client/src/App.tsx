@@ -39,6 +39,15 @@ function Router() {
       <Route path="/artwork/:id" component={ArtworkDetail} />
       <Route path="/checkout/:id" component={CheckoutOrder} />
       <Route path="/orders" component={OrdersPage} />
+      
+      {/* Admin gallery management routes */}
+      <Route path="/admin/gallery/artworks" component={GalleryPage} />
+      <Route path="/admin/gallery/sizes" component={GalleryPage} />
+      <Route path="/admin/gallery/orders" component={OrdersPage} />
+      
+      {/* Admin services management routes */}
+      <Route path="/admin/services/list" component={ServicesPage} />
+      <Route path="/admin/services/pricing" component={ServicesPage} />
       {/* Route for content pages created from menu links */}
       <Route path="/page/:slug" component={ContentPage} />
       <Route component={NotFound} />

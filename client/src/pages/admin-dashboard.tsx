@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ThemeSelector } from "@/components/theme-selector";
 import AnimatedText from "@/components/animated-text";
@@ -20,7 +20,15 @@ import {
   ToggleRight,
   Lock,
   Save,
-  FileText
+  FileText,
+  ImageIcon,
+  DollarSign,
+  PlusCircle,
+  Package,
+  Ruler,
+  ShoppingCart,
+  Printer,
+  Settings
 } from "lucide-react";
 import {
   Form,
@@ -76,7 +84,7 @@ type AccountFormValues = z.infer<typeof accountSchema>;
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  const [tab, setTab] = useState<"connections" | "menu-links" | "account" | "themes" | "animations">("connections");
+  const [tab, setTab] = useState<"connections" | "menu-links" | "gallery" | "services" | "printing" | "account" | "themes" | "animations">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
@@ -286,7 +294,7 @@ export default function AdminDashboard() {
         </header>
         
         <div className="mb-6">
-          <div className="flex border-b border-accent/30 mb-6">
+          <div className="flex flex-wrap border-b border-accent/30 mb-6">
             <button
               className={`px-4 py-2 ${tab === "connections" ? "border-b-2 border-primary" : ""}`}
               onClick={() => setTab("connections")}
@@ -299,6 +307,24 @@ export default function AdminDashboard() {
               onClick={() => setTab("menu-links")}
             >
               menu links
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "gallery" ? "border-b-2 border-primary" : ""}`}
+              onClick={() => setTab("gallery")}
+            >
+              gallery
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "services" ? "border-b-2 border-primary" : ""}`}
+              onClick={() => setTab("services")}
+            >
+              services
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "printing" ? "border-b-2 border-primary" : ""}`}
+              onClick={() => setTab("printing")}
+            >
+              printing
             </button>
             <button
               className={`px-4 py-2 ${tab === "themes" ? "border-b-2 border-primary" : ""}`}
@@ -346,6 +372,129 @@ export default function AdminDashboard() {
         )}
         
 
+        
+        {tab === "gallery" && (
+          <div className="bg-card p-6 rounded-lg border border-accent/20">
+            <h2 className="text-xl mb-6">gallery management</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="p-6 border border-accent/30 rounded-lg flex flex-col items-center text-center hover:border-primary/70 transition-all">
+                <ImageIcon className="h-12 w-12 mb-4"/>
+                <h3 className="text-lg font-medium mb-2">manage artworks</h3>
+                <p className="text-sm text-muted-foreground mb-4">Add, edit, or remove artwork from your gallery</p>
+                <Link to="/admin/gallery/artworks">
+                  <GlowButton className="w-full">
+                    manage artworks
+                  </GlowButton>
+                </Link>
+              </div>
+              
+              <div className="p-6 border border-accent/30 rounded-lg flex flex-col items-center text-center hover:border-primary/70 transition-all">
+                <Ruler className="h-12 w-12 mb-4"/>
+                <h3 className="text-lg font-medium mb-2">print sizes</h3>
+                <p className="text-sm text-muted-foreground mb-4">Configure print sizes and pricing options</p>
+                <Link to="/admin/gallery/sizes">
+                  <GlowButton className="w-full">
+                    manage sizes
+                  </GlowButton>
+                </Link>
+              </div>
+              
+              <div className="p-6 border border-accent/30 rounded-lg flex flex-col items-center text-center hover:border-primary/70 transition-all">
+                <ShoppingCart className="h-12 w-12 mb-4"/>
+                <h3 className="text-lg font-medium mb-2">customer orders</h3>
+                <p className="text-sm text-muted-foreground mb-4">View and manage customer print orders</p>
+                <Link to="/admin/gallery/orders">
+                  <GlowButton className="w-full">
+                    view orders
+                  </GlowButton>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {tab === "services" && (
+          <div className="bg-card p-6 rounded-lg border border-accent/20">
+            <h2 className="text-xl mb-6">services management</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="p-6 border border-accent/30 rounded-lg flex flex-col items-center text-center hover:border-primary/70 transition-all">
+                <Settings className="h-12 w-12 mb-4"/>
+                <h3 className="text-lg font-medium mb-2">manage services</h3>
+                <p className="text-sm text-muted-foreground mb-4">Add, edit, or remove services from your catalog</p>
+                <Link to="/admin/services/list">
+                  <GlowButton className="w-full">
+                    manage services
+                  </GlowButton>
+                </Link>
+              </div>
+              
+              <div className="p-6 border border-accent/30 rounded-lg flex flex-col items-center text-center hover:border-primary/70 transition-all">
+                <DollarSign className="h-12 w-12 mb-4"/>
+                <h3 className="text-lg font-medium mb-2">pricing options</h3>
+                <p className="text-sm text-muted-foreground mb-4">Set up service pricing and payment options</p>
+                <Link to="/admin/services/pricing">
+                  <GlowButton className="w-full">
+                    manage pricing
+                  </GlowButton>
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {tab === "printing" && (
+          <div className="bg-card p-6 rounded-lg border border-accent/20">
+            <h2 className="text-xl mb-6">print service integration</h2>
+            
+            <div className="grid grid-cols-1 gap-6">
+              <div className="p-6 border border-accent/30 rounded-lg flex flex-col">
+                <div className="flex items-center mb-4">
+                  <Printer className="h-8 w-8 mr-4"/>
+                  <h3 className="text-lg font-medium">printing service settings</h3>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Connect to your preferred printing service to fulfill artwork print orders automatically.
+                  Your customers will be able to order prints and have them delivered directly.
+                </p>
+                
+                <div className="space-y-4 mb-6">
+                  <div className="flex flex-col">
+                    <label className="text-sm mb-1">API Endpoint</label>
+                    <Input 
+                      className="bg-input border-input"
+                      placeholder="https://api.yourprintservice.com/v1" 
+                    />
+                  </div>
+                  
+                  <div className="flex flex-col">
+                    <label className="text-sm mb-1">API Key</label>
+                    <Input 
+                      className="bg-input border-input" 
+                      type="password"
+                      placeholder="Enter your print service API key" 
+                    />
+                  </div>
+                  
+                  <div className="flex flex-row items-center justify-between rounded-lg border border-input/20 p-3 shadow-sm">
+                    <div className="space-y-0.5">
+                      <label>Enable automatic order processing</label>
+                      <p className="text-xs text-muted-foreground">
+                        Automatically send new orders to printing service
+                      </p>
+                    </div>
+                    <Switch />
+                  </div>
+                </div>
+                
+                <GlowButton className="w-full mt-2">
+                  save settings
+                </GlowButton>
+              </div>
+            </div>
+          </div>
+        )}
         
         {tab === "menu-links" && (
           <div className="grid gap-8">

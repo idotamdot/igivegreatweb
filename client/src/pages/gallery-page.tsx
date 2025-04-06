@@ -4,7 +4,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
-import { Star, ShoppingCart, ArrowRight } from "lucide-react";
+import { Star, ShoppingCart, ArrowRight, Home, ArrowLeft } from "lucide-react";
+import { GlowButton } from "@/components/ui/glow-button";
 
 export default function GalleryPage() {
   const { toast } = useToast();
@@ -92,17 +93,30 @@ export default function GalleryPage() {
                 Browse Gallery <ArrowRight className="ml-2 h-5 w-5" />
               </button>
               {heroArtwork.originalAvailable && (
-                <Link href={`/artwork/${heroArtwork.id}`}>
-                  <a className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-md hover:bg-white/10 transition-all transform hover:-translate-y-1">
-                    Featured Artwork
-                  </a>
-                </Link>
+                <button 
+                  onClick={() => setLocation(`/artwork/${heroArtwork.id}`)}
+                  className="px-6 py-3 bg-transparent border-2 border-white text-white font-semibold rounded-md hover:bg-white/10 transition-all transform hover:-translate-y-1"
+                >
+                  Featured Artwork
+                </button>
               )}
             </div>
           </div>
         </div>
       )}
       
+      {/* Return to homepage button */}
+      <div className="container mx-auto px-4 py-4">
+        <GlowButton
+          className="flex items-center" 
+          size="sm"
+          onClick={() => setLocation("/")}
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          return to homepage
+        </GlowButton>
+      </div>
+        
       {/* Gallery Section */}
       <div id="gallery" className="container mx-auto px-4 py-8">
         <h2 className="text-3xl font-bold mb-8 text-center">our collection</h2>
@@ -138,12 +152,13 @@ export default function GalleryPage() {
                       </span>
                     )}
                   </div>
-                  <Link href={`/artwork/${artwork.id}`}>
-                    <a className="inline-flex items-center text-primary hover:text-primary/80">
-                      <ShoppingCart className="h-4 w-4 mr-1" />
-                      <span>View Prints</span>
-                    </a>
-                  </Link>
+                  <button 
+                    onClick={() => setLocation(`/artwork/${artwork.id}`)}
+                    className="inline-flex items-center text-primary hover:text-primary/80"
+                  >
+                    <ShoppingCart className="h-4 w-4 mr-1" />
+                    <span>View Prints</span>
+                  </button>
                 </div>
               </div>
             </div>

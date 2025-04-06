@@ -1,8 +1,12 @@
 import { 
-  users, connections, menuLinks,
+  users, connections, menuLinks, artworks, printSizes, artworkPrintSizes, printOrders,
   type User, type InsertUser, 
   type Connection, type InsertConnection, 
-  type MenuLink, type InsertMenuLink
+  type MenuLink, type InsertMenuLink,
+  type Artwork, type InsertArtwork,
+  type PrintSize, type InsertPrintSize,
+  type ArtworkPrintSize, type InsertArtworkPrintSize,
+  type PrintOrder, type InsertPrintOrder
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -30,6 +34,37 @@ export interface IStorage {
   updateMenuLink(id: number, menuLink: Partial<InsertMenuLink>): Promise<MenuLink | undefined>;
   deleteMenuLink(id: number): Promise<void>;
   
+  // Artwork methods
+  createArtwork(artwork: InsertArtwork): Promise<Artwork>;
+  getAllArtworks(): Promise<Artwork[]>;
+  getArtwork(id: number): Promise<Artwork | undefined>;
+  updateArtwork(id: number, artwork: Partial<InsertArtwork>): Promise<Artwork | undefined>;
+  deleteArtwork(id: number): Promise<void>;
+  getFeaturedArtworks(): Promise<Artwork[]>;
+  
+  // Print Size methods
+  createPrintSize(printSize: InsertPrintSize): Promise<PrintSize>;
+  getAllPrintSizes(): Promise<PrintSize[]>;
+  getPrintSize(id: number): Promise<PrintSize | undefined>;
+  updatePrintSize(id: number, printSize: Partial<InsertPrintSize>): Promise<PrintSize | undefined>;
+  deletePrintSize(id: number): Promise<void>;
+  
+  // Artwork Print Size methods
+  createArtworkPrintSize(artworkPrintSize: InsertArtworkPrintSize): Promise<ArtworkPrintSize>;
+  getArtworkPrintSizes(artworkId: number): Promise<ArtworkPrintSize[]>;
+  getArtworkPrintSizesWithDetails(artworkId: number): Promise<(ArtworkPrintSize & PrintSize)[]>;
+  updateArtworkPrintSize(id: number, artworkPrintSize: Partial<InsertArtworkPrintSize>): Promise<ArtworkPrintSize | undefined>;
+  deleteArtworkPrintSize(id: number): Promise<void>;
+  
+  // Print Order methods
+  createPrintOrder(order: InsertPrintOrder): Promise<PrintOrder>;
+  getPrintOrder(id: number): Promise<PrintOrder | undefined>;
+  getUserPrintOrders(userId: number): Promise<PrintOrder[]>;
+  getAllPrintOrders(): Promise<PrintOrder[]>;
+  updatePrintOrderStatus(id: number, status: string, trackingNumber?: string): Promise<PrintOrder | undefined>;
+  updatePrintOrderPaymentInfo(id: number, stripePaymentId: string): Promise<PrintOrder | undefined>;
+  updatePrintOrderPrintingInfo(id: number, printingServiceOrderId: string): Promise<PrintOrder | undefined>;
+  
   sessionStore: session.Store;
 }
 
@@ -37,18 +72,37 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private connections: Map<number, Connection>;
   private menuLinks: Map<number, MenuLink>;
+  private artworks: Map<number, Artwork>;
+  private printSizes: Map<number, PrintSize>;
+  private artworkPrintSizes: Map<number, ArtworkPrintSize>;
+  private printOrders: Map<number, PrintOrder>;
+  
   private userCurrentId: number;
   private connectionCurrentId: number;
   private menuLinkCurrentId: number;
+  private artworkCurrentId: number;
+  private printSizeCurrentId: number;
+  private artworkPrintSizeCurrentId: number;
+  private printOrderCurrentId: number;
+  
   sessionStore: session.Store;
 
   constructor() {
     this.users = new Map();
     this.connections = new Map();
     this.menuLinks = new Map();
+    this.artworks = new Map();
+    this.printSizes = new Map();
+    this.artworkPrintSizes = new Map();
+    this.printOrders = new Map();
+    
     this.userCurrentId = 1;
     this.connectionCurrentId = 1;
     this.menuLinkCurrentId = 1;
+    this.artworkCurrentId = 1;
+    this.printSizeCurrentId = 1;
+    this.artworkPrintSizeCurrentId = 1;
+    this.printOrderCurrentId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
@@ -65,6 +119,141 @@ export class MemStorage implements IStorage {
     
     // Add default menu links
     this._addDefaultMenuLinks();
+    
+    // Add initial print sizes
+    this._addInitialPrintSizes();
+    
+    // Add sample artworks
+    this._addSampleArtworks();
+  }
+  
+  // Add initial print sizes
+  private _addInitialPrintSizes() {
+    const sizes = [
+      { name: "Small (8x10)", width: "8", height: "10", priceFactor: "1.0", active: true },
+      { name: "Medium (11x14)", width: "11", height: "14", priceFactor: "1.5", active: true },
+      { name: "Large (16x20)", width: "16", height: "20", priceFactor: "2.0", active: true },
+      { name: "Extra Large (24x36)", width: "24", height: "36", priceFactor: "3.0", active: true }
+    ];
+    
+    sizes.forEach(size => {
+      const printSize: PrintSize = {
+        id: this.printSizeCurrentId++,
+        name: size.name,
+        width: size.width,
+        height: size.height,
+        priceFactor: size.priceFactor,
+        active: size.active
+      };
+      this.printSizes.set(printSize.id, printSize);
+    });
+  }
+  
+  // Add sample artworks
+  private _addSampleArtworks() {
+    const artworks = [
+      {
+        title: "Urban Glow",
+        description: "A vibrant cityscape with neon lights reflecting off wet streets, capturing the energy of urban nightlife.",
+        artistName: "Alex Rivera",
+        imageUrl: "https://images.unsplash.com/photo-1515634928627-2a4e0dae3ddf?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
+        originalAvailable: true,
+        originalPrice: "2400",
+        category: "Cityscape",
+        dimensions: "36x48 inches",
+        medium: "Acrylic on Canvas",
+        featured: true
+      },
+      {
+        title: "Serenity Shore",
+        description: "A peaceful beach scene at sunset with gentle waves and soft, golden light illuminating the coastline.",
+        artistName: "Maria Johnson",
+        imageUrl: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
+        originalAvailable: false,
+        originalPrice: "1800",
+        category: "Landscape",
+        dimensions: "24x36 inches",
+        medium: "Oil on Canvas",
+        featured: true
+      },
+      {
+        title: "Abstract Fusion",
+        description: "Bold, geometric forms in contrasting colors create a dynamic composition suggesting movement and tension.",
+        artistName: "Jamal Williams",
+        imageUrl: "https://images.unsplash.com/photo-1605106702734-205df224ecce?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
+        originalAvailable: true,
+        originalPrice: "3200",
+        category: "Abstract",
+        dimensions: "40x40 inches",
+        medium: "Mixed Media",
+        featured: false
+      },
+      {
+        title: "Forest Whispers",
+        description: "A misty forest scene with sunlight filtering through ancient trees, creating a magical atmosphere.",
+        artistName: "Emma Chen",
+        imageUrl: "https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1200",
+        originalAvailable: true,
+        originalPrice: "2800",
+        category: "Landscape",
+        dimensions: "30x40 inches",
+        medium: "Watercolor",
+        featured: true
+      }
+    ];
+    
+    artworks.forEach(artData => {
+      const artwork: Artwork = {
+        id: this.artworkCurrentId++,
+        title: artData.title,
+        description: artData.description,
+        artistName: artData.artistName,
+        imageUrl: artData.imageUrl,
+        originalAvailable: artData.originalAvailable,
+        originalPrice: artData.originalPrice,
+        category: artData.category,
+        dimensions: artData.dimensions,
+        medium: artData.medium,
+        featured: artData.featured,
+        createdAt: new Date()
+      };
+      this.artworks.set(artwork.id, artwork);
+      
+      // Add print sizes for each artwork
+      const printSizeIds = Array.from(this.printSizes.keys());
+      printSizeIds.forEach(printSizeId => {
+        const printSize = this.printSizes.get(printSizeId)!;
+        
+        // Base price varies by artwork
+        let basePrice = 0;
+        switch(artwork.category) {
+          case "Abstract":
+            basePrice = 120;
+            break;
+          case "Landscape":
+            basePrice = 150;
+            break;
+          case "Cityscape":
+            basePrice = 180;
+            break;
+          default:
+            basePrice = 100;
+        }
+        
+        // Calculate price based on print size factor
+        const price = Math.round(basePrice * parseFloat(printSize.priceFactor));
+        
+        const artworkPrintSize: ArtworkPrintSize = {
+          id: this.artworkPrintSizeCurrentId++,
+          artworkId: artwork.id,
+          printSizeId: printSize.id,
+          price: price.toString(),
+          inStock: true
+        };
+        
+        this.artworkPrintSizes.set(artworkPrintSize.id, artworkPrintSize);
+      });
+    });
   }
   
   // Add owner account
@@ -290,6 +479,252 @@ export class MemStorage implements IStorage {
   
   async deleteMenuLink(id: number): Promise<void> {
     this.menuLinks.delete(id);
+  }
+
+  // Artwork methods
+  async createArtwork(insertArtwork: InsertArtwork): Promise<Artwork> {
+    const id = this.artworkCurrentId++;
+    const artwork: Artwork = {
+      ...insertArtwork,
+      id,
+      createdAt: new Date(),
+      originalAvailable: insertArtwork.originalAvailable ?? false,
+      featured: insertArtwork.featured ?? false,
+      dimensions: insertArtwork.dimensions || null,
+      medium: insertArtwork.medium || null
+    };
+    this.artworks.set(id, artwork);
+    return artwork;
+  }
+
+  async getAllArtworks(): Promise<Artwork[]> {
+    return Array.from(this.artworks.values());
+  }
+
+  async getArtwork(id: number): Promise<Artwork | undefined> {
+    return this.artworks.get(id);
+  }
+
+  async updateArtwork(id: number, artworkUpdate: Partial<InsertArtwork>): Promise<Artwork | undefined> {
+    const existingArtwork = this.artworks.get(id);
+    if (!existingArtwork) {
+      return undefined;
+    }
+
+    const updatedArtwork: Artwork = {
+      ...existingArtwork,
+      ...artworkUpdate
+    };
+
+    this.artworks.set(id, updatedArtwork);
+    return updatedArtwork;
+  }
+
+  async deleteArtwork(id: number): Promise<void> {
+    this.artworks.delete(id);
+    
+    // Also delete associated print sizes
+    const artworkPrintSizeIds = Array.from(this.artworkPrintSizes.values())
+      .filter(aps => aps.artworkId === id)
+      .map(aps => aps.id);
+    
+    for (const apsId of artworkPrintSizeIds) {
+      this.artworkPrintSizes.delete(apsId);
+    }
+  }
+
+  async getFeaturedArtworks(): Promise<Artwork[]> {
+    return Array.from(this.artworks.values())
+      .filter(artwork => artwork.featured);
+  }
+
+  // Print Size methods
+  async createPrintSize(insertPrintSize: InsertPrintSize): Promise<PrintSize> {
+    const id = this.printSizeCurrentId++;
+    const printSize: PrintSize = {
+      ...insertPrintSize,
+      id,
+      active: insertPrintSize.active ?? true
+    };
+    this.printSizes.set(id, printSize);
+    return printSize;
+  }
+
+  async getAllPrintSizes(): Promise<PrintSize[]> {
+    return Array.from(this.printSizes.values());
+  }
+
+  async getPrintSize(id: number): Promise<PrintSize | undefined> {
+    return this.printSizes.get(id);
+  }
+
+  async updatePrintSize(id: number, printSizeUpdate: Partial<InsertPrintSize>): Promise<PrintSize | undefined> {
+    const existingPrintSize = this.printSizes.get(id);
+    if (!existingPrintSize) {
+      return undefined;
+    }
+
+    const updatedPrintSize: PrintSize = {
+      ...existingPrintSize,
+      ...printSizeUpdate
+    };
+
+    this.printSizes.set(id, updatedPrintSize);
+    return updatedPrintSize;
+  }
+
+  async deletePrintSize(id: number): Promise<void> {
+    this.printSizes.delete(id);
+    
+    // Delete associated artwork print sizes
+    const artworkPrintSizeIds = Array.from(this.artworkPrintSizes.values())
+      .filter(aps => aps.printSizeId === id)
+      .map(aps => aps.id);
+    
+    for (const apsId of artworkPrintSizeIds) {
+      this.artworkPrintSizes.delete(apsId);
+    }
+  }
+
+  // Artwork Print Size methods
+  async createArtworkPrintSize(insertArtworkPrintSize: InsertArtworkPrintSize): Promise<ArtworkPrintSize> {
+    const id = this.artworkPrintSizeCurrentId++;
+    const artworkPrintSize: ArtworkPrintSize = {
+      ...insertArtworkPrintSize,
+      id,
+      inStock: insertArtworkPrintSize.inStock ?? true
+    };
+    this.artworkPrintSizes.set(id, artworkPrintSize);
+    return artworkPrintSize;
+  }
+
+  async getArtworkPrintSizes(artworkId: number): Promise<ArtworkPrintSize[]> {
+    return Array.from(this.artworkPrintSizes.values())
+      .filter(aps => aps.artworkId === artworkId);
+  }
+
+  async getArtworkPrintSizesWithDetails(artworkId: number): Promise<(ArtworkPrintSize & PrintSize)[]> {
+    const artworkPrintSizes = await this.getArtworkPrintSizes(artworkId);
+    
+    return artworkPrintSizes.map(aps => {
+      const printSize = this.printSizes.get(aps.printSizeId);
+      if (!printSize) {
+        throw new Error(`Print size with ID ${aps.printSizeId} not found`);
+      }
+      
+      return {
+        ...aps,
+        ...printSize
+      };
+    });
+  }
+
+  async updateArtworkPrintSize(id: number, artworkPrintSizeUpdate: Partial<InsertArtworkPrintSize>): Promise<ArtworkPrintSize | undefined> {
+    const existingArtworkPrintSize = this.artworkPrintSizes.get(id);
+    if (!existingArtworkPrintSize) {
+      return undefined;
+    }
+
+    const updatedArtworkPrintSize: ArtworkPrintSize = {
+      ...existingArtworkPrintSize,
+      ...artworkPrintSizeUpdate
+    };
+
+    this.artworkPrintSizes.set(id, updatedArtworkPrintSize);
+    return updatedArtworkPrintSize;
+  }
+
+  async deleteArtworkPrintSize(id: number): Promise<void> {
+    this.artworkPrintSizes.delete(id);
+  }
+
+  // Print Order methods
+  async createPrintOrder(insertPrintOrder: InsertPrintOrder): Promise<PrintOrder> {
+    const id = this.printOrderCurrentId++;
+    const printOrder: PrintOrder = {
+      ...insertPrintOrder,
+      id,
+      isOriginal: insertPrintOrder.isOriginal ?? false,
+      quantity: insertPrintOrder.quantity ?? 1,
+      orderDate: new Date(),
+      status: insertPrintOrder.status ?? 'pending',
+      trackingNumber: null,
+      stripePaymentId: null,
+      printingServiceOrderId: null
+    };
+    this.printOrders.set(id, printOrder);
+    return printOrder;
+  }
+
+  async getPrintOrder(id: number): Promise<PrintOrder | undefined> {
+    return this.printOrders.get(id);
+  }
+
+  async getUserPrintOrders(userId: number): Promise<PrintOrder[]> {
+    return Array.from(this.printOrders.values())
+      .filter(order => order.userId === userId)
+      .sort((a, b) => {
+        // Handle possibly null orderDate values
+        const dateA = a.orderDate || new Date(0);
+        const dateB = b.orderDate || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+  }
+  
+  async getAllPrintOrders(): Promise<PrintOrder[]> {
+    return Array.from(this.printOrders.values())
+      .sort((a, b) => {
+        // Handle possibly null orderDate values
+        const dateA = a.orderDate || new Date(0);
+        const dateB = b.orderDate || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+  }
+
+  async updatePrintOrderStatus(id: number, status: string, trackingNumber?: string): Promise<PrintOrder | undefined> {
+    const existingOrder = this.printOrders.get(id);
+    if (!existingOrder) {
+      return undefined;
+    }
+
+    const updatedOrder: PrintOrder = {
+      ...existingOrder,
+      status,
+      trackingNumber: trackingNumber || existingOrder.trackingNumber
+    };
+
+    this.printOrders.set(id, updatedOrder);
+    return updatedOrder;
+  }
+
+  async updatePrintOrderPaymentInfo(id: number, stripePaymentId: string): Promise<PrintOrder | undefined> {
+    const existingOrder = this.printOrders.get(id);
+    if (!existingOrder) {
+      return undefined;
+    }
+
+    const updatedOrder: PrintOrder = {
+      ...existingOrder,
+      stripePaymentId
+    };
+
+    this.printOrders.set(id, updatedOrder);
+    return updatedOrder;
+  }
+
+  async updatePrintOrderPrintingInfo(id: number, printingServiceOrderId: string): Promise<PrintOrder | undefined> {
+    const existingOrder = this.printOrders.get(id);
+    if (!existingOrder) {
+      return undefined;
+    }
+
+    const updatedOrder: PrintOrder = {
+      ...existingOrder,
+      printingServiceOrderId
+    };
+
+    this.printOrders.set(id, updatedOrder);
+    return updatedOrder;
   }
 }
 

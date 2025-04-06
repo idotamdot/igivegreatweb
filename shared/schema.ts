@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, numeric } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -51,3 +51,108 @@ export type Connection = typeof connections.$inferSelect;
 export type InsertConnection = z.infer<typeof insertConnectionSchema>;
 export type MenuLink = typeof menuLinks.$inferSelect;
 export type InsertMenuLink = z.infer<typeof insertMenuLinkSchema>;
+
+// Artwork schema
+export const artworks = pgTable("artworks", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  artistName: text("artist_name").notNull(),
+  imageUrl: text("image_url").notNull(),
+  originalAvailable: boolean("original_available").default(false),
+  originalPrice: numeric("original_price", { precision: 10, scale: 2 }).notNull(),
+  category: text("category").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+  dimensions: text("dimensions"), // Format: "width x height" in inches
+  medium: text("medium"),
+  featured: boolean("featured").default(false),
+});
+
+// Print sizes schema
+export const printSizes = pgTable("print_sizes", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(), // e.g., "Small", "Medium", "Large"
+  width: numeric("width", { precision: 5, scale: 2 }).notNull(), // In inches
+  height: numeric("height", { precision: 5, scale: 2 }).notNull(), // In inches
+  priceFactor: numeric("price_factor", { precision: 5, scale: 2 }).notNull(), // Price multiplier
+  active: boolean("active").default(true),
+});
+
+// Artwork print sizes relationship
+export const artworkPrintSizes = pgTable("artwork_print_sizes", {
+  id: serial("id").primaryKey(),
+  artworkId: integer("artwork_id").references(() => artworks.id).notNull(),
+  printSizeId: integer("print_size_id").references(() => printSizes.id).notNull(),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(), // Custom price for this artwork & size
+  inStock: boolean("in_stock").default(true),
+});
+
+// Define orders for print purchases
+export const printOrders = pgTable("print_orders", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  artworkId: integer("artwork_id").references(() => artworks.id).notNull(),
+  printSizeId: integer("print_size_id").references(() => printSizes.id).notNull(),
+  quantity: integer("quantity").notNull().default(1),
+  price: numeric("price", { precision: 10, scale: 2 }).notNull(),
+  isOriginal: boolean("is_original").default(false),
+  shippingAddress: text("shipping_address").notNull(),
+  status: text("status").notNull().default("pending"), // pending, processing, shipped, delivered
+  trackingNumber: text("tracking_number"),
+  orderDate: timestamp("order_date").defaultNow(),
+  stripePaymentId: text("stripe_payment_id"),
+  printingServiceOrderId: text("printing_service_order_id"),
+});
+
+// Insert schemas
+export const insertArtworkSchema = createInsertSchema(artworks).pick({
+  title: true,
+  description: true,
+  artistName: true,
+  imageUrl: true,
+  originalAvailable: true,
+  originalPrice: true,
+  category: true,
+  dimensions: true,
+  medium: true,
+  featured: true,
+});
+
+export const insertPrintSizeSchema = createInsertSchema(printSizes).pick({
+  name: true,
+  width: true,
+  height: true,
+  priceFactor: true,
+  active: true,
+});
+
+export const insertArtworkPrintSizeSchema = createInsertSchema(artworkPrintSizes).pick({
+  artworkId: true,
+  printSizeId: true,
+  price: true,
+  inStock: true,
+});
+
+export const insertPrintOrderSchema = createInsertSchema(printOrders).pick({
+  userId: true,
+  artworkId: true,
+  printSizeId: true,
+  quantity: true,
+  price: true,
+  isOriginal: true,
+  shippingAddress: true,
+  status: true,
+});
+
+// Types
+export type Artwork = typeof artworks.$inferSelect;
+export type InsertArtwork = z.infer<typeof insertArtworkSchema>;
+
+export type PrintSize = typeof printSizes.$inferSelect;
+export type InsertPrintSize = z.infer<typeof insertPrintSizeSchema>;
+
+export type ArtworkPrintSize = typeof artworkPrintSizes.$inferSelect;
+export type InsertArtworkPrintSize = z.infer<typeof insertArtworkPrintSizeSchema>;
+
+export type PrintOrder = typeof printOrders.$inferSelect;
+export type InsertPrintOrder = z.infer<typeof insertPrintOrderSchema>;

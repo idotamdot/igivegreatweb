@@ -11,6 +11,10 @@ import MessageDetails from "@/pages/message-details";
 import ContentPage from "@/pages/content-page";
 import ServicesPage from "@/pages/services-page";
 import Checkout from "@/pages/checkout";
+import GalleryPage from "@/pages/gallery-page";
+import ArtworkDetail from "@/pages/artwork-detail";
+import CheckoutOrder from "@/pages/checkout-order";
+import OrdersPage from "@/pages/orders-page";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
 // Temporarily commenting out protected route for development
@@ -30,6 +34,11 @@ function Router() {
       {/* Services and checkout routes */}
       <Route path="/services" component={ServicesPage} />
       <Route path="/checkout" component={Checkout} />
+      {/* Gallery and artwork routes */}
+      <Route path="/gallery" component={GalleryPage} />
+      <Route path="/artwork/:id" component={ArtworkDetail} />
+      <Route path="/checkout/:id" component={CheckoutOrder} />
+      <Route path="/orders" component={OrdersPage} />
       {/* Route for content pages created from menu links */}
       <Route path="/page/:slug" component={ContentPage} />
       <Route component={NotFound} />

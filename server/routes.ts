@@ -5,7 +5,15 @@ import { setupAuth } from "./auth";
 import { 
   insertConnectionSchema, 
   insertMenuLinkSchema, 
-  type InsertMenuLink
+  insertArtworkSchema,
+  insertPrintSizeSchema,
+  insertArtworkPrintSizeSchema,
+  insertPrintOrderSchema,
+  type InsertMenuLink,
+  type InsertArtwork,
+  type InsertPrintSize,
+  type InsertArtworkPrintSize,
+  type InsertPrintOrder,
 } from "@shared/schema";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -515,6 +523,439 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res
         .status(500)
         .json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // ==================== ARTWORK & PRINTS ENDPOINTS ====================
+
+  // API endpoint to get all artworks
+  app.get("/api/artworks", (req, res) => {
+    storage.getAllArtworks()
+      .then(artworks => res.json(artworks))
+      .catch(error => res.status(500).json({ message: error.message }));
+  });
+
+  // API endpoint to get featured artworks
+  app.get("/api/artworks/featured", (req, res) => {
+    storage.getFeaturedArtworks()
+      .then(artworks => res.json(artworks))
+      .catch(error => res.status(500).json({ message: error.message }));
+  });
+
+  // API endpoint to get a single artwork by ID
+  app.get("/api/artworks/:id", async (req, res) => {
+    const artworkId = parseInt(req.params.id);
+    if (isNaN(artworkId)) {
+      return res.status(400).json({ message: "Invalid artwork ID" });
+    }
+    
+    try {
+      const artwork = await storage.getArtwork(artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      res.json(artwork);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to create a new artwork (protected, admin access required)
+  app.post("/api/artworks", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    try {
+      // Validate request body
+      const validatedData = insertArtworkSchema.parse(req.body);
+      
+      // Create the artwork
+      const artwork = await storage.createArtwork(validatedData);
+      
+      // Return the created artwork
+      res.status(201).json(artwork);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to update an artwork (protected, admin access required)
+  app.patch("/api/artworks/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const artworkId = parseInt(req.params.id);
+    if (isNaN(artworkId)) {
+      return res.status(400).json({ message: "Invalid artwork ID" });
+    }
+    
+    try {
+      const artwork = await storage.getArtwork(artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      // Only update fields that are provided
+      const updateData: Partial<InsertArtwork> = {};
+      
+      if (req.body.title !== undefined) updateData.title = req.body.title;
+      if (req.body.description !== undefined) updateData.description = req.body.description;
+      if (req.body.artistName !== undefined) updateData.artistName = req.body.artistName;
+      if (req.body.imageUrl !== undefined) updateData.imageUrl = req.body.imageUrl;
+      if (req.body.originalAvailable !== undefined) updateData.originalAvailable = req.body.originalAvailable;
+      if (req.body.originalPrice !== undefined) updateData.originalPrice = req.body.originalPrice;
+      if (req.body.category !== undefined) updateData.category = req.body.category;
+      if (req.body.dimensions !== undefined) updateData.dimensions = req.body.dimensions;
+      if (req.body.medium !== undefined) updateData.medium = req.body.medium;
+      if (req.body.featured !== undefined) updateData.featured = req.body.featured;
+      
+      const updatedArtwork = await storage.updateArtwork(artworkId, updateData);
+      
+      res.json(updatedArtwork);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to delete an artwork (protected, admin access required)
+  app.delete("/api/artworks/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const artworkId = parseInt(req.params.id);
+    if (isNaN(artworkId)) {
+      return res.status(400).json({ message: "Invalid artwork ID" });
+    }
+    
+    try {
+      const artwork = await storage.getArtwork(artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      await storage.deleteArtwork(artworkId);
+      res.status(200).json({ message: "Artwork deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to get all print sizes
+  app.get("/api/print-sizes", (req, res) => {
+    storage.getAllPrintSizes()
+      .then(printSizes => res.json(printSizes))
+      .catch(error => res.status(500).json({ message: error.message }));
+  });
+
+  // API endpoint to create a new print size (protected, admin access required)
+  app.post("/api/print-sizes", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    try {
+      // Validate request body
+      const validatedData = insertPrintSizeSchema.parse(req.body);
+      
+      // Create the print size
+      const printSize = await storage.createPrintSize(validatedData);
+      
+      // Return the created print size
+      res.status(201).json(printSize);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to get all available print sizes for a specific artwork
+  app.get("/api/artworks/:id/print-sizes", async (req, res) => {
+    const artworkId = parseInt(req.params.id);
+    if (isNaN(artworkId)) {
+      return res.status(400).json({ message: "Invalid artwork ID" });
+    }
+    
+    try {
+      const artwork = await storage.getArtwork(artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      const printSizesWithDetails = await storage.getArtworkPrintSizesWithDetails(artworkId);
+      res.json(printSizesWithDetails);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to add a print size to an artwork (protected, admin access required)
+  app.post("/api/artworks/:id/print-sizes", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const artworkId = parseInt(req.params.id);
+    if (isNaN(artworkId)) {
+      return res.status(400).json({ message: "Invalid artwork ID" });
+    }
+    
+    try {
+      const artwork = await storage.getArtwork(artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      // Validate request body
+      const { printSizeId, price, inStock } = req.body;
+      
+      if (!printSizeId || !price) {
+        return res.status(400).json({ message: "Print size ID and price are required" });
+      }
+      
+      const printSize = await storage.getPrintSize(printSizeId);
+      if (!printSize) {
+        return res.status(404).json({ message: "Print size not found" });
+      }
+      
+      // Create the association
+      const artworkPrintSize = await storage.createArtworkPrintSize({
+        artworkId,
+        printSizeId,
+        price,
+        inStock: inStock !== undefined ? inStock : true
+      });
+      
+      // Return the created association with print size details
+      const response = {
+        ...artworkPrintSize,
+        printSize
+      };
+      
+      res.status(201).json(response);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to create an order for a print (requires user authentication)
+  app.post("/api/print-orders", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    try {
+      const { artworkId, printSizeId, quantity, isOriginal, shippingAddress } = req.body;
+      
+      if (!artworkId || !(printSizeId || isOriginal) || !shippingAddress) {
+        return res.status(400).json({ 
+          message: "Artwork ID, print size ID (or isOriginal=true), and shipping address are required" 
+        });
+      }
+      
+      // Get the artwork
+      const artwork = await storage.getArtwork(artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      let price: number;
+      
+      if (isOriginal) {
+        // Check if original is available
+        if (!artwork.originalAvailable) {
+          return res.status(400).json({ message: "Original artwork is not available for purchase" });
+        }
+        
+        price = parseFloat(artwork.originalPrice.toString());
+      } else {
+        // Get the artwork print size
+        const artworkPrintSizes = await storage.getArtworkPrintSizes(artworkId);
+        const artworkPrintSize = artworkPrintSizes.find(aps => aps.printSizeId === printSizeId);
+        
+        if (!artworkPrintSize) {
+          return res.status(404).json({ message: "Print size not available for this artwork" });
+        }
+        
+        if (!artworkPrintSize.inStock) {
+          return res.status(400).json({ message: "Print size is out of stock" });
+        }
+        
+        price = parseFloat(artworkPrintSize.price.toString());
+      }
+      
+      // Calculate total price
+      const totalPrice = price * (quantity || 1);
+      
+      // Create the order
+      const order = await storage.createPrintOrder({
+        userId: req.user.id,
+        artworkId,
+        printSizeId: isOriginal ? 0 : printSizeId,
+        quantity: quantity || 1,
+        price: totalPrice.toString(),
+        isOriginal: isOriginal || false,
+        shippingAddress,
+        status: "pending"
+      });
+      
+      // Return the created order
+      res.status(201).json(order);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to get orders for the current user
+  app.get("/api/print-orders", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    try {
+      const orders = await storage.getUserPrintOrders(req.user.id);
+      res.json(orders);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to update order status (protected, admin access required)
+  app.patch("/api/print-orders/:id/status", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const orderId = parseInt(req.params.id);
+    if (isNaN(orderId)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+    
+    try {
+      const { status, trackingNumber } = req.body;
+      
+      if (!status) {
+        return res.status(400).json({ message: "Status is required" });
+      }
+      
+      const order = await storage.getPrintOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      const updatedOrder = await storage.updatePrintOrderStatus(orderId, status, trackingNumber);
+      res.json(updatedOrder);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API endpoint to integrate with print service (protected, admin access required)
+  app.post("/api/print-orders/:id/print-service", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const orderId = parseInt(req.params.id);
+    if (isNaN(orderId)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+    
+    try {
+      const { printingServiceOrderId } = req.body;
+      
+      if (!printingServiceOrderId) {
+        return res.status(400).json({ message: "Printing service order ID is required" });
+      }
+      
+      const order = await storage.getPrintOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      const updatedOrder = await storage.updatePrintOrderPrintingInfo(orderId, printingServiceOrderId);
+      
+      // Update status to processing if it's currently pending
+      if (updatedOrder && updatedOrder.status === "pending") {
+        await storage.updatePrintOrderStatus(orderId, "processing");
+      }
+      
+      res.json(updatedOrder);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // API endpoint for Stripe payment for prints (directly ties to an order)
+  app.post("/api/print-orders/:id/payment", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const orderId = parseInt(req.params.id);
+    if (isNaN(orderId)) {
+      return res.status(400).json({ message: "Invalid order ID" });
+    }
+    
+    try {
+      const order = await storage.getPrintOrder(orderId);
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+      
+      // Verify the order belongs to the current user
+      if (order.userId !== req.user.id) {
+        return res.status(403).json({ message: "Forbidden - You do not have access to this order" });
+      }
+      
+      // Create a payment intent with Stripe
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(parseFloat(order.price.toString()) * 100), // Convert to cents
+        currency: "usd",
+        metadata: {
+          orderId: order.id.toString(),
+          userId: req.user.id.toString(),
+          isOriginal: order.isOriginal ? "true" : "false",
+          artworkId: order.artworkId.toString()
+        }
+      });
+      
+      // Update the order with the Stripe payment ID
+      await storage.updatePrintOrderPaymentInfo(orderId, paymentIntent.id);
+      
+      res.json({ clientSecret: paymentIntent.client_secret });
+    } catch (error: any) {
+      res.status(500).json({ message: "Error creating payment intent: " + error.message });
     }
   });
 

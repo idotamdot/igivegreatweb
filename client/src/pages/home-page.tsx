@@ -39,7 +39,7 @@ export default function HomePage() {
       </div>
       
       <main className="flex-1 flex justify-center items-center">
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-center px-4 text-white animate-pulse-slow site-title-glow">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-center px-4 text-white animate-pulse-slow site-title-glow font-mono">
           igivegreatweb.com
         </h1>
       </main>

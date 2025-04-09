@@ -66,6 +66,7 @@ export const artworks = pgTable("artworks", {
   dimensions: text("dimensions"), // Format: "width x height" in inches
   medium: text("medium"),
   featured: boolean("featured").default(false),
+  visible: boolean("visible").default(true), // New field to toggle artwork visibility
 });
 
 // Print sizes schema
@@ -116,6 +117,7 @@ export const insertArtworkSchema = createInsertSchema(artworks).pick({
   dimensions: true,
   medium: true,
   featured: true,
+  visible: true,
 });
 
 export const insertPrintSizeSchema = createInsertSchema(printSizes).pick({

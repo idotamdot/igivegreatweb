@@ -353,8 +353,9 @@
   .site-title-glow {
     text-shadow: 0 0 25px rgba(255,255,255,0.7), 0 0 50px rgba(255,255,255,0.4), 0 0 75px rgba(255,255,255,0.2);
     animation: intense-glow 4s infinite ease-in-out;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     font-weight: 300;
+    font-family: 'Courier New', monospace; /* Adding a more tech-looking font */
   }
 
   .animate-pulse-slow {

@@ -530,7 +530,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // API endpoint to get all artworks
   app.get("/api/artworks", (req, res) => {
-    storage.getAllArtworks()
+    // Check if we should include hidden artworks (for admin pages)
+    const includeHidden = req.query.includeHidden === 'true';
+    
+    // Only allow admin users to see hidden artworks
+    const showHidden = includeHidden && req.isAuthenticated() && 
+      (req.user?.role === 'admin' || req.user?.role === 'owner');
+    
+    storage.getAllArtworks(showHidden)
       .then(artworks => res.json(artworks))
       .catch(error => res.status(500).json({ message: error.message }));
   });
@@ -628,7 +635,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // API endpoint to toggle artwork visibility (protected, admin access required)
+  app.patch("/api/artworks/:id/toggle-visibility", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const artworkId = parseInt(req.params.id);
+    if (isNaN(artworkId)) {
+      return res.status(400).json({ message: "Invalid artwork ID" });
+    }
+    
+    try {
+      const artwork = await storage.getArtwork(artworkId);
+      if (!artwork) {
+        return res.status(404).json({ message: "Artwork not found" });
+      }
+      
+      // Toggle the visibility
+      const newVisibility = artwork.visible === false ? true : false;
+      
+      const updatedArtwork = await storage.updateArtwork(artworkId, { 
+        visible: newVisibility
+      });
+      
+      if (!updatedArtwork) {
+        return res.status(500).json({ message: "Failed to update artwork visibility" });
+      }
+      
+      res.status(200).json({ 
+        message: `Artwork ${newVisibility ? 'shown' : 'hidden'} successfully`,
+        artwork: updatedArtwork
+      });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
   // API endpoint to delete an artwork (protected, admin access required)
+  // Note: This is kept for backwards compatibility but artwork deletion is now discouraged
+  // Use toggle-visibility endpoint instead to hide artwork
   app.delete("/api/artworks/:id", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -649,8 +699,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Artwork not found" });
       }
       
-      await storage.deleteArtwork(artworkId);
-      res.status(200).json({ message: "Artwork deleted successfully" });
+      // Instead of deleting, just hide it
+      await storage.updateArtwork(artworkId, { visible: false });
+      res.status(200).json({ message: "Artwork hidden successfully" });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

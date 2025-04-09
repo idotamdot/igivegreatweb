@@ -382,7 +382,7 @@ export default function AdminDashboard() {
                 <ImageIcon className="h-12 w-12 mb-4"/>
                 <h3 className="text-lg font-medium mb-2">manage artworks</h3>
                 <p className="text-sm text-muted-foreground mb-4">Add, edit, or remove artwork from your gallery</p>
-                <Link to="/admin/gallery/artworks">
+                <Link to="/admin-gallery-management">
                   <GlowButton className="w-full">
                     manage artworks
                   </GlowButton>
@@ -697,17 +697,7 @@ This is a paragraph of text.
                           >
                             <PencilIcon className="h-4 w-4" />
                           </button>
-                          <button
-                            className="text-red-500 hover:text-red-400"
-                            onClick={() => handleRemoveMenuLink(menuLink.id)}
-                            disabled={removeMenuLinkMutation.isPending}
-                          >
-                            {removeMenuLinkMutation.isPending ? (
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                            ) : (
-                              <Trash2 className="h-4 w-4" />
-                            )}
-                          </button>
+                          {/* Delete button removed, only using toggle functionality */}
                         </div>
                       </div>
                     </div>

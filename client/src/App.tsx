@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
 import AdminDashboard from "@/pages/admin-dashboard";
+import AdminGalleryManagement from "@/pages/admin-gallery-management";
 import ClientDashboard from "@/pages/client-dashboard";
 import ProjectDetails from "@/pages/project-details";
 import MessageDetails from "@/pages/message-details";
@@ -41,6 +42,7 @@ function Router() {
       <Route path="/orders" component={OrdersPage} />
       
       {/* Admin gallery management routes */}
+      <Route path="/admin-gallery-management" component={AdminGalleryManagement} />
       <Route path="/admin/gallery/artworks" component={GalleryPage} />
       <Route path="/admin/gallery/sizes" component={GalleryPage} />
       <Route path="/admin/gallery/orders" component={OrdersPage} />

@@ -215,6 +215,7 @@ export class MemStorage implements IStorage {
         dimensions: artData.dimensions,
         medium: artData.medium,
         featured: artData.featured,
+        visible: true,
         createdAt: new Date()
       };
       this.artworks.set(artwork.id, artwork);
@@ -502,6 +503,7 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
       originalAvailable: insertArtwork.originalAvailable ?? false,
       featured: insertArtwork.featured ?? false,
+      visible: insertArtwork.visible ?? true,
       dimensions: insertArtwork.dimensions || null,
       medium: insertArtwork.medium || null
     };
@@ -509,8 +511,9 @@ export class MemStorage implements IStorage {
     return artwork;
   }
 
-  async getAllArtworks(): Promise<Artwork[]> {
-    return Array.from(this.artworks.values());
+  async getAllArtworks(includeHidden: boolean = false): Promise<Artwork[]> {
+    const allArtworks = Array.from(this.artworks.values());
+    return includeHidden ? allArtworks : allArtworks.filter(artwork => artwork.visible !== false);
   }
 
   async getArtwork(id: number): Promise<Artwork | undefined> {
@@ -547,7 +550,7 @@ export class MemStorage implements IStorage {
 
   async getFeaturedArtworks(): Promise<Artwork[]> {
     return Array.from(this.artworks.values())
-      .filter(artwork => artwork.featured);
+      .filter(artwork => artwork.featured && artwork.visible !== false);
   }
 
   // Print Size methods

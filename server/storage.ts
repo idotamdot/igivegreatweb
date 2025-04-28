@@ -632,14 +632,22 @@ export class MemStorage implements IStorage {
   async getFeaturedArtworks(): Promise<Artwork[]> {
     return Array.from(this.artworks.values())
       .filter(artwork => artwork.featured && artwork.visible)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => {
+        // Handle potential null values for createdAt
+        if (!a.createdAt || !b.createdAt) return 0;
+        return b.createdAt.getTime() - a.createdAt.getTime();
+      });
   }
   
   async createPrintSize(insertPrintSize: InsertPrintSize): Promise<PrintSize> {
     const id = this.printSizeCurrentId++;
     const printSize: PrintSize = {
-      ...insertPrintSize,
-      id
+      id,
+      name: insertPrintSize.name,
+      width: insertPrintSize.width,
+      height: insertPrintSize.height,
+      priceFactor: insertPrintSize.priceFactor,
+      active: insertPrintSize.active ?? true
     };
     this.printSizes.set(id, printSize);
     return printSize;
@@ -677,8 +685,11 @@ export class MemStorage implements IStorage {
   async createArtworkPrintSize(insertArtworkPrintSize: InsertArtworkPrintSize): Promise<ArtworkPrintSize> {
     const id = this.artworkPrintSizeCurrentId++;
     const artworkPrintSize: ArtworkPrintSize = {
-      ...insertArtworkPrintSize,
-      id
+      id,
+      artworkId: insertArtworkPrintSize.artworkId,
+      printSizeId: insertArtworkPrintSize.printSizeId,
+      price: insertArtworkPrintSize.price,
+      inStock: insertArtworkPrintSize.inStock ?? true
     };
     this.artworkPrintSizes.set(id, artworkPrintSize);
     return artworkPrintSize;
@@ -727,13 +738,19 @@ export class MemStorage implements IStorage {
   async createPrintOrder(insertPrintOrder: InsertPrintOrder): Promise<PrintOrder> {
     const id = this.printOrderCurrentId++;
     const printOrder: PrintOrder = {
-      ...insertPrintOrder,
       id,
+      userId: insertPrintOrder.userId,
+      artworkId: insertPrintOrder.artworkId,
+      printSizeId: insertPrintOrder.printSizeId,
+      quantity: insertPrintOrder.quantity || 1,
+      price: insertPrintOrder.price,
+      isOriginal: insertPrintOrder.isOriginal || false,
+      shippingAddress: insertPrintOrder.shippingAddress,
       orderDate: new Date(),
       status: insertPrintOrder.status || "pending",
-      trackingNumber: undefined,
-      stripePaymentId: undefined,
-      printingServiceOrderId: undefined
+      trackingNumber: null,
+      stripePaymentId: null,
+      printingServiceOrderId: null
     };
     this.printOrders.set(id, printOrder);
     return printOrder;

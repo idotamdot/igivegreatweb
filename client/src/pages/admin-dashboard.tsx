@@ -18,6 +18,9 @@ import {
   PencilIcon, 
   ToggleLeft, 
   ToggleRight,
+  EyeOff,
+  Eye,
+  Edit,
   Lock,
   Save,
   FileText,
@@ -1253,7 +1256,7 @@ This is a paragraph of text.
                 <div className="flex justify-center p-8">
                   <Loader2 className="h-8 w-8 animate-spin text-white" />
                 </div>
-              ) : contentBlocks?.length > 0 ? (
+              ) : contentBlocks && contentBlocks.length > 0 ? (
                 <div className="space-y-4">
                   {contentBlocks.map((contentBlock) => (
                     <div key={contentBlock.id} className="border border-accent/30 rounded-lg p-4 hover:border-primary/50 transition-all">
@@ -1289,7 +1292,7 @@ This is a paragraph of text.
                             className="p-2 text-gray-400 hover:text-red-400"
                             title="Delete"
                           >
-                            <Trash size={16} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </div>

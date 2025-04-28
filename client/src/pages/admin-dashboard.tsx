@@ -111,6 +111,7 @@ export default function AdminDashboard() {
   const { toast } = useToast();
   const [tab, setTab] = useState<"connections" | "menu-links" | "gallery" | "services" | "printing" | "account" | "themes" | "animations" | "content">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
+  const [editingContentBlock, setEditingContentBlock] = useState<ContentBlock | null>(null);
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
     queryKey: ["/api/connections"],
@@ -126,6 +127,11 @@ export default function AdminDashboard() {
   const { data: menuLinks, isLoading: isLoadingMenuLinks } = useQuery<MenuLink[]>({
     queryKey: ["/api/menu-links"],
     enabled: tab === "menu-links",
+  });
+  
+  const { data: contentBlocks, isLoading: isLoadingContentBlocks } = useQuery<ContentBlock[]>({
+    queryKey: ["/api/content-blocks"],
+    enabled: tab === "content",
   });
   
   const menuLinkForm = useForm<MenuLinkFormValues>({
@@ -147,6 +153,18 @@ export default function AdminDashboard() {
       currentPassword: "",
       newPassword: "",
       confirmPassword: ""
+    }
+  });
+  
+  const contentBlockForm = useForm<ContentBlockFormValues>({
+    resolver: zodResolver(contentBlockSchema),
+    defaultValues: {
+      key: "",
+      title: "",
+      content: "",
+      placement: "home_hero",
+      active: true,
+      metaData: "{}"
     }
   });
   
@@ -304,6 +322,140 @@ export default function AdminDashboard() {
   
   const onAccountSubmit = (values: AccountFormValues) => {
     updateAccountMutation.mutate(values);
+  };
+  
+  // Content Block mutations
+  const addContentBlockMutation = useMutation({
+    mutationFn: async (values: ContentBlockFormValues) => {
+      const res = await apiRequest("POST", "/api/content-blocks", values);
+      return await res.json();
+    },
+    onSuccess: () => {
+      contentBlockForm.reset({
+        key: "",
+        title: "",
+        content: "",
+        placement: "home_hero",
+        active: true,
+        metaData: "{}"
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/content-blocks"] });
+      toast({
+        title: "Content block added",
+        description: "New content block has been added successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to add content block",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const updateContentBlockMutation = useMutation({
+    mutationFn: async (values: ContentBlockFormValues & { id: number }) => {
+      const { id, ...blockData } = values;
+      const res = await apiRequest("PATCH", `/api/content-blocks/${id}`, blockData);
+      return await res.json();
+    },
+    onSuccess: () => {
+      setEditingContentBlock(null);
+      contentBlockForm.reset({
+        key: "",
+        title: "",
+        content: "",
+        placement: "home_hero",
+        active: true,
+        metaData: "{}"
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/content-blocks"] });
+      toast({
+        title: "Content block updated",
+        description: "Content block has been updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update content block",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const removeContentBlockMutation = useMutation({
+    mutationFn: async (contentBlockId: number) => {
+      const res = await apiRequest("DELETE", `/api/content-blocks/${contentBlockId}`);
+      return res;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/content-blocks"] });
+      toast({
+        title: "Content block removed",
+        description: "Content block has been removed successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to remove content block",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const toggleContentBlockActiveMutation = useMutation({
+    mutationFn: async ({ id, active }: { id: number, active: boolean }) => {
+      const res = await apiRequest("PATCH", `/api/content-blocks/${id}`, { active });
+      return await res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/content-blocks"] });
+      toast({
+        title: "Content block updated",
+        description: "Block visibility has been updated successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Failed to update content block",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const onContentBlockSubmit = (values: ContentBlockFormValues) => {
+    if (editingContentBlock) {
+      updateContentBlockMutation.mutate({ ...values, id: editingContentBlock.id });
+    } else {
+      addContentBlockMutation.mutate(values);
+    }
+  };
+  
+  const handleEditContentBlock = (contentBlock: ContentBlock) => {
+    setEditingContentBlock(contentBlock);
+    contentBlockForm.reset({
+      key: contentBlock.key,
+      title: contentBlock.title,
+      content: contentBlock.content,
+      placement: contentBlock.placement,
+      active: contentBlock.active ?? true,
+      metaData: contentBlock.metaData ?? "{}"
+    });
+  };
+  
+  const handleRemoveContentBlock = (contentBlockId: number) => {
+    removeContentBlockMutation.mutate(contentBlockId);
+  };
+  
+  const handleToggleContentBlockActive = (contentBlock: ContentBlock) => {
+    toggleContentBlockActiveMutation.mutate({
+      id: contentBlock.id,
+      active: !contentBlock.active
+    });
   };
 
   return (

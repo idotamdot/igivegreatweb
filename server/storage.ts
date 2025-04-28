@@ -569,9 +569,19 @@ export class MemStorage implements IStorage {
   async createArtwork(insertArtwork: InsertArtwork): Promise<Artwork> {
     const id = this.artworkCurrentId++;
     const artwork: Artwork = {
-      ...insertArtwork,
       id,
-      createdAt: new Date()
+      title: insertArtwork.title,
+      description: insertArtwork.description,
+      artistName: insertArtwork.artistName,
+      imageUrl: insertArtwork.imageUrl,
+      originalPrice: insertArtwork.originalPrice,
+      category: insertArtwork.category,
+      createdAt: new Date(),
+      originalAvailable: insertArtwork.originalAvailable ?? null,
+      dimensions: insertArtwork.dimensions ?? null,
+      medium: insertArtwork.medium ?? null,
+      featured: insertArtwork.featured ?? null,
+      visible: insertArtwork.visible ?? true
     };
     this.artworks.set(id, artwork);
     return artwork;
@@ -591,6 +601,7 @@ export class MemStorage implements IStorage {
       }
       
       // Then sort by creation date (newest first)
+      if (!a.createdAt || !b.createdAt) return 0;
       return b.createdAt.getTime() - a.createdAt.getTime();
     });
   }
@@ -735,12 +746,20 @@ export class MemStorage implements IStorage {
   async getUserPrintOrders(userId: number): Promise<PrintOrder[]> {
     return Array.from(this.printOrders.values())
       .filter(order => order.userId === userId)
-      .sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
+      .sort((a, b) => {
+        // Handle potential null values for orderDate
+        if (!a.orderDate || !b.orderDate) return 0;
+        return b.orderDate.getTime() - a.orderDate.getTime();
+      });
   }
   
   async getAllPrintOrders(): Promise<PrintOrder[]> {
     return Array.from(this.printOrders.values())
-      .sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
+      .sort((a, b) => {
+        // Handle potential null values for orderDate
+        if (!a.orderDate || !b.orderDate) return 0;
+        return b.orderDate.getTime() - a.orderDate.getTime();
+      });
   }
   
   async updatePrintOrderStatus(id: number, status: string, trackingNumber?: string): Promise<PrintOrder | undefined> {
@@ -752,7 +771,7 @@ export class MemStorage implements IStorage {
     const updatedOrder: PrintOrder = {
       ...existingOrder,
       status,
-      trackingNumber
+      trackingNumber: trackingNumber || null
     };
     
     this.printOrders.set(id, updatedOrder);

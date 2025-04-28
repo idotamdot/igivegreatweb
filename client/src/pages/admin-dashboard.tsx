@@ -1063,6 +1063,246 @@ This is a paragraph of text.
           </div>
         )}
         
+        {tab === "content" && (
+          <div className="grid gap-8">
+            <div className="bg-card p-6 rounded-lg border border-accent/20">
+              <h2 className="text-xl mb-4">
+                {editingContentBlock ? "edit content block" : "add content block"}
+                {editingContentBlock && (
+                  <button 
+                    onClick={() => {
+                      setEditingContentBlock(null);
+                      contentBlockForm.reset({
+                        key: "",
+                        title: "",
+                        content: "",
+                        placement: "home_hero",
+                        active: true,
+                        metaData: "{}"
+                      });
+                    }}
+                    className="ml-4 text-sm text-gray-400 hover:text-white"
+                  >
+                    (cancel)
+                  </button>
+                )}
+              </h2>
+              
+              <Form {...contentBlockForm}>
+                <form onSubmit={contentBlockForm.handleSubmit(onContentBlockSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={contentBlockForm.control}
+                      name="key"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>identifier key</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="home_hero_text" 
+                              className="bg-input border-input" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs text-gray-400">
+                            Unique key to identify this content block
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={contentBlockForm.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>title</FormLabel>
+                          <FormControl>
+                            <Input 
+                              placeholder="Hero Welcome Text" 
+                              className="bg-input border-input" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormDescription className="text-xs text-gray-400">
+                            Human-readable title for this content
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={contentBlockForm.control}
+                      name="placement"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>placement</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger className="bg-input border-input">
+                                <SelectValue placeholder="Select placement" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="home_hero">Home Hero</SelectItem>
+                              <SelectItem value="home_about">Home About</SelectItem>
+                              <SelectItem value="services_intro">Services Intro</SelectItem>
+                              <SelectItem value="gallery_intro">Gallery Intro</SelectItem>
+                              <SelectItem value="footer">Footer</SelectItem>
+                              <SelectItem value="connect_dialog">Connect Dialog</SelectItem>
+                              <SelectItem value="global">Global Content</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormDescription className="text-xs text-gray-400">
+                            Where this content will be displayed
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={contentBlockForm.control}
+                      name="active"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-row items-center justify-between rounded-lg border border-input/20 p-3 shadow-sm">
+                          <div className="space-y-0.5">
+                            <FormLabel>active</FormLabel>
+                            <FormDescription className="text-xs text-gray-400">
+                              Show this content on the site
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <FormField
+                    control={contentBlockForm.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>content</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Enter content here..." 
+                            className="min-h-[200px] bg-input border-input" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription className="text-xs text-gray-400">
+                          Supports markdown formatting
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={contentBlockForm.control}
+                    name="metaData"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>metadata (json)</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="{}" 
+                            className="min-h-[100px] bg-input border-input font-mono text-xs" 
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormDescription className="text-xs text-gray-400">
+                          Optional JSON metadata for this content block
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex justify-end">
+                    <GlowButton type="submit" disabled={addContentBlockMutation.isPending || updateContentBlockMutation.isPending}>
+                      {(addContentBlockMutation.isPending || updateContentBlockMutation.isPending) ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          saving...
+                        </>
+                      ) : editingContentBlock ? "update content block" : "add content block"}
+                    </GlowButton>
+                  </div>
+                </form>
+              </Form>
+            </div>
+            
+            <div className="bg-card p-6 rounded-lg border border-accent/20">
+              <h2 className="text-xl mb-4">content blocks</h2>
+              
+              {isLoadingContentBlocks ? (
+                <div className="flex justify-center p-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-white" />
+                </div>
+              ) : contentBlocks?.length > 0 ? (
+                <div className="space-y-4">
+                  {contentBlocks.map((contentBlock) => (
+                    <div key={contentBlock.id} className="border border-accent/30 rounded-lg p-4 hover:border-primary/50 transition-all">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg font-medium mb-1">{contentBlock.title}</h3>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="bg-primary/20 text-primary px-2 py-0.5 rounded text-xs">{contentBlock.placement}</span>
+                            <span className="bg-accent/20 text-gray-300 px-2 py-0.5 rounded text-xs">Key: {contentBlock.key}</span>
+                            <span className={`px-2 py-0.5 rounded text-xs ${contentBlock.active ? "bg-green-500/20 text-green-300" : "bg-red-500/20 text-red-300"}`}>
+                              {contentBlock.active ? "Active" : "Inactive"}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-400 line-clamp-2">{contentBlock.content}</p>
+                        </div>
+                        <div className="flex space-x-2">
+                          <button
+                            onClick={() => handleToggleContentBlockActive(contentBlock)}
+                            className="p-2 text-gray-400 hover:text-white"
+                            title={contentBlock.active ? "Deactivate" : "Activate"}
+                          >
+                            {contentBlock.active ? <EyeOff size={16} /> : <Eye size={16} />}
+                          </button>
+                          <button
+                            onClick={() => handleEditContentBlock(contentBlock)}
+                            className="p-2 text-gray-400 hover:text-white"
+                            title="Edit"
+                          >
+                            <Edit size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleRemoveContentBlock(contentBlock.id)}
+                            className="p-2 text-gray-400 hover:text-red-400"
+                            title="Delete"
+                          >
+                            <Trash size={16} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 py-4">No content blocks yet. Add one using the form above.</p>
+              )}
+            </div>
+          </div>
+        )}
+        
         {tab === "account" && (
           <div className="bg-card p-6 rounded-lg border border-accent/20">
             <h2 className="text-xl mb-4">update owner credentials</h2>

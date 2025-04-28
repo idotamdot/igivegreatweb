@@ -50,8 +50,16 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
-  const [activeTab, setActiveTab] = useState<string>("staff-login");
-  const [selectedRole, setSelectedRole] = useState<string>("staff");
+  
+  // Get the role from URL query parameter if present
+  const params = new URLSearchParams(window.location.search);
+  const roleParam = params.get('role');
+  const initialRole = ['admin', 'staff', 'client'].includes(roleParam || '') 
+    ? roleParam as string 
+    : 'staff';
+  
+  const [activeTab, setActiveTab] = useState<string>(`${initialRole}-login`);
+  const [selectedRole, setSelectedRole] = useState<string>(initialRole);
 
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),

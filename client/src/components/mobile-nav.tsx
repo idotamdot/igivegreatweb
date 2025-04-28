@@ -129,11 +129,23 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
             <Link href="/services" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
               our services
             </Link>
-            <Link href="/client" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
-              client login
+            <Link href="/gallery" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
+              gallery
             </Link>
-            <Link href="/admin" className="block py-2 text-white hover:text-gray-300" onClick={onClose}>
-              staff login
+            
+            {/* Account links with separating line */}
+            <div className="border-t border-gray-800 my-2 pt-2">
+              <h3 className="text-sm uppercase text-gray-500 mb-2">account access</h3>
+            </div>
+            
+            <Link href="/auth?role=admin" className="flex items-center py-2 text-amber-400 hover:text-amber-300" onClick={onClose}>
+              <span className="mr-2">⚙️</span> admin login
+            </Link>
+            <Link href="/auth?role=staff" className="flex items-center py-2 text-blue-400 hover:text-blue-300" onClick={onClose}>
+              <span className="mr-2">👤</span> staff login
+            </Link>
+            <Link href="/auth?role=client" className="flex items-center py-2 text-green-400 hover:text-green-300" onClick={onClose}>
+              <span className="mr-2">🔑</span> client login
             </Link>
           </div>
           

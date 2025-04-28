@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, numeric, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, numeric, json, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -189,3 +189,51 @@ export const insertContentBlockSchema = createInsertSchema(contentBlocks).pick({
 
 export type ContentBlock = typeof contentBlocks.$inferSelect;
 export type InsertContentBlock = z.infer<typeof insertContentBlockSchema>;
+
+// Dashboard widgets schema
+export const dashboardWidgets = pgTable("dashboard_widgets", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // The widget type identifier (e.g., "recent-orders", "activity-log", "stats")
+  config: jsonb("config"), // JSON configuration for the widget
+  position: integer("position").notNull().default(0), // Order position in the dashboard
+  width: text("width").notNull().default("full"), // full, half, third
+  height: text("height").default("auto"), // Can be "auto" or a specific height
+  roles: text("roles").array().notNull(), // Array of roles that can see this widget: ["admin", "staff", "client"]
+  active: boolean("active").notNull().default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  userId: integer("user_id").references(() => users.id), // If null, this is a default widget. If set, it's a custom user widget
+});
+
+// Dashboard layout schema (for storing user dashboard customizations)
+export const dashboardLayouts = pgTable("dashboard_layouts", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  role: text("role").notNull(), // The role this layout applies to
+  layout: jsonb("layout").notNull(), // JSON array of widget IDs in display order
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertDashboardWidgetSchema = createInsertSchema(dashboardWidgets).pick({
+  name: true,
+  type: true,
+  config: true,
+  position: true,
+  width: true,
+  height: true,
+  roles: true,
+  active: true,
+  userId: true,
+});
+
+export const insertDashboardLayoutSchema = createInsertSchema(dashboardLayouts).pick({
+  userId: true,
+  role: true,
+  layout: true,
+});
+
+export type DashboardWidget = typeof dashboardWidgets.$inferSelect;
+export type InsertDashboardWidget = z.infer<typeof insertDashboardWidgetSchema>;
+export type DashboardLayout = typeof dashboardLayouts.$inferSelect;
+export type InsertDashboardLayout = z.infer<typeof insertDashboardLayoutSchema>;

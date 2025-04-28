@@ -79,6 +79,22 @@ export interface IStorage {
   updateContentBlock(id: number, contentBlock: Partial<InsertContentBlock>): Promise<ContentBlock | undefined>;
   deleteContentBlock(id: number): Promise<void>;
   
+  // Dashboard Widget methods
+  createDashboardWidget(widget: InsertDashboardWidget): Promise<DashboardWidget>;
+  getAllDashboardWidgets(): Promise<DashboardWidget[]>;
+  getDashboardWidget(id: number): Promise<DashboardWidget | undefined>;
+  getDashboardWidgetsByRole(role: string): Promise<DashboardWidget[]>;
+  getDashboardWidgetsByUser(userId: number): Promise<DashboardWidget[]>;
+  getDashboardWidgetsByUserAndRole(userId: number, role: string): Promise<DashboardWidget[]>;
+  updateDashboardWidget(id: number, widget: Partial<InsertDashboardWidget>): Promise<DashboardWidget | undefined>;
+  deleteDashboardWidget(id: number): Promise<void>;
+  
+  // Dashboard Layout methods
+  createDashboardLayout(layout: InsertDashboardLayout): Promise<DashboardLayout>;
+  getDashboardLayout(userId: number, role: string): Promise<DashboardLayout | undefined>;
+  updateDashboardLayout(id: number, layout: Partial<InsertDashboardLayout>): Promise<DashboardLayout | undefined>;
+  deleteDashboardLayout(id: number): Promise<void>;
+  
   sessionStore: session.Store;
 }
 

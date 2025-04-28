@@ -152,10 +152,49 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // API endpoint to get all menu links
-  app.get("/api/menu-links", (req, res) => {
-    storage.getAllMenuLinks()
-      .then(menuLinks => res.json(menuLinks))
-      .catch(error => res.status(500).json({ message: error.message }));
+  app.get("/api/menu-links", async (req, res) => {
+    try {
+      // For public use, only return active and approved links
+      if (!req.isAuthenticated()) {
+        // Public view - only approved links
+        const approvedLinks = await storage.getApprovedMenuLinks();
+        return res.json(approvedLinks.filter(link => link.active));
+      }
+      
+      const role = req.user?.role;
+      const userId = req.user?.id;
+      
+      // Owner sees all links
+      if (role === "owner") {
+        const allLinks = await storage.getAllMenuLinks();
+        return res.json(allLinks);
+      }
+      
+      // Staff sees their own links plus approved ones
+      if ((role === "staff" || role === "admin") && userId) {
+        // Get links created by this user
+        const userLinks = await storage.getUserMenuLinks(userId);
+        // Get links shared with this user
+        const sharedLinks = await storage.getSharedMenuLinks(userId);
+        // Get all approved links
+        const approvedLinks = await storage.getApprovedMenuLinks();
+        
+        // Combine links and remove duplicates based on ID
+        const combinedLinks = [...userLinks, ...sharedLinks, ...approvedLinks];
+        const uniqueLinks = Array.from(new Map(combinedLinks.map(link => [link.id, link])).values());
+        
+        // Sort by order
+        uniqueLinks.sort((a, b) => a.order - b.order);
+        
+        return res.json(uniqueLinks);
+      }
+      
+      // Default to approved links
+      const approvedLinks = await storage.getApprovedMenuLinks();
+      return res.json(approvedLinks.filter(link => link.active));
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
   });
   
   // API endpoint to get a specific menu link by ID
@@ -172,28 +211,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Menu link not found" });
       }
       
+      // For public use, only return active and approved links
+      if (!req.isAuthenticated()) {
+        if (!menuLink.active || !menuLink.approved) {
+          return res.status(404).json({ message: "Menu link not found" });
+        }
+      } else {
+        const role = req.user?.role;
+        const userId = req.user?.id;
+        
+        // Owner can see any link
+        if (role === "owner") {
+          return res.json(menuLink);
+        }
+        
+        // Staff can see their own links or approved links
+        if ((role === "staff" || role === "admin") && userId) {
+          // Check if the link is created by this user, shared with them, or approved
+          const isCreator = menuLink.createdBy === userId;
+          const isShared = menuLink.sharedWith && menuLink.sharedWith.includes(userId.toString());
+          const isApproved = menuLink.approved;
+          
+          if (!isCreator && !isShared && !isApproved) {
+            return res.status(404).json({ message: "Menu link not found" });
+          }
+        }
+      }
+      
       res.json(menuLink);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
   
-  // API endpoint to create a new menu link (protected, only for owner)
+  // API endpoint to create a new menu link (protected, staff and owner)
   app.post("/api/menu-links", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    if (req.user?.role !== "owner") {
-      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    const role = req.user?.role;
+    const userId = req.user?.id;
+    
+    if (!role || !userId) {
+      return res.status(400).json({ message: "Invalid user role or ID" });
+    }
+    
+    // Only staff, admin, and owner can create menu links
+    if (role !== "staff" && role !== "admin" && role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Insufficient permissions" });
     }
     
     try {
       // Validate request body
-      const validatedData = insertMenuLinkSchema.parse(req.body);
+      const parsedData = insertMenuLinkSchema.safeParse(req.body);
+      
+      if (!parsedData.success) {
+        return res.status(400).json({ 
+          message: "Invalid menu link data", 
+          errors: parsedData.error.format() 
+        });
+      }
+      
+      // Set the creator ID
+      const menuLinkData = {
+        ...parsedData.data,
+        createdBy: userId,
+        // Owner-created links are automatically approved
+        approved: role === "owner" ? true : false
+      };
       
       // Create the menu link
-      const menuLink = await storage.createMenuLink(validatedData);
+      const menuLink = await storage.createMenuLink(menuLinkData);
       
       // Return the created menu link
       res.status(201).json(menuLink);

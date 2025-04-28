@@ -374,6 +374,9 @@ export class MemStorage implements IStorage {
         active: true,
         images: [],
         showImageGallery: false,
+        createdBy: 1, // Owner user ID
+        approved: true,
+        sharedWith: [],
         createdAt: new Date()
       },
       {
@@ -386,6 +389,9 @@ export class MemStorage implements IStorage {
         active: true,
         images: [],
         showImageGallery: false,
+        createdBy: 1, // Owner user ID
+        approved: true,
+        sharedWith: [],
         createdAt: new Date()
       },
       {
@@ -398,6 +404,9 @@ export class MemStorage implements IStorage {
         active: true,
         images: [],
         showImageGallery: false,
+        createdBy: 1, // Owner user ID
+        approved: true,
+        sharedWith: [],
         createdAt: new Date()
       },
       {
@@ -410,6 +419,9 @@ export class MemStorage implements IStorage {
         active: true,
         images: [],
         showImageGallery: false,
+        createdBy: 1, // Owner user ID
+        approved: true,
+        sharedWith: [],
         createdAt: new Date()
       },
       {
@@ -422,6 +434,9 @@ export class MemStorage implements IStorage {
         active: true,
         images: [],
         showImageGallery: false,
+        createdBy: 1, // Owner user ID
+        approved: true,
+        sharedWith: [],
         createdAt: new Date()
       },
       {
@@ -434,6 +449,9 @@ export class MemStorage implements IStorage {
         active: true,
         images: [],
         showImageGallery: false,
+        createdBy: 1, // Owner user ID
+        approved: true,
+        sharedWith: [],
         createdAt: new Date()
       }
     ];

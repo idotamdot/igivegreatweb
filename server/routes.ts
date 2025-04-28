@@ -291,14 +291,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API endpoint to update a menu link (protected, only for owner)
+  // API endpoint to update a menu link (protected)
   app.patch("/api/menu-links/:id", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    if (req.user?.role !== "owner") {
-      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    const role = req.user?.role;
+    const userId = req.user?.id;
+    
+    if (!role || !userId) {
+      return res.status(400).json({ message: "Invalid user role or ID" });
     }
     
     const menuLinkId = parseInt(req.params.id);
@@ -311,6 +314,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!menuLink) {
         return res.status(404).json({ message: "Menu link not found" });
+      }
+      
+      // Check permissions - owner can edit any link, staff can only edit their own links or shared links
+      if (role !== 'owner') {
+        // Check if the staff member created this link or if it's shared with them
+        const isCreator = menuLink.createdBy === userId;
+        const isShared = menuLink.sharedWith && menuLink.sharedWith.includes(userId.toString());
+        
+        if (!isCreator && !isShared) {
+          return res.status(403).json({ message: "Forbidden - You can only edit your own links or links shared with you" });
+        }
       }
       
       // Only validate fields that are provided in the request body
@@ -324,6 +338,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (req.body.images !== undefined) updateData.images = req.body.images;
       if (req.body.showImageGallery !== undefined) updateData.showImageGallery = req.body.showImageGallery;
       
+      // Only owner can update sharing and approval status
+      if (role === 'owner') {
+        if (req.body.sharedWith !== undefined) updateData.sharedWith = req.body.sharedWith;
+        if (req.body.approved !== undefined) updateData.approved = req.body.approved;
+      }
+      
       const updatedMenuLink = await storage.updateMenuLink(menuLinkId, updateData);
       
       res.json(updatedMenuLink);
@@ -332,14 +352,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API endpoint to delete a menu link (protected, only for owner)
-  app.delete("/api/menu-links/:id", async (req, res) => {
+  // API endpoint to update menu link approval (protected, only for owner)
+  app.patch("/api/menu-links/:id/approval", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
     if (req.user?.role !== "owner") {
       return res.status(403).json({ message: "Forbidden - Owner access required" });
+    }
+    
+    const menuLinkId = parseInt(req.params.id);
+    if (isNaN(menuLinkId)) {
+      return res.status(400).json({ message: "Invalid menu link ID" });
+    }
+    
+    try {
+      const { approved } = req.body;
+      
+      if (approved === undefined) {
+        return res.status(400).json({ message: "Approval status is required" });
+      }
+      
+      const updatedMenuLink = await storage.updateMenuLinkApproval(menuLinkId, approved);
+      
+      if (!updatedMenuLink) {
+        return res.status(404).json({ message: "Menu link not found" });
+      }
+      
+      res.json(updatedMenuLink);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // API endpoint to delete a menu link (protected)
+  app.delete("/api/menu-links/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    const role = req.user?.role;
+    const userId = req.user?.id;
+    
+    if (!role || !userId) {
+      return res.status(400).json({ message: "Invalid user role or ID" });
     }
     
     const menuLinkId = parseInt(req.params.id);
@@ -354,6 +411,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ message: "Menu link not found" });
       }
       
+      // Owner can delete any link
+      if (role !== 'owner') {
+        // Staff can only delete their own links
+        if (menuLink.createdBy !== userId) {
+          return res.status(403).json({ message: "Forbidden - You can only delete your own links" });
+        }
+        
+        // Staff can't delete approved links
+        if (menuLink.approved) {
+          return res.status(403).json({ message: "Forbidden - You cannot delete approved links" });
+        }
+      }
+      
       await storage.deleteMenuLink(menuLinkId);
       res.status(200).json({ message: "Menu link deleted successfully" });
     } catch (error: any) {
@@ -361,14 +431,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API endpoint to update menu link images (protected, only for owner)
+  // API endpoint to update menu link images (protected)
   app.post("/api/menu-links/:id/images", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    if (req.user?.role !== "owner") {
-      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    const role = req.user?.role;
+    const userId = req.user?.id;
+    
+    if (!role || !userId) {
+      return res.status(400).json({ message: "Invalid user role or ID" });
     }
     
     const menuLinkId = parseInt(req.params.id);
@@ -381,6 +454,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!menuLink) {
         return res.status(404).json({ message: "Menu link not found" });
+      }
+      
+      // Check permissions - owner can edit any link, staff can only edit their own links or shared links
+      if (role !== 'owner') {
+        // Check if the staff member created this link or if it's shared with them
+        const isCreator = menuLink.createdBy === userId;
+        const isShared = menuLink.sharedWith && menuLink.sharedWith.includes(userId.toString());
+        
+        if (!isCreator && !isShared) {
+          return res.status(403).json({ message: "Forbidden - You can only edit your own links or links shared with you" });
+        }
       }
       
       const { imageUrl } = req.body;
@@ -403,14 +487,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  // API endpoint to delete an image from menu link (protected, only for owner)
+  // API endpoint to delete an image from menu link (protected)
   app.delete("/api/menu-links/:id/images/:imageIndex", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    if (req.user?.role !== "owner") {
-      return res.status(403).json({ message: "Forbidden - Owner access required" });
+    const role = req.user?.role;
+    const userId = req.user?.id;
+    
+    if (!role || !userId) {
+      return res.status(400).json({ message: "Invalid user role or ID" });
     }
     
     const menuLinkId = parseInt(req.params.id);
@@ -429,6 +516,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!menuLink) {
         return res.status(404).json({ message: "Menu link not found" });
+      }
+      
+      // Check permissions - owner can edit any link, staff can only edit their own links or shared links
+      if (role !== 'owner') {
+        // Check if the staff member created this link or if it's shared with them
+        const isCreator = menuLink.createdBy === userId;
+        const isShared = menuLink.sharedWith && menuLink.sharedWith.includes(userId.toString());
+        
+        if (!isCreator && !isShared) {
+          return res.status(403).json({ message: "Forbidden - You can only edit your own links or links shared with you" });
+        }
       }
       
       const currentImages = menuLink.images || [];

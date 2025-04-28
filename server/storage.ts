@@ -34,6 +34,10 @@ export interface IStorage {
   getMenuLink(id: number): Promise<MenuLink | undefined>;
   updateMenuLink(id: number, menuLink: Partial<InsertMenuLink>): Promise<MenuLink | undefined>;
   deleteMenuLink(id: number): Promise<void>;
+  getUserMenuLinks(userId: number): Promise<MenuLink[]>;
+  getApprovedMenuLinks(): Promise<MenuLink[]>;
+  updateMenuLinkApproval(id: number, approved: boolean): Promise<MenuLink | undefined>;
+  getSharedMenuLinks(userId: number): Promise<MenuLink[]>;
   
   // Artwork methods
   createArtwork(artwork: InsertArtwork): Promise<Artwork>;
@@ -509,6 +513,9 @@ export class MemStorage implements IStorage {
     const pageContent = hasPage ? (insertMenuLink.pageContent || "") : null; // Default to empty string for pages, null otherwise
     const images = insertMenuLink.images ?? []; // Default to empty array if not provided
     const showImageGallery = insertMenuLink.showImageGallery ?? false; // Default to false if not provided
+    const createdBy = insertMenuLink.createdBy ?? null; // Default to null if not provided
+    const approved = insertMenuLink.approved ?? false; // Default to false if not provided
+    const sharedWith = insertMenuLink.sharedWith ?? []; // Default to empty array if not provided
     
     const menuLink: MenuLink = {
       ...insertMenuLink,
@@ -519,6 +526,9 @@ export class MemStorage implements IStorage {
       pageContent,
       images,
       showImageGallery,
+      createdBy,
+      approved,
+      sharedWith,
       createdAt: new Date()
     };
     this.menuLinks.set(id, menuLink);
@@ -564,6 +574,49 @@ export class MemStorage implements IStorage {
   
   async deleteMenuLink(id: number): Promise<void> {
     this.menuLinks.delete(id);
+  }
+  
+  async getUserMenuLinks(userId: number): Promise<MenuLink[]> {
+    return Array.from(this.menuLinks.values())
+      .filter(link => link.createdBy === userId)
+      .sort((a, b) => a.order - b.order);
+  }
+  
+  async getApprovedMenuLinks(): Promise<MenuLink[]> {
+    return Array.from(this.menuLinks.values())
+      .filter(link => link.approved)
+      .sort((a, b) => a.order - b.order);
+  }
+  
+  async updateMenuLinkApproval(id: number, approved: boolean): Promise<MenuLink | undefined> {
+    const menuLink = this.menuLinks.get(id);
+    if (!menuLink) {
+      return undefined;
+    }
+    
+    const updatedMenuLink: MenuLink = {
+      ...menuLink,
+      approved
+    };
+    
+    this.menuLinks.set(id, updatedMenuLink);
+    return updatedMenuLink;
+  }
+  
+  async getSharedMenuLinks(userId: number): Promise<MenuLink[]> {
+    return Array.from(this.menuLinks.values())
+      .filter(link => {
+        // Include links explicitly shared with this user
+        if (link.sharedWith && link.sharedWith.includes(userId.toString())) {
+          return true;
+        }
+        // Include approved links created by this user
+        if (link.createdBy === userId && link.approved) {
+          return true;
+        }
+        return false;
+      })
+      .sort((a, b) => a.order - b.order);
   }
   
   async createArtwork(insertArtwork: InsertArtwork): Promise<Artwork> {

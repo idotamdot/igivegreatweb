@@ -27,6 +27,9 @@ export const menuLinks = pgTable("menu_links", {
   images: text("images").array(),  // Array of image paths or URLs
   showImageGallery: boolean("show_image_gallery").notNull().default(false),  // Flag to display images as gallery
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  createdBy: integer("created_by"),  // User ID of who created this link
+  approved: boolean("approved").notNull().default(false),  // Flag to indicate if link is approved by admin
+  sharedWith: text("shared_with").array(),  // Array of user IDs that this link is shared with
 });
 
 export const insertUserSchema = createInsertSchema(users);
@@ -43,6 +46,9 @@ export const insertMenuLinkSchema = createInsertSchema(menuLinks).pick({
   active: true,
   images: true,
   showImageGallery: true,
+  createdBy: true,
+  approved: true,
+  sharedWith: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;

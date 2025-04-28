@@ -535,27 +535,39 @@ export class MemStorage implements IStorage {
   }
   
   async updateMenuLink(id: number, menuLinkUpdate: Partial<InsertMenuLink>): Promise<MenuLink | undefined> {
-    const menuLink = this.menuLinks.get(id);
-    if (!menuLink) {
+    const existingMenuLink = this.menuLinks.get(id);
+    if (!existingMenuLink) {
       return undefined;
     }
     
-    // Special handling for hasPage to ensure pageContent is correct
-    let pageContent = menuLink.pageContent;
-    if (menuLinkUpdate.hasPage !== undefined) {
-      if (menuLinkUpdate.hasPage) {
-        pageContent = menuLinkUpdate.pageContent || menuLink.pageContent || "";
-      } else {
-        pageContent = null;
-      }
-    } else if (menuLink.hasPage) {
-      pageContent = menuLinkUpdate.pageContent || menuLink.pageContent;
+    // Process hasPage and pageContent separately to handle the relationship between them
+    const hasPage = menuLinkUpdate.hasPage !== undefined ? menuLinkUpdate.hasPage : existingMenuLink.hasPage;
+    let pageContent = menuLinkUpdate.pageContent !== undefined ? menuLinkUpdate.pageContent : existingMenuLink.pageContent;
+    
+    // If switching to hasPage=true and pageContent is null, set default empty content
+    if (hasPage && pageContent === null) {
+      pageContent = "";
     }
     
+    // If switching to hasPage=false, set pageContent to null
+    if (!hasPage) {
+      pageContent = null;
+    }
+    
+    // Process images and showImageGallery
+    const images = menuLinkUpdate.images !== undefined ? menuLinkUpdate.images : existingMenuLink.images;
+    const showImageGallery = menuLinkUpdate.showImageGallery !== undefined 
+      ? menuLinkUpdate.showImageGallery 
+      : existingMenuLink.showImageGallery;
+    
+    // Create updated menu link with processed values
     const updatedMenuLink: MenuLink = {
-      ...menuLink,
+      ...existingMenuLink,
       ...menuLinkUpdate,
+      hasPage,
       pageContent,
+      images,
+      showImageGallery
     };
     
     this.menuLinks.set(id, updatedMenuLink);
@@ -565,119 +577,131 @@ export class MemStorage implements IStorage {
   async deleteMenuLink(id: number): Promise<void> {
     this.menuLinks.delete(id);
   }
-  
+
+  // Artwork methods
   async createArtwork(insertArtwork: InsertArtwork): Promise<Artwork> {
     const id = this.artworkCurrentId++;
     const artwork: Artwork = {
       ...insertArtwork,
       id,
-      createdAt: new Date()
+      createdAt: new Date(),
+      originalAvailable: insertArtwork.originalAvailable ?? false,
+      featured: insertArtwork.featured ?? false,
+      visible: insertArtwork.visible ?? true,
+      dimensions: insertArtwork.dimensions || null,
+      medium: insertArtwork.medium || null
     };
     this.artworks.set(id, artwork);
     return artwork;
   }
-  
+
   async getAllArtworks(includeHidden: boolean = false): Promise<Artwork[]> {
-    let artworks = Array.from(this.artworks.values());
-    
-    if (!includeHidden) {
-      artworks = artworks.filter(artwork => artwork.visible);
-    }
-    
-    return artworks.sort((a, b) => {
-      // Sort by featured status (featured first)
-      if (a.featured !== b.featured) {
-        return a.featured ? -1 : 1;
-      }
-      
-      // Then sort by creation date (newest first)
-      return b.createdAt.getTime() - a.createdAt.getTime();
-    });
+    const allArtworks = Array.from(this.artworks.values());
+    return includeHidden ? allArtworks : allArtworks.filter(artwork => artwork.visible !== false);
   }
-  
+
   async getArtwork(id: number): Promise<Artwork | undefined> {
     return this.artworks.get(id);
   }
-  
+
   async updateArtwork(id: number, artworkUpdate: Partial<InsertArtwork>): Promise<Artwork | undefined> {
-    const artwork = this.artworks.get(id);
-    if (!artwork) {
+    const existingArtwork = this.artworks.get(id);
+    if (!existingArtwork) {
       return undefined;
     }
-    
+
     const updatedArtwork: Artwork = {
-      ...artwork,
+      ...existingArtwork,
       ...artworkUpdate
     };
-    
+
     this.artworks.set(id, updatedArtwork);
     return updatedArtwork;
   }
-  
+
   async deleteArtwork(id: number): Promise<void> {
     this.artworks.delete(id);
+    
+    // Also delete associated print sizes
+    const artworkPrintSizeIds = Array.from(this.artworkPrintSizes.values())
+      .filter(aps => aps.artworkId === id)
+      .map(aps => aps.id);
+    
+    for (const apsId of artworkPrintSizeIds) {
+      this.artworkPrintSizes.delete(apsId);
+    }
   }
-  
+
   async getFeaturedArtworks(): Promise<Artwork[]> {
     return Array.from(this.artworks.values())
-      .filter(artwork => artwork.featured && artwork.visible)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .filter(artwork => artwork.featured && artwork.visible !== false);
   }
-  
+
+  // Print Size methods
   async createPrintSize(insertPrintSize: InsertPrintSize): Promise<PrintSize> {
     const id = this.printSizeCurrentId++;
     const printSize: PrintSize = {
       ...insertPrintSize,
-      id
+      id,
+      active: insertPrintSize.active ?? true
     };
     this.printSizes.set(id, printSize);
     return printSize;
   }
-  
+
   async getAllPrintSizes(): Promise<PrintSize[]> {
-    return Array.from(this.printSizes.values())
-      .filter(size => size.active)
-      .sort((a, b) => parseFloat(a.priceFactor) - parseFloat(b.priceFactor));
+    return Array.from(this.printSizes.values());
   }
-  
+
   async getPrintSize(id: number): Promise<PrintSize | undefined> {
     return this.printSizes.get(id);
   }
-  
+
   async updatePrintSize(id: number, printSizeUpdate: Partial<InsertPrintSize>): Promise<PrintSize | undefined> {
-    const printSize = this.printSizes.get(id);
-    if (!printSize) {
+    const existingPrintSize = this.printSizes.get(id);
+    if (!existingPrintSize) {
       return undefined;
     }
-    
+
     const updatedPrintSize: PrintSize = {
-      ...printSize,
+      ...existingPrintSize,
       ...printSizeUpdate
     };
-    
+
     this.printSizes.set(id, updatedPrintSize);
     return updatedPrintSize;
   }
-  
+
   async deletePrintSize(id: number): Promise<void> {
     this.printSizes.delete(id);
+    
+    // Delete associated artwork print sizes
+    const artworkPrintSizeIds = Array.from(this.artworkPrintSizes.values())
+      .filter(aps => aps.printSizeId === id)
+      .map(aps => aps.id);
+    
+    for (const apsId of artworkPrintSizeIds) {
+      this.artworkPrintSizes.delete(apsId);
+    }
   }
-  
+
+  // Artwork Print Size methods
   async createArtworkPrintSize(insertArtworkPrintSize: InsertArtworkPrintSize): Promise<ArtworkPrintSize> {
     const id = this.artworkPrintSizeCurrentId++;
     const artworkPrintSize: ArtworkPrintSize = {
       ...insertArtworkPrintSize,
-      id
+      id,
+      inStock: insertArtworkPrintSize.inStock ?? true
     };
     this.artworkPrintSizes.set(id, artworkPrintSize);
     return artworkPrintSize;
   }
-  
+
   async getArtworkPrintSizes(artworkId: number): Promise<ArtworkPrintSize[]> {
     return Array.from(this.artworkPrintSizes.values())
       .filter(aps => aps.artworkId === artworkId);
   }
-  
+
   async getArtworkPrintSizesWithDetails(artworkId: number): Promise<(ArtworkPrintSize & PrintSize)[]> {
     const artworkPrintSizes = await this.getArtworkPrintSizes(artworkId);
     
@@ -691,104 +715,118 @@ export class MemStorage implements IStorage {
         ...aps,
         ...printSize
       };
-    }).sort((a, b) => parseFloat(a.priceFactor) - parseFloat(b.priceFactor));
+    });
   }
-  
+
   async updateArtworkPrintSize(id: number, artworkPrintSizeUpdate: Partial<InsertArtworkPrintSize>): Promise<ArtworkPrintSize | undefined> {
-    const artworkPrintSize = this.artworkPrintSizes.get(id);
-    if (!artworkPrintSize) {
+    const existingArtworkPrintSize = this.artworkPrintSizes.get(id);
+    if (!existingArtworkPrintSize) {
       return undefined;
     }
-    
+
     const updatedArtworkPrintSize: ArtworkPrintSize = {
-      ...artworkPrintSize,
+      ...existingArtworkPrintSize,
       ...artworkPrintSizeUpdate
     };
-    
+
     this.artworkPrintSizes.set(id, updatedArtworkPrintSize);
     return updatedArtworkPrintSize;
   }
-  
+
   async deleteArtworkPrintSize(id: number): Promise<void> {
     this.artworkPrintSizes.delete(id);
   }
-  
+
+  // Print Order methods
   async createPrintOrder(insertPrintOrder: InsertPrintOrder): Promise<PrintOrder> {
     const id = this.printOrderCurrentId++;
     const printOrder: PrintOrder = {
       ...insertPrintOrder,
       id,
+      isOriginal: insertPrintOrder.isOriginal ?? false,
+      quantity: insertPrintOrder.quantity ?? 1,
       orderDate: new Date(),
-      status: insertPrintOrder.status || "pending",
-      trackingNumber: undefined,
-      stripePaymentId: undefined,
-      printingServiceOrderId: undefined
+      status: insertPrintOrder.status ?? 'pending',
+      trackingNumber: null,
+      stripePaymentId: null,
+      printingServiceOrderId: null
     };
     this.printOrders.set(id, printOrder);
     return printOrder;
   }
-  
+
   async getPrintOrder(id: number): Promise<PrintOrder | undefined> {
     return this.printOrders.get(id);
   }
-  
+
   async getUserPrintOrders(userId: number): Promise<PrintOrder[]> {
     return Array.from(this.printOrders.values())
       .filter(order => order.userId === userId)
-      .sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
+      .sort((a, b) => {
+        // Handle possibly null orderDate values
+        const dateA = a.orderDate || new Date(0);
+        const dateB = b.orderDate || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
   }
   
   async getAllPrintOrders(): Promise<PrintOrder[]> {
     return Array.from(this.printOrders.values())
-      .sort((a, b) => b.orderDate.getTime() - a.orderDate.getTime());
+      .sort((a, b) => {
+        // Handle possibly null orderDate values
+        const dateA = a.orderDate || new Date(0);
+        const dateB = b.orderDate || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
   }
-  
+
   async updatePrintOrderStatus(id: number, status: string, trackingNumber?: string): Promise<PrintOrder | undefined> {
     const existingOrder = this.printOrders.get(id);
     if (!existingOrder) {
       return undefined;
     }
-    
+
     const updatedOrder: PrintOrder = {
       ...existingOrder,
       status,
-      trackingNumber
+      trackingNumber: trackingNumber || existingOrder.trackingNumber
     };
-    
+
     this.printOrders.set(id, updatedOrder);
     return updatedOrder;
   }
-  
+
   async updatePrintOrderPaymentInfo(id: number, stripePaymentId: string): Promise<PrintOrder | undefined> {
     const existingOrder = this.printOrders.get(id);
     if (!existingOrder) {
       return undefined;
     }
-    
+
     const updatedOrder: PrintOrder = {
       ...existingOrder,
       stripePaymentId
     };
-    
+
     this.printOrders.set(id, updatedOrder);
     return updatedOrder;
   }
-  
+
   async updatePrintOrderPrintingInfo(id: number, printingServiceOrderId: string): Promise<PrintOrder | undefined> {
     const existingOrder = this.printOrders.get(id);
     if (!existingOrder) {
       return undefined;
     }
-    
+
     const updatedOrder: PrintOrder = {
       ...existingOrder,
       printingServiceOrderId
     };
-    
+
     this.printOrders.set(id, updatedOrder);
     return updatedOrder;
   }
-  
+}
+
   // Content management methods
   async createContentBlock(insertContentBlock: InsertContentBlock): Promise<ContentBlock> {
     const id = this.contentBlockCurrentId++;

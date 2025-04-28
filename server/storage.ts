@@ -1,12 +1,13 @@
 import { 
-  users, connections, menuLinks, artworks, printSizes, artworkPrintSizes, printOrders,
+  users, connections, menuLinks, artworks, printSizes, artworkPrintSizes, printOrders, contentBlocks,
   type User, type InsertUser, 
   type Connection, type InsertConnection, 
   type MenuLink, type InsertMenuLink,
   type Artwork, type InsertArtwork,
   type PrintSize, type InsertPrintSize,
   type ArtworkPrintSize, type InsertArtworkPrintSize,
-  type PrintOrder, type InsertPrintOrder
+  type PrintOrder, type InsertPrintOrder,
+  type ContentBlock, type InsertContentBlock
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";

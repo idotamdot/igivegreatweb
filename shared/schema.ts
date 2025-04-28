@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, numeric } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, numeric, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -158,3 +158,28 @@ export type InsertArtworkPrintSize = z.infer<typeof insertArtworkPrintSizeSchema
 
 export type PrintOrder = typeof printOrders.$inferSelect;
 export type InsertPrintOrder = z.infer<typeof insertPrintOrderSchema>;
+
+// Content management schema
+export const contentBlocks = pgTable("content_blocks", {
+  id: serial("id").primaryKey(),
+  key: text("key").notNull().unique(), // Unique identifier for the content block
+  title: text("title").notNull(),
+  content: text("content").notNull(), // Can be plain text, HTML, or markdown
+  placement: text("placement").notNull(), // Where on the site this content appears
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+  metaData: text("meta_data").default("{}"), // For additional configurable options (stored as JSON string)
+});
+
+export const insertContentBlockSchema = createInsertSchema(contentBlocks).pick({
+  key: true,
+  title: true,
+  content: true,
+  placement: true,
+  active: true,
+  metaData: true,
+});
+
+export type ContentBlock = typeof contentBlocks.$inferSelect;
+export type InsertContentBlock = z.infer<typeof insertContentBlockSchema>;

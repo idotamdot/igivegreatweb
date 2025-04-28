@@ -9,11 +9,13 @@ import {
   insertPrintSizeSchema,
   insertArtworkPrintSizeSchema,
   insertPrintOrderSchema,
+  insertContentBlockSchema,
   type InsertMenuLink,
   type InsertArtwork,
   type InsertPrintSize,
   type InsertArtworkPrintSize,
   type InsertPrintOrder,
+  type InsertContentBlock,
 } from "@shared/schema";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -1007,6 +1009,182 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ clientSecret: paymentIntent.client_secret });
     } catch (error: any) {
       res.status(500).json({ message: "Error creating payment intent: " + error.message });
+    }
+  });
+
+  // Content block routes
+  // Get all content blocks (protected, only for admin/owner)
+  app.get("/api/content-blocks", (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    storage.getAllContentBlocks()
+      .then(contentBlocks => res.json(contentBlocks))
+      .catch(error => res.status(500).json({ message: error.message }));
+  });
+  
+  // Get active content blocks by placement (public)
+  app.get("/api/content-blocks/placement/:placement", (req, res) => {
+    const placement = req.params.placement;
+    
+    storage.getActiveContentBlocksByPlacement(placement)
+      .then(contentBlocks => res.json(contentBlocks))
+      .catch(error => res.status(500).json({ message: error.message }));
+  });
+  
+  // Get a specific content block by key (public)
+  app.get("/api/content-blocks/key/:key", async (req, res) => {
+    const key = req.params.key;
+    
+    try {
+      const contentBlock = await storage.getContentBlockByKey(key);
+      
+      if (!contentBlock) {
+        return res.status(404).json({ message: "Content block not found" });
+      }
+      
+      res.json(contentBlock);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Get a specific content block by ID (protected, admin/owner)
+  app.get("/api/content-blocks/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const contentBlockId = parseInt(req.params.id);
+    if (isNaN(contentBlockId)) {
+      return res.status(400).json({ message: "Invalid content block ID" });
+    }
+    
+    try {
+      const contentBlock = await storage.getContentBlock(contentBlockId);
+      
+      if (!contentBlock) {
+        return res.status(404).json({ message: "Content block not found" });
+      }
+      
+      res.json(contentBlock);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Create a new content block (protected, admin/owner)
+  app.post("/api/content-blocks", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    try {
+      // Check if a block with this key already exists
+      const existingBlock = await storage.getContentBlockByKey(req.body.key);
+      if (existingBlock) {
+        return res.status(400).json({ message: "A content block with this key already exists" });
+      }
+      
+      // Validate request body
+      const validatedData = insertContentBlockSchema.parse(req.body);
+      
+      // Create the content block
+      const contentBlock = await storage.createContentBlock(validatedData);
+      
+      // Return the created content block
+      res.status(201).json(contentBlock);
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+  
+  // Update a content block (protected, admin/owner)
+  app.patch("/api/content-blocks/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const contentBlockId = parseInt(req.params.id);
+    if (isNaN(contentBlockId)) {
+      return res.status(400).json({ message: "Invalid content block ID" });
+    }
+    
+    try {
+      const contentBlock = await storage.getContentBlock(contentBlockId);
+      
+      if (!contentBlock) {
+        return res.status(404).json({ message: "Content block not found" });
+      }
+      
+      // Only validate fields that are provided in the request body
+      const updateData: Partial<InsertContentBlock> = {};
+      if (req.body.key !== undefined) updateData.key = req.body.key;
+      if (req.body.title !== undefined) updateData.title = req.body.title;
+      if (req.body.content !== undefined) updateData.content = req.body.content;
+      if (req.body.placement !== undefined) updateData.placement = req.body.placement;
+      if (req.body.active !== undefined) updateData.active = req.body.active;
+      if (req.body.metaData !== undefined) updateData.metaData = req.body.metaData;
+      
+      // If changing the key, make sure it's still unique
+      if (updateData.key && updateData.key !== contentBlock.key) {
+        const existingBlock = await storage.getContentBlockByKey(updateData.key);
+        if (existingBlock) {
+          return res.status(400).json({ message: "A content block with this key already exists" });
+        }
+      }
+      
+      const updatedContentBlock = await storage.updateContentBlock(contentBlockId, updateData);
+      
+      res.json(updatedContentBlock);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Delete a content block (protected, admin/owner)
+  app.delete("/api/content-blocks/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    
+    if (req.user?.role !== "admin" && req.user?.role !== "owner") {
+      return res.status(403).json({ message: "Forbidden - Admin access required" });
+    }
+    
+    const contentBlockId = parseInt(req.params.id);
+    if (isNaN(contentBlockId)) {
+      return res.status(400).json({ message: "Invalid content block ID" });
+    }
+    
+    try {
+      const contentBlock = await storage.getContentBlock(contentBlockId);
+      
+      if (!contentBlock) {
+        return res.status(404).json({ message: "Content block not found" });
+      }
+      
+      await storage.deleteContentBlock(contentBlockId);
+      res.status(200).json({ message: "Content block deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
     }
   });
 

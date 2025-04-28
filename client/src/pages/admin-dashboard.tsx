@@ -41,8 +41,15 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
-import { User, MenuLink } from "@shared/schema";
+import { User, MenuLink, ContentBlock } from "@shared/schema";
 import { Textarea } from "@/components/ui/textarea";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 
 
@@ -78,13 +85,31 @@ const accountSchema = z.object({
 });
 
 
+const contentBlockSchema = z.object({
+  key: z.string().min(2, {
+    message: "key must be at least 2 characters.",
+  }),
+  title: z.string().min(1, {
+    message: "title is required.",
+  }),
+  content: z.string().min(1, {
+    message: "content is required.",
+  }),
+  placement: z.string().min(1, {
+    message: "placement is required.",
+  }),
+  active: z.boolean().default(true),
+  metaData: z.string().optional(),
+});
+
 type MenuLinkFormValues = z.infer<typeof menuLinkSchema>;
 type AccountFormValues = z.infer<typeof accountSchema>;
+type ContentBlockFormValues = z.infer<typeof contentBlockSchema>;
 
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();
   const { toast } = useToast();
-  const [tab, setTab] = useState<"connections" | "menu-links" | "gallery" | "services" | "printing" | "account" | "themes" | "animations">("connections");
+  const [tab, setTab] = useState<"connections" | "menu-links" | "gallery" | "services" | "printing" | "account" | "themes" | "animations" | "content">("connections");
   const [editingMenuLink, setEditingMenuLink] = useState<MenuLink | null>(null);
   
   const { data: connections, isLoading: isLoadingConnections } = useQuery({
@@ -337,6 +362,12 @@ export default function AdminDashboard() {
               onClick={() => setTab("animations")}
             >
               animations
+            </button>
+            <button
+              className={`px-4 py-2 ${tab === "content" ? "border-b-2 border-primary" : ""}`}
+              onClick={() => setTab("content")}
+            >
+              content
             </button>
             <button
               className={`px-4 py-2 ${tab === "account" ? "border-b-2 border-primary" : ""}`}

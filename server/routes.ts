@@ -10,12 +10,16 @@ import {
   insertArtworkPrintSizeSchema,
   insertPrintOrderSchema,
   insertContentBlockSchema,
+  insertDashboardWidgetSchema,
+  insertDashboardLayoutSchema,
   type InsertMenuLink,
   type InsertArtwork,
   type InsertPrintSize,
   type InsertArtworkPrintSize,
   type InsertPrintOrder,
   type InsertContentBlock,
+  type InsertDashboardWidget,
+  type InsertDashboardLayout,
 } from "@shared/schema";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
@@ -43,6 +47,151 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Dashboard Widget API routes
+  app.get("/api/widgets", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+    
+    // If no specific role is provided, use the user's current role
+    const role = (req.query.role as string) || req.user.role;
+    const userId = req.user.id;
+    
+    try {
+      // Get dashboard widgets based on user and role
+      const widgets = await storage.getDashboardWidgetsByUserAndRole(userId, role);
+      res.json(widgets);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
+  app.post("/api/widgets", async (req, res) => {
+    if (!req.isAuthenticated() || (req.user.role !== "admin" && req.user.role !== "owner")) {
+      return res.sendStatus(403);
+    }
+    
+    try {
+      const widgetData = insertDashboardWidgetSchema.parse({
+        ...req.body,
+        userId: req.user.id // Set the current user as the creator
+      });
+      
+      const widget = await storage.createDashboardWidget(widgetData);
+      res.status(201).json(widget);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+  
+  app.patch("/api/widgets/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+    
+    const widgetId = parseInt(req.params.id);
+    const widget = await storage.getDashboardWidget(widgetId);
+    
+    if (!widget) {
+      return res.status(404).json({ error: "Widget not found" });
+    }
+    
+    // Only allow admin/owner to update widgets, or the user who created it
+    if (req.user.role !== "admin" && req.user.role !== "owner" && widget.userId !== req.user.id) {
+      return res.sendStatus(403);
+    }
+    
+    try {
+      const updatedWidget = await storage.updateDashboardWidget(widgetId, req.body);
+      res.json(updatedWidget);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
+  
+  app.delete("/api/widgets/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+    
+    const widgetId = parseInt(req.params.id);
+    const widget = await storage.getDashboardWidget(widgetId);
+    
+    if (!widget) {
+      return res.status(404).json({ error: "Widget not found" });
+    }
+    
+    // Only allow admin/owner to delete widgets, or the user who created it
+    if (req.user.role !== "admin" && req.user.role !== "owner" && widget.userId !== req.user.id) {
+      return res.sendStatus(403);
+    }
+    
+    try {
+      await storage.deleteDashboardWidget(widgetId);
+      res.sendStatus(204);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
+  // Dashboard Layout API routes
+  app.get("/api/layouts", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+    
+    // If no specific role is provided, use the user's current role
+    const role = (req.query.role as string) || req.user.role;
+    const userId = req.user.id;
+    
+    try {
+      // Get dashboard layout for the user and role
+      const layout = await storage.getDashboardLayout(userId, role);
+      
+      if (!layout) {
+        // If no layout exists, return default layout based on widgets order
+        const widgets = await storage.getDashboardWidgetsByUserAndRole(userId, role);
+        const defaultLayout = widgets.map(widget => widget.id.toString());
+        
+        return res.json({ layout: defaultLayout });
+      }
+      
+      res.json(layout);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+  
+  app.post("/api/layouts", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.sendStatus(401);
+    }
+    
+    try {
+      // First check if layout already exists
+      const existingLayout = await storage.getDashboardLayout(req.user.id, req.body.role);
+      
+      if (existingLayout) {
+        // Update the existing layout
+        const updatedLayout = await storage.updateDashboardLayout(existingLayout.id, {
+          layout: req.body.layout
+        });
+        return res.json(updatedLayout);
+      }
+      
+      // Create new layout
+      const layoutData = insertDashboardLayoutSchema.parse({
+        userId: req.user.id,
+        role: req.body.role,
+        layout: req.body.layout
+      });
+      
+      const layout = await storage.createDashboardLayout(layoutData);
+      res.status(201).json(layout);
+    } catch (error: any) {
+      res.status(400).json({ error: error.message });
+    }
+  });
   // Setup Authentication
   setupAuth(app);
 

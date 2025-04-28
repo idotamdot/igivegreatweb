@@ -1,5 +1,5 @@
 import { 
-  users, connections, menuLinks, artworks, printSizes, artworkPrintSizes, printOrders, contentBlocks,
+  users, connections, menuLinks, artworks, printSizes, artworkPrintSizes, printOrders, contentBlocks, dashboardWidgets, dashboardLayouts,
   type User, type InsertUser, 
   type Connection, type InsertConnection, 
   type MenuLink, type InsertMenuLink,
@@ -7,7 +7,9 @@ import {
   type PrintSize, type InsertPrintSize,
   type ArtworkPrintSize, type InsertArtworkPrintSize,
   type PrintOrder, type InsertPrintOrder,
-  type ContentBlock, type InsertContentBlock
+  type ContentBlock, type InsertContentBlock,
+  type DashboardWidget, type InsertDashboardWidget,
+  type DashboardLayout, type InsertDashboardLayout
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -107,6 +109,8 @@ export class MemStorage implements IStorage {
   private artworkPrintSizes: Map<number, ArtworkPrintSize>;
   private printOrders: Map<number, PrintOrder>;
   private contentBlocks: Map<number, ContentBlock>;
+  private dashboardWidgets: Map<number, DashboardWidget>;
+  private dashboardLayouts: Map<number, DashboardLayout>;
   
   private userCurrentId: number;
   private connectionCurrentId: number;
@@ -116,6 +120,8 @@ export class MemStorage implements IStorage {
   private artworkPrintSizeCurrentId: number;
   private printOrderCurrentId: number;
   private contentBlockCurrentId: number;
+  private dashboardWidgetCurrentId: number;
+  private dashboardLayoutCurrentId: number;
   
   sessionStore: session.Store;
 
@@ -128,6 +134,8 @@ export class MemStorage implements IStorage {
     this.artworkPrintSizes = new Map();
     this.printOrders = new Map();
     this.contentBlocks = new Map();
+    this.dashboardWidgets = new Map();
+    this.dashboardLayouts = new Map();
     
     this.userCurrentId = 1;
     this.connectionCurrentId = 1;
@@ -137,6 +145,8 @@ export class MemStorage implements IStorage {
     this.artworkPrintSizeCurrentId = 1;
     this.printOrderCurrentId = 1;
     this.contentBlockCurrentId = 1;
+    this.dashboardWidgetCurrentId = 1;
+    this.dashboardLayoutCurrentId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
@@ -162,6 +172,137 @@ export class MemStorage implements IStorage {
     
     // Add initial content blocks
     this._addInitialContentBlocks();
+    
+    // Add default dashboard widgets
+    this._addDefaultDashboardWidgets();
+  }
+  
+  // Add default dashboard widgets
+  private _addDefaultDashboardWidgets() {
+    const defaultWidgets = [
+      {
+        name: "Recent Connections",
+        type: "recent-connections",
+        config: JSON.stringify({
+          limit: 5,
+          showDate: true,
+          showEmail: true
+        }),
+        position: 0,
+        width: "half",
+        roles: ["admin", "owner"],
+        active: true
+      },
+      {
+        name: "Recent Orders",
+        type: "recent-orders",
+        config: JSON.stringify({
+          limit: 5,
+          showStatus: true,
+          showAmount: true
+        }),
+        position: 1,
+        width: "half",
+        roles: ["admin", "owner"],
+        active: true
+      },
+      {
+        name: "Gallery Stats",
+        type: "gallery-stats",
+        config: JSON.stringify({
+          showTotalArtworks: true,
+          showTotalSales: true,
+          showTopCategories: true
+        }),
+        position: 2,
+        width: "third",
+        roles: ["admin", "owner"],
+        active: true
+      },
+      {
+        name: "Menu Links",
+        type: "menu-links-overview",
+        config: JSON.stringify({
+          showPending: true,
+          showActive: true,
+          showCount: true
+        }),
+        position: 3,
+        width: "third",
+        roles: ["admin", "owner", "staff"],
+        active: true
+      },
+      {
+        name: "Activity Log",
+        type: "activity-log",
+        config: JSON.stringify({
+          limit: 10,
+          showTime: true,
+          showUser: true
+        }),
+        position: 4,
+        width: "third",
+        roles: ["admin", "owner", "staff"],
+        active: true
+      },
+      {
+        name: "Your Projects",
+        type: "client-projects",
+        config: JSON.stringify({
+          limit: 5,
+          showStatus: true,
+          showDeadline: true
+        }),
+        position: 0,
+        width: "full",
+        roles: ["client"],
+        active: true
+      },
+      {
+        name: "Messages",
+        type: "client-messages",
+        config: JSON.stringify({
+          limit: 5,
+          showDate: true,
+          showPreview: true
+        }),
+        position: 1,
+        width: "half",
+        roles: ["client"],
+        active: true
+      },
+      {
+        name: "Recent Files",
+        type: "client-files",
+        config: JSON.stringify({
+          limit: 5,
+          showSize: true,
+          showType: true
+        }),
+        position: 2,
+        width: "half",
+        roles: ["client"],
+        active: true
+      }
+    ];
+    
+    defaultWidgets.forEach(widget => {
+      const dashboardWidget: DashboardWidget = {
+        id: this.dashboardWidgetCurrentId++,
+        name: widget.name,
+        type: widget.type,
+        config: widget.config,
+        position: widget.position,
+        width: widget.width,
+        height: "auto",
+        roles: widget.roles,
+        active: widget.active,
+        createdAt: new Date(),
+        userId: null
+      };
+      
+      this.dashboardWidgets.set(dashboardWidget.id, dashboardWidget);
+    });
   }
   
   // Add initial content blocks as a private method
@@ -969,6 +1110,114 @@ export class MemStorage implements IStorage {
 
   async deleteContentBlock(id: number): Promise<void> {
     this.contentBlocks.delete(id);
+  }
+  
+  // Dashboard Widget methods
+  async createDashboardWidget(insertWidget: InsertDashboardWidget): Promise<DashboardWidget> {
+    const id = this.dashboardWidgetCurrentId++;
+    
+    const widget: DashboardWidget = {
+      ...insertWidget,
+      id,
+      createdAt: new Date()
+    };
+    
+    this.dashboardWidgets.set(id, widget);
+    return widget;
+  }
+  
+  async getAllDashboardWidgets(): Promise<DashboardWidget[]> {
+    return Array.from(this.dashboardWidgets.values());
+  }
+  
+  async getDashboardWidget(id: number): Promise<DashboardWidget | undefined> {
+    return this.dashboardWidgets.get(id);
+  }
+  
+  async getDashboardWidgetsByRole(role: string): Promise<DashboardWidget[]> {
+    return Array.from(this.dashboardWidgets.values())
+      .filter(widget => widget.roles.includes(role) && widget.active)
+      .sort((a, b) => a.position - b.position);
+  }
+  
+  async getDashboardWidgetsByUser(userId: number): Promise<DashboardWidget[]> {
+    return Array.from(this.dashboardWidgets.values())
+      .filter(widget => widget.userId === userId && widget.active)
+      .sort((a, b) => a.position - b.position);
+  }
+  
+  async getDashboardWidgetsByUserAndRole(userId: number, role: string): Promise<DashboardWidget[]> {
+    // Get default role-based widgets
+    const defaultWidgets = Array.from(this.dashboardWidgets.values())
+      .filter(widget => widget.roles.includes(role) && widget.userId === null && widget.active);
+    
+    // Get user-customized widgets
+    const userWidgets = Array.from(this.dashboardWidgets.values())
+      .filter(widget => widget.userId === userId && widget.roles.includes(role) && widget.active);
+    
+    // Combine and sort by position
+    return [...defaultWidgets, ...userWidgets].sort((a, b) => a.position - b.position);
+  }
+  
+  async updateDashboardWidget(id: number, widgetUpdate: Partial<InsertDashboardWidget>): Promise<DashboardWidget | undefined> {
+    const widget = this.dashboardWidgets.get(id);
+    
+    if (!widget) {
+      return undefined;
+    }
+    
+    const updatedWidget: DashboardWidget = {
+      ...widget,
+      ...widgetUpdate
+    };
+    
+    this.dashboardWidgets.set(id, updatedWidget);
+    return updatedWidget;
+  }
+  
+  async deleteDashboardWidget(id: number): Promise<void> {
+    this.dashboardWidgets.delete(id);
+  }
+  
+  // Dashboard Layout methods
+  async createDashboardLayout(insertLayout: InsertDashboardLayout): Promise<DashboardLayout> {
+    const id = this.dashboardLayoutCurrentId++;
+    
+    const layout: DashboardLayout = {
+      ...insertLayout,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    
+    this.dashboardLayouts.set(id, layout);
+    return layout;
+  }
+  
+  async getDashboardLayout(userId: number, role: string): Promise<DashboardLayout | undefined> {
+    return Array.from(this.dashboardLayouts.values())
+      .find(layout => layout.userId === userId && layout.role === role);
+  }
+  
+  async updateDashboardLayout(id: number, layoutUpdate: Partial<InsertDashboardLayout>): Promise<DashboardLayout | undefined> {
+    const layout = this.dashboardLayouts.get(id);
+    
+    if (!layout) {
+      return undefined;
+    }
+    
+    const updatedLayout: DashboardLayout = {
+      ...layout,
+      ...layoutUpdate,
+      updatedAt: new Date()
+    };
+    
+    this.dashboardLayouts.set(id, updatedLayout);
+    return updatedLayout;
+  }
+  
+  async deleteDashboardLayout(id: number): Promise<void> {
+    this.dashboardLayouts.delete(id);
   }
 }
 

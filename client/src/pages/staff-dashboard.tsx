@@ -9,12 +9,12 @@ import {
   TabsTrigger 
 } from "@/components/ui/tabs";
 
-export default function AdminDashboard() {
+export default function StaffDashboard() {
   const { user, logoutMutation } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
 
   // Check if user has the appropriate role
-  const isAuthorized = user && (user.role === "admin" || user.role === "owner");
+  const isAuthorized = user && user.role === "staff";
 
   if (!isAuthorized) {
     return (
@@ -33,7 +33,7 @@ export default function AdminDashboard() {
       <header className="mb-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-normal">
-            <span className="text-gradient-glow">admin dashboard</span>
+            <span className="text-gradient-glow">staff dashboard</span>
           </h1>
           <div className="flex space-x-4 items-center">
             <span className="text-sm text-gray-400">
@@ -57,9 +57,7 @@ export default function AdminDashboard() {
       >
         <TabsList className="bg-black border border-gray-800">
           <TabsTrigger value="dashboard">dashboard</TabsTrigger>
-          <TabsTrigger value="connections">connections</TabsTrigger>
-          <TabsTrigger value="menu-links">menu links</TabsTrigger>
-          <TabsTrigger value="gallery">gallery</TabsTrigger>
+          <TabsTrigger value="menu-links">my menu links</TabsTrigger>
           <TabsTrigger value="content">content</TabsTrigger>
           <TabsTrigger value="account">account</TabsTrigger>
         </TabsList>
@@ -68,31 +66,17 @@ export default function AdminDashboard() {
           <DashboardManager role={user.role} canReorder={true} />
         </TabsContent>
         
-        <TabsContent value="connections" className="mt-6">
-          <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Connections</h2>
-            <p className="text-gray-400">View and manage user connections.</p>
-          </div>
-        </TabsContent>
-        
         <TabsContent value="menu-links" className="mt-6">
           <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Menu Links</h2>
-            <p className="text-gray-400">Manage site navigation and menu links.</p>
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="gallery" className="mt-6">
-          <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Gallery Management</h2>
-            <p className="text-gray-400">Manage artwork and prints.</p>
+            <h2 className="text-xl mb-4">My Menu Links</h2>
+            <p className="text-gray-400">Manage your menu links and shared links.</p>
           </div>
         </TabsContent>
         
         <TabsContent value="content" className="mt-6">
           <div className="bg-black border border-gray-800 rounded-lg p-6">
             <h2 className="text-xl mb-4">Content Management</h2>
-            <p className="text-gray-400">Edit website content and blocks.</p>
+            <p className="text-gray-400">Edit website content for your sections.</p>
           </div>
         </TabsContent>
         

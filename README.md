@@ -35,8 +35,3 @@ To help people who work with their hands and hearts build powerful digital profi
 
 ## 🛠️ Setup
 
-```bash
-git clone https://github.com/YOUR-USERNAME/igivegreatweb.com.git
-cd igivegreatweb.com
-npm install
-npm run dev

@@ -43,22 +43,22 @@ export default function MenuLinksWidget({
     >
       <div className="p-4">
         {allLinks.length === 0 && !isLoading ? (
-          <p className="text-gray-400 text-center py-8">No menu links available</p>
+          <p className="text-muted-foreground text-center py-8">No menu links available</p>
         ) : (
           <div className="space-y-4">
             {/* Counts section */}
             {showCount && (
               <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="bg-gray-900 p-3 rounded-md text-center">
-                  <p className="text-xs text-gray-400">Total</p>
-                  <p className="text-lg font-semibold text-white">{totalCount}</p>
+                <div className="bg-muted p-3 rounded-md text-center">
+                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="text-lg font-semibold text-foreground">{totalCount}</p>
                 </div>
-                <div className="bg-gray-900 p-3 rounded-md text-center">
-                  <p className="text-xs text-gray-400">Active</p>
+                <div className="bg-muted p-3 rounded-md text-center">
+                  <p className="text-xs text-muted-foreground">Active</p>
                   <p className="text-lg font-semibold text-green-400">{activeCount}</p>
                 </div>
-                <div className="bg-gray-900 p-3 rounded-md text-center">
-                  <p className="text-xs text-gray-400">Pending</p>
+                <div className="bg-muted p-3 rounded-md text-center">
+                  <p className="text-xs text-muted-foreground">Pending</p>
                   <p className="text-lg font-semibold text-yellow-400">{pendingCount}</p>
                 </div>
               </div>

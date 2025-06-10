@@ -2,6 +2,7 @@ import { DashboardWidget } from "@shared/schema";
 import RecentConnectionsWidget from "./recent-connections-widget";
 import MenuLinksWidget from "./menu-links-widget";
 import GalleryStatsWidget from "./gallery-stats-widget";
+import RecentOrdersWidget from "./recent-orders-widget";
 import { useState } from "react";
 
 interface WidgetFactoryProps {
@@ -52,12 +53,11 @@ export default function WidgetFactory({ widget }: WidgetFactoryProps) {
       );
       
     case "recent-orders":
-      // This would be replaced with an actual order widget once implemented
       return (
-        <PlaceholderWidget 
-          title={widget.name}
-          type={widget.type}
-          description="Displays recent orders with status information"
+        <RecentOrdersWidget 
+          widgetId={widget.id.toString()} 
+          title={widget.name} 
+          config={parsedConfig as any}
         />
       );
       
@@ -122,15 +122,15 @@ interface PlaceholderWidgetProps {
 
 function PlaceholderWidget({ title, type, description, error = false }: PlaceholderWidgetProps) {
   return (
-    <div className={`bg-black border border-gray-800 rounded-lg overflow-hidden ${error ? "border-red-900" : ""}`}>
-      <div className="p-4 border-b border-gray-800 bg-gray-950">
-        <h3 className="text-md font-normal">{title}</h3>
+    <div className={`bg-card border rounded-lg overflow-hidden ${error ? "border-destructive" : ""}`}>
+      <div className="p-4 border-b bg-muted/50">
+        <h3 className="text-md font-semibold text-foreground">{title}</h3>
       </div>
       <div className="p-6 flex flex-col items-center justify-center min-h-[200px] text-center">
-        <div className={`text-sm ${error ? "text-red-400" : "text-gray-400"} mb-2`}>
+        <div className={`text-sm ${error ? "text-destructive" : "text-muted-foreground"} mb-2 font-medium`}>
           {type}
         </div>
-        <div className={`text-xs ${error ? "text-red-300" : "text-gray-500"}`}>
+        <div className={`text-xs ${error ? "text-destructive/80" : "text-muted-foreground/80"}`}>
           {description}
         </div>
       </div>

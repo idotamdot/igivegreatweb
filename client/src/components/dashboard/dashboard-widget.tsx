@@ -33,17 +33,17 @@ export default function DashboardWidget({
   }[width];
 
   return (
-    <Card className={`overflow-hidden border border-gray-800 bg-black ${widthClass} ${className}`}>
-      <CardHeader className="bg-gray-950 border-b border-gray-800 pb-3">
+    <Card className={`overflow-hidden ${widthClass} ${className}`}>
+      <CardHeader className="pb-3">
         <div className="flex justify-between items-center">
           <div>
-            <CardTitle className="text-md font-normal">{title}</CardTitle>
-            {description && <CardDescription>{description}</CardDescription>}
+            <CardTitle className="text-md font-semibold text-foreground">{title}</CardTitle>
+            {description && <CardDescription className="text-muted-foreground">{description}</CardDescription>}
           </div>
           {onSettingsClick && (
             <button 
               onClick={onSettingsClick}
-              className="text-gray-400 hover:text-white transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Widget settings"
             >
               <svg 
@@ -67,13 +67,13 @@ export default function DashboardWidget({
       <CardContent className={`p-0 ${minHeight}`}>
         {isLoading ? (
           <div className="w-full h-full flex items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-border" />
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : error ? (
           <div className="w-full h-full flex items-center justify-center p-6 text-center">
-            <div className="text-red-400">
+            <div className="text-destructive">
               <p className="font-medium mb-1">Error loading widget</p>
-              <p className="text-sm text-gray-400">{error.message}</p>
+              <p className="text-sm text-muted-foreground">{error.message}</p>
             </div>
           </div>
         ) : (

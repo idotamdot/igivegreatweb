@@ -20,6 +20,8 @@ import {
   FileText, 
   Settings 
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 
 export default function AdminDashboard() {
   const { user, logoutMutation } = useAuth();

@@ -73,17 +73,17 @@ export default function MenuLinksWidget({
                 </h3>
                 <ul className="space-y-1">
                   {pendingLinks.slice(0, 3).map(link => (
-                    <li key={link.id} className="text-sm flex items-center justify-between bg-gray-900 p-2 rounded">
-                      <span className="truncate max-w-[180px]">{link.label}</span>
+                    <li key={link.id} className="text-sm flex items-center justify-between bg-muted p-2 rounded">
+                      <span className="truncate max-w-[180px] text-foreground">{link.label}</span>
                       {link.active ? (
-                        <span className="text-xs bg-green-900 text-green-300 px-1.5 py-0.5 rounded">Active</span>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">Active</span>
                       ) : (
-                        <span className="text-xs bg-gray-800 text-gray-300 px-1.5 py-0.5 rounded">Inactive</span>
+                        <span className="text-xs bg-muted-foreground/20 text-muted-foreground px-1.5 py-0.5 rounded">Inactive</span>
                       )}
                     </li>
                   ))}
                   {pendingLinks.length > 3 && (
-                    <li className="text-xs text-gray-500 text-center">
+                    <li className="text-xs text-muted-foreground text-center">
                       +{pendingLinks.length - 3} more pending links
                     </li>
                   )}
@@ -100,17 +100,17 @@ export default function MenuLinksWidget({
                 </h3>
                 <ul className="space-y-1">
                   {activeLinks.slice(0, 5).map(link => (
-                    <li key={link.id} className="text-sm flex items-center justify-between bg-gray-900 p-2 rounded">
-                      <span className="truncate max-w-[180px]">{link.label}</span>
+                    <li key={link.id} className="text-sm flex items-center justify-between bg-muted p-2 rounded">
+                      <span className="truncate max-w-[180px] text-foreground">{link.label}</span>
                       {link.approved ? (
-                        <span className="text-xs bg-green-900 text-green-300 px-1.5 py-0.5 rounded">Approved</span>
+                        <span className="text-xs bg-green-500/20 text-green-400 px-1.5 py-0.5 rounded">Approved</span>
                       ) : (
-                        <span className="text-xs bg-yellow-900 text-yellow-300 px-1.5 py-0.5 rounded">Pending</span>
+                        <span className="text-xs bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded">Pending</span>
                       )}
                     </li>
                   ))}
                   {activeLinks.length > 5 && (
-                    <li className="text-xs text-gray-500 text-center">
+                    <li className="text-xs text-muted-foreground text-center">
                       +{activeLinks.length - 5} more active links
                     </li>
                   )}

@@ -57,22 +57,22 @@ export default function GalleryStatsWidget({
     >
       <div className="p-4">
         {!totalArtworks && !isLoading ? (
-          <p className="text-gray-400 text-center py-8">No artwork data available</p>
+          <p className="text-muted-foreground text-center py-8">No artwork data available</p>
         ) : (
           <div className="space-y-4">
             {/* Overview stats */}
             {showTotalArtworks && (
               <div className="grid grid-cols-3 gap-2 mb-4">
-                <div className="bg-gray-900 p-3 rounded-md text-center">
-                  <p className="text-xs text-gray-400">Total</p>
-                  <p className="text-lg font-semibold text-white">{totalArtworks}</p>
+                <div className="bg-muted p-3 rounded-md text-center">
+                  <p className="text-xs text-muted-foreground">Total</p>
+                  <p className="text-lg font-semibold text-foreground">{totalArtworks}</p>
                 </div>
-                <div className="bg-gray-900 p-3 rounded-md text-center">
-                  <p className="text-xs text-gray-400">Featured</p>
+                <div className="bg-muted p-3 rounded-md text-center">
+                  <p className="text-xs text-muted-foreground">Featured</p>
                   <p className="text-lg font-semibold text-purple-400">{featuredArtworks}</p>
                 </div>
-                <div className="bg-gray-900 p-3 rounded-md text-center">
-                  <p className="text-xs text-gray-400">Visible</p>
+                <div className="bg-muted p-3 rounded-md text-center">
+                  <p className="text-xs text-muted-foreground">Visible</p>
                   <p className="text-lg font-semibold text-green-400">{visibleArtworks}</p>
                 </div>
               </div>

@@ -47,6 +47,9 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication first
+  setupAuth(app);
+  
   // Dashboard Widget API routes
   app.get("/api/widgets", async (req, res) => {
     if (!req.isAuthenticated()) {

@@ -30,11 +30,11 @@ async function main() {
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
     } else {
-      await setupVite(app, server);
+      await setupVite(app, server as any);
     }
 
     // Start the server
-    server.listen(port, "0.0.0.0", () => {
+    server.listen(Number(port), "0.0.0.0", () => {
       log(`serving on port ${port}`);
     });
 

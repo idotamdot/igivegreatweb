@@ -23,7 +23,7 @@ export default function DashboardManager({
   const [role, setRole] = useState<string>(initialRole || "");
   
   // Fetch user's role if not provided
-  const { data: userData } = useQuery({
+  const { data: userData } = useQuery<{ role: string }>({
     queryKey: ["/api/user"],
     enabled: !initialRole,
   });
@@ -48,7 +48,7 @@ export default function DashboardManager({
   // Fetch layout data
   const { 
     data: layoutData
-  } = useQuery({
+  } = useQuery<{ layout?: string[] }>({
     queryKey: ["/api/layouts", role],
     enabled: !!role,
   });
@@ -67,7 +67,7 @@ export default function DashboardManager({
         
         // Add any widgets not in the layout
         const widgetsNotInLayout = widgets
-          .filter(widget => !layoutData.layout.includes(widget.id.toString()))
+          .filter(widget => !layoutData.layout?.includes(widget.id.toString()))
           .map(widget => widget.id.toString());
         
         setWidgetIds([...validWidgetIds, ...widgetsNotInLayout]);

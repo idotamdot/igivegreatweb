@@ -1119,6 +1119,12 @@ export class MemStorage implements IStorage {
     const widget: DashboardWidget = {
       ...insertWidget,
       id,
+      config: insertWidget.config || null,
+      position: insertWidget.position || 0,
+      width: insertWidget.width || "full",
+      height: insertWidget.height || "auto",
+      active: insertWidget.active !== undefined ? insertWidget.active : true,
+      userId: insertWidget.userId || null,
       createdAt: new Date()
     };
     

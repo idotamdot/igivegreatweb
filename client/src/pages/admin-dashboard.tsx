@@ -29,25 +29,34 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-normal">
-            <span className="text-gradient-glow">admin dashboard</span>
-          </h1>
-          <div className="flex space-x-4 items-center">
-            <span className="text-sm text-gray-400">
-              Logged in as <span className="text-white">{user.username}</span>
-            </span>
-            <button
-              onClick={() => logoutMutation.mutate()}
-              className="text-sm text-gray-400 hover:text-white"
-            >
-              Logout
-            </button>
+    <div className="min-h-screen bg-background text-foreground">
+      <div className="container mx-auto px-4 py-8">
+        <header className="mb-8">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center space-x-4">
+              <Link 
+                to="/" 
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                ← Back to Home
+              </Link>
+              <h1 className="text-2xl font-bold text-foreground">
+                Admin Dashboard
+              </h1>
+            </div>
+            <div className="flex space-x-4 items-center">
+              <span className="text-sm text-muted-foreground">
+                Logged in as <span className="text-foreground font-medium">{user.username}</span>
+              </span>
+              <button
+                onClick={() => logoutMutation.mutate()}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Logout
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
 
       <Tabs 
         defaultValue="dashboard" 
@@ -55,13 +64,13 @@ export default function AdminDashboard() {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="bg-black border border-gray-800">
-          <TabsTrigger value="dashboard">dashboard</TabsTrigger>
-          <TabsTrigger value="connections">connections</TabsTrigger>
-          <TabsTrigger value="menu-links">menu links</TabsTrigger>
-          <TabsTrigger value="gallery">gallery</TabsTrigger>
-          <TabsTrigger value="content">content</TabsTrigger>
-          <TabsTrigger value="account">account</TabsTrigger>
+        <TabsList className="bg-muted">
+          <TabsTrigger value="dashboard" className="text-foreground">Dashboard</TabsTrigger>
+          <TabsTrigger value="connections" className="text-foreground">Connections</TabsTrigger>
+          <TabsTrigger value="menu-links" className="text-foreground">Menu Links</TabsTrigger>
+          <TabsTrigger value="gallery" className="text-foreground">Gallery</TabsTrigger>
+          <TabsTrigger value="content" className="text-foreground">Content</TabsTrigger>
+          <TabsTrigger value="account" className="text-foreground">Account</TabsTrigger>
         </TabsList>
         
         <TabsContent value="dashboard" className="mt-6">
@@ -69,40 +78,41 @@ export default function AdminDashboard() {
         </TabsContent>
         
         <TabsContent value="connections" className="mt-6">
-          <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Connections</h2>
-            <p className="text-gray-400">View and manage user connections.</p>
+          <div className="bg-card border rounded-lg p-6">
+            <h2 className="text-xl mb-4 text-foreground">Connections</h2>
+            <p className="text-muted-foreground">View and manage user connections.</p>
           </div>
         </TabsContent>
         
         <TabsContent value="menu-links" className="mt-6">
-          <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Menu Links</h2>
-            <p className="text-gray-400">Manage site navigation and menu links.</p>
+          <div className="bg-card border rounded-lg p-6">
+            <h2 className="text-xl mb-4 text-foreground">Menu Links</h2>
+            <p className="text-muted-foreground">Manage site navigation and menu links.</p>
           </div>
         </TabsContent>
         
         <TabsContent value="gallery" className="mt-6">
-          <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Gallery Management</h2>
-            <p className="text-gray-400">Manage artwork and prints.</p>
+          <div className="bg-card border rounded-lg p-6">
+            <h2 className="text-xl mb-4 text-foreground">Gallery Management</h2>
+            <p className="text-muted-foreground">Manage artwork and prints.</p>
           </div>
         </TabsContent>
         
         <TabsContent value="content" className="mt-6">
-          <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Content Management</h2>
-            <p className="text-gray-400">Edit website content and blocks.</p>
+          <div className="bg-card border rounded-lg p-6">
+            <h2 className="text-xl mb-4 text-foreground">Content Management</h2>
+            <p className="text-muted-foreground">Edit website content and blocks.</p>
           </div>
         </TabsContent>
         
         <TabsContent value="account" className="mt-6">
-          <div className="bg-black border border-gray-800 rounded-lg p-6">
-            <h2 className="text-xl mb-4">Account Settings</h2>
-            <p className="text-gray-400">Update your account settings and preferences.</p>
+          <div className="bg-card border rounded-lg p-6">
+            <h2 className="text-xl mb-4 text-foreground">Account Settings</h2>
+            <p className="text-muted-foreground">Update your account settings and preferences.</p>
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

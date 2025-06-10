@@ -2,6 +2,76 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  /* Seasonal Gradient Backgrounds */
+  .bg-spring-gradient {
+    background: linear-gradient(135deg, hsl(var(--spring-mint)) 0%, hsl(var(--spring-sky-blue)) 100%);
+  }
+  
+  .bg-summer-gradient {
+    background: linear-gradient(135deg, hsl(var(--summer-sand)) 0%, hsl(var(--summer-coral)) 100%);
+  }
+  
+  .bg-winter-gradient {
+    background: linear-gradient(135deg, hsl(var(--winter-snow)) 0%, hsl(var(--winter-ice)) 100%);
+  }
+  
+  /* Seasonal Text Colors */
+  .text-spring { color: hsl(var(--spring-fresh-green)); }
+  .text-summer { color: hsl(var(--summer-coral)); }
+  .text-winter { color: hsl(var(--winter-pine)); }
+  
+  /* Seasonal Accent Dots */
+  .accent-spring::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: hsl(var(--spring-bloom-pink));
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .accent-summer::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: hsl(var(--summer-coral));
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  .accent-winter::before {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: hsl(var(--winter-berry));
+    border-radius: 50%;
+    margin-right: 8px;
+  }
+  
+  /* Seasonal Card Styles */
+  .card-spring {
+    background: linear-gradient(135deg, hsl(var(--spring-mint) / 0.3) 0%, hsl(var(--spring-sky-blue) / 0.2) 100%);
+    border: 2px solid hsl(var(--spring-fresh-green));
+    box-shadow: 0 4px 20px hsl(var(--spring-fresh-green) / 0.2);
+  }
+  
+  .card-summer {
+    background: linear-gradient(135deg, hsl(var(--summer-sand) / 0.3) 0%, hsl(var(--summer-coral) / 0.2) 100%);
+    border: 2px solid hsl(var(--summer-ocean));
+    box-shadow: 0 4px 20px hsl(var(--summer-ocean) / 0.2);
+  }
+  
+  .card-winter {
+    background: linear-gradient(135deg, hsl(var(--winter-snow) / 0.3) 0%, hsl(var(--winter-ice) / 0.2) 100%);
+    border: 2px solid hsl(var(--winter-pine));
+    box-shadow: 0 4px 20px hsl(var(--winter-pine) / 0.2);
+  }
+}
+
 /* Global animation keyframes */
 @keyframes smooth-glow {
   0% { box-shadow: 0 0 15px rgba(255,255,255,0.3), 0 0 30px rgba(255,255,255,0.15); }
@@ -13,27 +83,49 @@
 
 @layer base {
   :root {
-    --primary: #000000;
-    --background: #FFFFFF;
-    --foreground: #1A1A1A;
-    --accent: #333333;
+    --primary: 142 76% 36%;
+    --background: 120 60% 97%;
+    --foreground: 160 30% 15%;
+    --accent: 330 81% 60%;
     
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    /* Seasonal Color Palette */
+    --spring-fresh-green: 142 76% 36%;
+    --spring-bloom-pink: 330 81% 60%;
+    --spring-sky-blue: 200 89% 70%;
+    --spring-sunshine: 48 98% 77%;
+    --spring-lavender: 270 50% 75%;
+    --spring-mint: 150 60% 80%;
+    
+    --summer-coral: 16 100% 66%;
+    --summer-ocean: 194 100% 50%;
+    --summer-sunset: 25 100% 60%;
+    --summer-lime: 80 70% 50%;
+    --summer-berry: 320 70% 45%;
+    --summer-sand: 45 60% 85%;
+    
+    --winter-ice: 200 50% 90%;
+    --winter-pine: 160 30% 35%;
+    --winter-berry: 350 80% 50%;
+    --winter-frost: 220 20% 85%;
+    --winter-midnight: 240 30% 25%;
+    --winter-snow: 0 0% 98%;
+    
+    --card: 120 40% 98%;
+    --card-foreground: 160 30% 15%;
+    --popover: 120 40% 98%;
+    --popover-foreground: 160 30% 15%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 150 40% 94%;
+    --secondary-foreground: 160 30% 20%;
+    --muted: 150 30% 92%;
+    --muted-foreground: 160 20% 45%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 350 80% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 150 30% 88%;
+    --input: 150 30% 88%;
     --ring: var(--primary);
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
  
   .dark {

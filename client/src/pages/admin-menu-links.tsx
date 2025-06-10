@@ -66,7 +66,7 @@ export default function AdminMenuLinks() {
     defaultValues: {
       label: "",
       url: "",
-      description: "",
+
       active: true,
     },
   });

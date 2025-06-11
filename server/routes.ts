@@ -35,8 +35,6 @@ try {
   console.warn('Stripe initialization failed:', error);
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 const scryptAsync = promisify(scrypt);
 
 async function hashPassword(password: string) {

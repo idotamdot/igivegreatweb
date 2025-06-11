@@ -580,7 +580,7 @@ export class MemStorage implements IStorage {
     const id = this.userCurrentId++;
     // Create a hashed password for "QuantumAccess2024!" (format: hash.salt)
     // This matches the format created by hashPassword() in auth.ts
-    const hashedPassword = "a2b8c9d0e1f2345678901234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab.f36954f3ad71a25e7aa4844843eae71b";
+    const hashedPassword = "5ad1e3b23a726b2ae9fe873cae2601878d51eef7ca1cc8c9612ed0f36669d73c291c8e16df7b91bf02d07dcb71dddb84df995e3a112b68839fc548d69731506a.6d092dc7e8b4eda0ddc25faee15085ce";
     
     const user: User = {
       id,

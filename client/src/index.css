@@ -3,23 +3,34 @@
 @tailwind utilities;
 
 @layer utilities {
-  /* Seasonal Gradient Backgrounds */
-  .bg-spring-gradient {
-    background: linear-gradient(135deg, hsl(var(--spring-mint)) 0%, hsl(var(--spring-sky-blue)) 100%);
+  /* Futuristic Gradient Backgrounds */
+  .bg-cyber-gradient {
+    background: linear-gradient(135deg, #0a0a23 0%, #1a1a3e 25%, #2d1b69 50%, #8b5cf6 100%);
   }
   
-  .bg-summer-gradient {
-    background: linear-gradient(135deg, hsl(var(--summer-sand)) 0%, hsl(var(--summer-coral)) 100%);
+  .bg-neon-gradient {
+    background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
   }
   
-  .bg-winter-gradient {
-    background: linear-gradient(135deg, hsl(var(--winter-snow)) 0%, hsl(var(--winter-ice)) 100%);
+  .bg-hologram-gradient {
+    background: linear-gradient(135deg, #00f5ff 0%, #ff00ff 50%, #ffff00 100%);
   }
   
-  /* Seasonal Text Colors */
-  .text-spring { color: hsl(var(--spring-fresh-green)); }
-  .text-summer { color: hsl(var(--summer-coral)); }
-  .text-winter { color: hsl(var(--winter-pine)); }
+  .bg-matrix-gradient {
+    background: linear-gradient(135deg, #0d1421 0%, #1e3a8a 50%, #059669 100%);
+  }
+  
+  /* Cyberpunk Text Colors */
+  .text-neon-pink { color: #ff006e; }
+  .text-neon-blue { color: #3a86ff; }
+  .text-neon-purple { color: #8338ec; }
+  .text-cyber-green { color: #00ff41; }
+  .text-hologram { 
+    background: linear-gradient(45deg, #00f5ff, #ff00ff, #ffff00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
   
   /* Seasonal Accent Dots */
   .accent-spring::before {
@@ -52,23 +63,26 @@
     margin-right: 8px;
   }
   
-  /* Seasonal Card Styles */
-  .card-spring {
-    background: linear-gradient(135deg, hsl(var(--spring-mint) / 0.3) 0%, hsl(var(--spring-sky-blue) / 0.2) 100%);
-    border: 2px solid hsl(var(--spring-fresh-green));
-    box-shadow: 0 4px 20px hsl(var(--spring-fresh-green) / 0.2);
+  /* Cyberpunk Card Styles */
+  .card-cyber {
+    background: linear-gradient(135deg, rgba(10, 10, 35, 0.9) 0%, rgba(45, 27, 105, 0.8) 100%);
+    border: 2px solid #8b5cf6;
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(16px);
   }
   
-  .card-summer {
-    background: linear-gradient(135deg, hsl(var(--summer-sand) / 0.3) 0%, hsl(var(--summer-coral) / 0.2) 100%);
-    border: 2px solid hsl(var(--summer-ocean));
-    box-shadow: 0 4px 20px hsl(var(--summer-ocean) / 0.2);
+  .card-neon {
+    background: linear-gradient(135deg, rgba(255, 0, 110, 0.1) 0%, rgba(131, 56, 236, 0.1) 100%);
+    border: 2px solid #ff006e;
+    box-shadow: 0 8px 32px rgba(255, 0, 110, 0.4), 0 0 20px rgba(255, 0, 110, 0.2);
+    backdrop-filter: blur(16px);
   }
   
-  .card-winter {
-    background: linear-gradient(135deg, hsl(var(--winter-snow) / 0.3) 0%, hsl(var(--winter-ice) / 0.2) 100%);
-    border: 2px solid hsl(var(--winter-pine));
-    box-shadow: 0 4px 20px hsl(var(--winter-pine) / 0.2);
+  .card-matrix {
+    background: linear-gradient(135deg, rgba(13, 20, 33, 0.9) 0%, rgba(5, 150, 105, 0.1) 100%);
+    border: 2px solid #00ff41;
+    box-shadow: 0 8px 32px rgba(0, 255, 65, 0.3), inset 0 1px 0 rgba(0, 255, 65, 0.1);
+    backdrop-filter: blur(16px);
   }
 
   /* Advanced Interactive Elements */
@@ -195,6 +209,56 @@
   .btn-magnetic:hover::before {
     opacity: 0.7;
   }
+
+  /* Cyberpunk Effects */
+  .neon-glow {
+    animation: neonPulse 2s ease-in-out infinite alternate;
+  }
+
+  .glitch-effect {
+    animation: glitch 0.3s ease-in-out infinite;
+  }
+
+  .hologram-effect {
+    animation: hologramFlicker 4s ease-in-out infinite;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+    background-size: 200% 200%;
+    animation: hologramFlicker 4s ease-in-out infinite, backgroundShift 3s ease infinite;
+  }
+
+  .cyber-grid {
+    background-image: 
+      linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  .data-stream {
+    animation: dataStream 3s linear infinite;
+  }
+
+  /* Futuristic Glass Cards */
+  .cyber-glass {
+    background: rgba(10, 10, 35, 0.8);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    box-shadow: 
+      0 8px 32px rgba(139, 92, 246, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  .neon-border {
+    border: 2px solid;
+    border-image: linear-gradient(45deg, #ff006e, #8338ec, #3a86ff, #ff006e) 1;
+    animation: backgroundShift 3s ease infinite;
+  }
+
+  /* Terminal-style text */
+  .terminal-text {
+    font-family: 'Courier New', monospace;
+    color: #00ff41;
+    text-shadow: 0 0 10px #00ff41;
+  }
 }
 
 /* Global animation keyframes */
@@ -253,6 +317,46 @@
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+@keyframes neonPulse {
+  0%, 100% { 
+    box-shadow: 0 0 5px currentColor, 0 0 10px currentColor, 0 0 15px currentColor;
+    text-shadow: 0 0 5px currentColor;
+  }
+  50% { 
+    box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+    text-shadow: 0 0 10px currentColor;
+  }
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  2% { transform: translate(-2px, 2px); }
+  4% { transform: translate(-2px, -2px); }
+  6% { transform: translate(2px, 2px); }
+  8% { transform: translate(2px, -2px); }
+  10% { transform: translate(-2px, 2px); }
+  12% { transform: translate(-2px, -2px); }
+  14% { transform: translate(2px, 2px); }
+  16% { transform: translate(2px, -2px); }
+  18% { transform: translate(0); }
+  100% { transform: translate(0); }
+}
+
+@keyframes dataStream {
+  0% { transform: translateY(-100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+@keyframes hologramFlicker {
+  0%, 100% { opacity: 1; filter: brightness(1); }
+  2% { opacity: 0.8; filter: brightness(1.2); }
+  4% { opacity: 1; filter: brightness(0.9); }
+  8% { opacity: 0.9; filter: brightness(1.1); }
+  12% { opacity: 1; filter: brightness(1); }
 }
 
 @layer base {

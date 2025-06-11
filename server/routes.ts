@@ -24,8 +24,15 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+// Stripe configuration - will be initialized when needed
+let stripe: Stripe | undefined;
+
+try {
+  if (process.env.STRIPE_SECRET_KEY) {
+    stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+} catch (error) {
+  console.warn('Stripe initialization failed:', error);
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);

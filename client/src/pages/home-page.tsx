@@ -4,6 +4,8 @@ import SiteHeader from "@/components/site-header";
 import MobileNav from "@/components/mobile-nav";
 import ConnectDialog from "@/components/connect-dialog";
 import ParticleBackground from "@/components/ParticleBackground";
+import CyberMatrix from "@/components/CyberMatrix";
+import NeuralNavigation from "@/components/NeuralNavigation";
 import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Heart } from "lucide-react";
 
@@ -13,7 +15,9 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
+      <CyberMatrix />
       <ParticleBackground />
+      <NeuralNavigation />
       <SiteHeader 
         onMenuClick={() => setMobileNavOpen(true)} 
         onConnectClick={() => setConnectOpen(true)}

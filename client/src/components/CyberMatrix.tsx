@@ -103,8 +103,8 @@ export default function CyberMatrix() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
-      style={{ opacity: 0.3 }}
+      className="fixed inset-0 pointer-events-none -z-10"
+      style={{ opacity: 0.15 }}
     />
   );
 }

@@ -1467,8 +1467,16 @@ export class MemStorage implements IStorage {
   async createPsiReview(insertReview: InsertPsiReview): Promise<PsiReview> {
     const id = this.psiReviewCurrentId++;
     const review: PsiReview = {
-      ...insertReview,
       id,
+      title: insertReview.title || null,
+      content: insertReview.content,
+      rating: insertReview.rating,
+      productId: insertReview.productId || null,
+      userId: insertReview.userId || null,
+      approved: false,
+      helpfulVotes: 0,
+      verifiedPurchase: insertReview.verifiedPurchase || null,
+      flagged: false,
       createdAt: new Date(),
       updatedAt: new Date()
     };

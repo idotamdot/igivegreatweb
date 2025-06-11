@@ -407,6 +407,7 @@ export const insertPsiProductSchema = createInsertSchema(psiProducts).pick({
 });
 
 export const insertPsiReviewSchema = createInsertSchema(psiReviews).pick({
+  userId: true,
   productId: true,
   rating: true,
   title: true,

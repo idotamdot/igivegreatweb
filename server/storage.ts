@@ -1351,15 +1351,19 @@ export class MemStorage implements IStorage {
   async getActivePsiCategories(): Promise<PsiCategory[]> {
     return Array.from(this.psiCategories.values())
       .filter(cat => cat.active)
-      .sort((a, b) => a.order - b.order);
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
   }
 
   // PSI Value methods
   async createPsiValue(insertValue: InsertPsiValue): Promise<PsiValue> {
     const id = this.psiValueCurrentId++;
     const value: PsiValue = {
-      ...insertValue,
       id,
+      name: insertValue.name,
+      active: insertValue.active || null,
+      description: insertValue.description || null,
+      icon: insertValue.icon || null,
+      color: insertValue.color || null,
       createdAt: new Date()
     };
     this.psiValues.set(id, value);

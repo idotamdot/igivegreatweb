@@ -29,7 +29,7 @@ async function main() {
     
     // Create HTTP server for development
     const { createServer } = await import("http");
-    const server = createServer(app) as any;
+    const server: Server = createServer(app);
     
     // Setup Vite in development or serve static files in production
     if (process.env.NODE_ENV === "production") {

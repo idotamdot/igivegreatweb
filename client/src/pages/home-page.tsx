@@ -61,6 +61,18 @@ export default function HomePage() {
           <p className="text-white/80 text-center max-w-md text-sm">
             "Index Instead of Intrude" - Find ethical products and services through seeking, not manipulation
           </p>
+          
+          {/* Add Business Button */}
+          <Link to="/apply">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 px-6 py-3 rounded-xl backdrop-blur-sm transition-all duration-300"
+            >
+              <Heart className="w-4 h-4 mr-2" />
+              Add Your Business Here
+            </Button>
+          </Link>
         </div>
       </main>
 

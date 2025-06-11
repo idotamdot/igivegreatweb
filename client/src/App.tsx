@@ -8,6 +8,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import AdminGalleryManagement from "@/pages/admin-gallery-management";
 import ClientDashboard from "@/pages/client-dashboard";
 import PSIIndex from "@/pages/psi-index";
+import BusinessApplication from "@/pages/business-application";
 import ProjectDetails from "@/pages/project-details";
 import MessageDetails from "@/pages/message-details";
 import ContentPage from "@/pages/content-page";
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/client" component={ClientDashboard} />
       <Route path="/index" component={PSIIndex} />
+      <Route path="/apply" component={BusinessApplication} />
       <Route path="/project/:id" component={ProjectDetails} />
       <Route path="/message/:id" component={MessageDetails} />
       {/* Services and checkout routes */}

@@ -211,7 +211,7 @@ export default function PSIIndex() {
                       className={`p-3 rounded-lg border-2 transition-all text-center ${
                         isSelected 
                           ? `${value.color} border-white text-white shadow-lg` 
-                          : 'bg-white/50 border-white/30 text-winter-pine hover:bg-white/70'
+                          : 'bg-white/90 border-winter-pine/30 text-winter-pine hover:bg-white hover:border-winter-pine'
                       }`}
                     >
                       <Icon className="w-5 h-5 mx-auto mb-1" />
@@ -304,28 +304,28 @@ export default function PSIIndex() {
 
         {/* Philosophy Footer */}
         <footer className="text-center">
-          <Card className="bg-winter-gradient text-white">
+          <Card className="bg-winter-gradient text-white border-2 border-white/20">
             <CardContent className="py-8">
-              <h3 className="text-xl font-bold mb-4">Why We Index, Not Advertise</h3>
-              <p className="text-white/90 mb-4 max-w-2xl mx-auto">
+              <h3 className="text-xl font-bold mb-4 text-white">Why We Index, Not Advertise</h3>
+              <p className="text-white mb-4 max-w-2xl mx-auto">
                 We believe in respecting your autonomy and attention. Instead of bombarding you with manipulative ads, 
                 we provide a transparent index where you can find what you need by seeking, not by being exploited.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <Shield className="w-6 h-6 mx-auto mb-2" />
-                  <strong>No Behavioral Manipulation</strong>
-                  <p className="text-white/80">We rank by integrity and value, not ad spend</p>
+                <div className="text-white">
+                  <Shield className="w-6 h-6 mx-auto mb-2 text-white" />
+                  <strong className="text-white">No Behavioral Manipulation</strong>
+                  <p className="text-white/90 mt-1">We rank by integrity and value, not ad spend</p>
                 </div>
-                <div>
-                  <Users className="w-6 h-6 mx-auto mb-2" />
-                  <strong>Community Curated</strong>
-                  <p className="text-white/80">Real reviews from people, not bots or paid promotions</p>
+                <div className="text-white">
+                  <Users className="w-6 h-6 mx-auto mb-2 text-white" />
+                  <strong className="text-white">Community Curated</strong>
+                  <p className="text-white/90 mt-1">Real reviews from people, not bots or paid promotions</p>
                 </div>
-                <div>
-                  <Heart className="w-6 h-6 mx-auto mb-2" />
-                  <strong>Values Aligned</strong>
-                  <p className="text-white/80">Find businesses that share your ethical commitments</p>
+                <div className="text-white">
+                  <Heart className="w-6 h-6 mx-auto mb-2 text-white" />
+                  <strong className="text-white">Values Aligned</strong>
+                  <p className="text-white/90 mt-1">Find businesses that share your ethical commitments</p>
                 </div>
               </div>
             </CardContent>

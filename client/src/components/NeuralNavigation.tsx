@@ -97,81 +97,55 @@ export default function NeuralNavigation() {
   };
 
   return (
-    <div className="fixed top-4 left-4 z-50">
-      <div className="cyber-glass p-4 rounded-2xl neon-border">
-        {/* Network Status Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <Activity className="w-5 h-5 text-cyber-green neon-glow" />
-          <div className="terminal-text text-cyber-green text-sm">
-            NEURAL_NETWORK
+    <div className="w-full bg-gray-900/50 backdrop-blur-sm border-b border-cyber-green/20">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          {/* Logo/Brand */}
+          <div className="flex items-center gap-3">
+            <Brain className="w-6 h-6 text-cyber-green neon-glow" />
+            <div className="terminal-text text-cyber-green font-bold">NEURAL_WEB_LABS</div>
+            <Badge className="bg-cyber-green text-black text-xs neon-glow">
+              QUANTUM_READY
+            </Badge>
           </div>
-          <Badge className="bg-cyber-green text-black text-xs neon-glow">
-            ONLINE
-          </Badge>
-        </div>
 
-        {/* Navigation Nodes */}
-        <div className="space-y-2">
-          {navNodes.map((node) => {
-            const Icon = node.icon;
-            const isActive = activeNode === node.id;
-            const isCurrentPath = location === node.path;
-            
-            return (
-              <Link key={node.id} to={node.path}>
-                <Button
-                  variant={isCurrentPath ? "default" : "ghost"}
-                  size="sm"
-                  className={`w-full justify-start gap-3 text-xs h-10 transition-all duration-300 ${
-                    isCurrentPath 
-                      ? 'bg-neon-gradient text-white neon-glow' 
-                      : 'text-cyber-green hover:bg-cyber-green/10 hover:text-neon-pink'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
+          {/* Navigation Links */}
+          <div className="flex items-center gap-4">
+            {navNodes.map((node) => {
+              const Icon = node.icon;
+              const isCurrentPath = location === node.path;
+              
+              return (
+                <Link key={node.id} to={node.path}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={`gap-2 text-xs transition-all duration-300 ${
+                      isCurrentPath 
+                        ? 'bg-neon-gradient text-white neon-glow' 
+                        : 'text-cyber-green hover:bg-cyber-green/10 hover:text-neon-pink'
+                    }`}
+                  >
                     <div className={`w-2 h-2 rounded-full ${getStatusColor(node.status)} neon-glow`}></div>
                     <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 text-left">
-                    <div className="terminal-text font-medium">{node.label}</div>
-                    <div className="text-xs opacity-70">{node.description}</div>
-                  </div>
-                </Button>
-              </Link>
-            );
-          })}
-        </div>
+                    <span className="terminal-text font-medium">{node.label}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
 
-        {/* Network Pulse Indicator */}
-        <div className="mt-4 pt-3 border-t border-cyber-green/20">
-          <div className="flex items-center gap-2 text-xs">
-            <Globe className="w-3 h-3 text-neon-blue" />
-            <div className="terminal-text text-cyber-green">
-              NETWORK_PULSE: {networkPulse}%
+          {/* Status Indicator */}
+          <div className="flex items-center gap-2">
+            <div className="text-xs terminal-text text-cyber-green">
+              NETWORK: {networkPulse}%
             </div>
-            <div 
-              className="w-16 h-1 bg-gray-800 rounded-full overflow-hidden"
-            >
+            <div className="w-12 h-1 bg-gray-800 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-cyber-green neon-glow transition-all duration-100"
                 style={{ width: `${networkPulse}%` }}
               ></div>
             </div>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-3 pt-3 border-t border-cyber-green/20">
-          <div className="text-xs terminal-text text-cyber-green mb-2">QUICK_ACCESS:</div>
-          <div className="grid grid-cols-2 gap-1">
-            <Button variant="ghost" size="sm" className="text-xs h-6 cyber-glass">
-              <Terminal className="w-3 h-3 mr-1" />
-              CLI
-            </Button>
-            <Button variant="ghost" size="sm" className="text-xs h-6 cyber-glass">
-              <Zap className="w-3 h-3 mr-1" />
-              BOOST
-            </Button>
           </div>
         </div>
       </div>

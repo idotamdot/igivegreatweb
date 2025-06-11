@@ -64,6 +64,96 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Setup authentication first
   setupAuth(app);
 
+  // Initialize Neural Web Labs database
+  try {
+    await createTables();
+    await seedData();
+    console.log("Neural Web Labs database initialized successfully");
+  } catch (error) {
+    console.log("Database already initialized or error:", error);
+  }
+
+  // Neural Web Labs API endpoints
+  app.get("/api/neural/ai-operators", async (req, res) => {
+    try {
+      const operators = await getAIOperators();
+      res.json(operators);
+    } catch (error) {
+      console.error("Error fetching AI operators:", error);
+      res.status(500).json({ error: "Failed to fetch AI operators" });
+    }
+  });
+
+  app.get("/api/neural/business-metrics", async (req, res) => {
+    try {
+      const metrics = await getBusinessMetrics();
+      res.json(metrics);
+    } catch (error) {
+      console.error("Error fetching business metrics:", error);
+      res.status(500).json({ error: "Failed to fetch business metrics" });
+    }
+  });
+
+  app.get("/api/neural/services", async (req, res) => {
+    try {
+      const services = await getServices();
+      res.json(services);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      res.status(500).json({ error: "Failed to fetch services" });
+    }
+  });
+
+  app.get("/api/neural/client-projects", async (req, res) => {
+    try {
+      const projects = await getClientProjects();
+      res.json(projects);
+    } catch (error) {
+      console.error("Error fetching client projects:", error);
+      res.status(500).json({ error: "Failed to fetch client projects" });
+    }
+  });
+
+  app.post("/api/neural/projects", async (req, res) => {
+    try {
+      const { project_name, client_name, ai_operator_id, complexity_level, revenue } = req.body;
+      
+      if (!project_name || !client_name || !ai_operator_id || !complexity_level || !revenue) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      const project = await createProject({
+        project_name,
+        client_name,
+        ai_operator_id: parseInt(ai_operator_id),
+        complexity_level,
+        revenue: parseFloat(revenue)
+      });
+
+      res.json(project);
+    } catch (error) {
+      console.error("Error creating project:", error);
+      res.status(500).json({ error: "Failed to create project" });
+    }
+  });
+
+  app.put("/api/neural/operators/:id/metrics", async (req, res) => {
+    try {
+      const operatorId = parseInt(req.params.id);
+      const { tasksCompleted, efficiency } = req.body;
+
+      if (!tasksCompleted || !efficiency) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      await updateOperatorMetrics(operatorId, parseInt(tasksCompleted), parseFloat(efficiency));
+      res.json({ message: "Operator metrics updated successfully" });
+    } catch (error) {
+      console.error("Error updating operator metrics:", error);
+      res.status(500).json({ error: "Failed to update operator metrics" });
+    }
+  });
+
   // Password change endpoint
   app.post("/api/change-password", async (req, res) => {
     if (!req.isAuthenticated()) {

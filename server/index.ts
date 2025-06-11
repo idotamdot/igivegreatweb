@@ -24,13 +24,17 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 async function main() {
   try {
     // Register API routes
-    const server = await registerRoutes(app);
+    await registerRoutes(app);
+    
+    // Create HTTP server for development
+    const { createServer } = await import("http");
+    const server = createServer(app);
     
     // Setup Vite in development or serve static files in production
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
     } else {
-      await setupVite(app, server as any);
+      await setupVite(app, server);
     }
 
     // Start the server

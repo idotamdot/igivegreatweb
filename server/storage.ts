@@ -196,6 +196,12 @@ export class MemStorage implements IStorage {
     this.contentBlocks = new Map();
     this.dashboardWidgets = new Map();
     this.dashboardLayouts = new Map();
+    this.psiCategories = new Map();
+    this.psiValues = new Map();
+    this.psiProducts = new Map();
+    this.psiProductValues = new Map();
+    this.psiReviews = new Map();
+    this.psiSearches = new Map();
     
     this.userCurrentId = 1;
     this.connectionCurrentId = 1;
@@ -207,6 +213,12 @@ export class MemStorage implements IStorage {
     this.contentBlockCurrentId = 1;
     this.dashboardWidgetCurrentId = 1;
     this.dashboardLayoutCurrentId = 1;
+    this.psiCategoryCurrentId = 1;
+    this.psiValueCurrentId = 1;
+    this.psiProductCurrentId = 1;
+    this.psiProductValueCurrentId = 1;
+    this.psiReviewCurrentId = 1;
+    this.psiSearchCurrentId = 1;
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000,
@@ -1284,6 +1296,222 @@ export class MemStorage implements IStorage {
   
   async deleteDashboardLayout(id: number): Promise<void> {
     this.dashboardLayouts.delete(id);
+  }
+
+  // PSI Category methods
+  async createPsiCategory(insertCategory: InsertPsiCategory): Promise<PsiCategory> {
+    const id = this.psiCategoryCurrentId++;
+    const category: PsiCategory = {
+      ...insertCategory,
+      id,
+      createdAt: new Date()
+    };
+    this.psiCategories.set(id, category);
+    return category;
+  }
+
+  async getAllPsiCategories(): Promise<PsiCategory[]> {
+    return Array.from(this.psiCategories.values()).sort((a, b) => a.order - b.order);
+  }
+
+  async getPsiCategory(id: number): Promise<PsiCategory | undefined> {
+    return this.psiCategories.get(id);
+  }
+
+  async updatePsiCategory(id: number, categoryUpdate: Partial<InsertPsiCategory>): Promise<PsiCategory | undefined> {
+    const category = this.psiCategories.get(id);
+    if (!category) return undefined;
+    
+    const updatedCategory: PsiCategory = { ...category, ...categoryUpdate };
+    this.psiCategories.set(id, updatedCategory);
+    return updatedCategory;
+  }
+
+  async deletePsiCategory(id: number): Promise<void> {
+    this.psiCategories.delete(id);
+  }
+
+  async getActivePsiCategories(): Promise<PsiCategory[]> {
+    return Array.from(this.psiCategories.values())
+      .filter(cat => cat.active)
+      .sort((a, b) => a.order - b.order);
+  }
+
+  // PSI Value methods
+  async createPsiValue(insertValue: InsertPsiValue): Promise<PsiValue> {
+    const id = this.psiValueCurrentId++;
+    const value: PsiValue = {
+      ...insertValue,
+      id,
+      createdAt: new Date()
+    };
+    this.psiValues.set(id, value);
+    return value;
+  }
+
+  async getAllPsiValues(): Promise<PsiValue[]> {
+    return Array.from(this.psiValues.values());
+  }
+
+  async getPsiValue(id: number): Promise<PsiValue | undefined> {
+    return this.psiValues.get(id);
+  }
+
+  async updatePsiValue(id: number, valueUpdate: Partial<InsertPsiValue>): Promise<PsiValue | undefined> {
+    const value = this.psiValues.get(id);
+    if (!value) return undefined;
+    
+    const updatedValue: PsiValue = { ...value, ...valueUpdate };
+    this.psiValues.set(id, updatedValue);
+    return updatedValue;
+  }
+
+  async deletePsiValue(id: number): Promise<void> {
+    this.psiValues.delete(id);
+  }
+
+  async getActivePsiValues(): Promise<PsiValue[]> {
+    return Array.from(this.psiValues.values()).filter(val => val.active);
+  }
+
+  // PSI Product methods (basic implementation)
+  async createPsiProduct(insertProduct: InsertPsiProduct): Promise<PsiProduct> {
+    const id = this.psiProductCurrentId++;
+    const product: PsiProduct = {
+      ...insertProduct,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.psiProducts.set(id, product);
+    return product;
+  }
+
+  async getAllPsiProducts(includeInactive?: boolean): Promise<PsiProduct[]> {
+    const products = Array.from(this.psiProducts.values());
+    return includeInactive ? products : products.filter(p => p.active);
+  }
+
+  async getPsiProduct(id: number): Promise<PsiProduct | undefined> {
+    return this.psiProducts.get(id);
+  }
+
+  async updatePsiProduct(id: number, productUpdate: Partial<InsertPsiProduct>): Promise<PsiProduct | undefined> {
+    const product = this.psiProducts.get(id);
+    if (!product) return undefined;
+    
+    const updatedProduct: PsiProduct = { 
+      ...product, 
+      ...productUpdate,
+      updatedAt: new Date()
+    };
+    this.psiProducts.set(id, updatedProduct);
+    return updatedProduct;
+  }
+
+  async deletePsiProduct(id: number): Promise<void> {
+    this.psiProducts.delete(id);
+  }
+
+  async getFeaturedPsiProducts(): Promise<PsiProduct[]> {
+    return Array.from(this.psiProducts.values())
+      .filter(p => p.featured && p.active && p.approved);
+  }
+
+  async getApprovedPsiProducts(): Promise<PsiProduct[]> {
+    return Array.from(this.psiProducts.values())
+      .filter(p => p.approved && p.active);
+  }
+
+  async getUserPsiProducts(userId: number): Promise<PsiProduct[]> {
+    return Array.from(this.psiProducts.values())
+      .filter(p => p.createdBy === userId);
+  }
+
+  async searchPsiProducts(query: string, filters?: any): Promise<PsiProduct[]> {
+    const products = Array.from(this.psiProducts.values())
+      .filter(p => p.active && p.approved);
+    
+    if (!query) return products;
+    
+    return products.filter(p => 
+      p.name.toLowerCase().includes(query.toLowerCase()) ||
+      p.description.toLowerCase().includes(query.toLowerCase()) ||
+      (p.tags && p.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase())))
+    );
+  }
+
+  async getPsiProductsByCategory(categoryId: number): Promise<PsiProduct[]> {
+    return Array.from(this.psiProducts.values())
+      .filter(p => p.categoryId === categoryId && p.active && p.approved);
+  }
+
+  // PSI Review methods (basic implementation)
+  async createPsiReview(insertReview: InsertPsiReview): Promise<PsiReview> {
+    const id = this.psiReviewCurrentId++;
+    const review: PsiReview = {
+      ...insertReview,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.psiReviews.set(id, review);
+    return review;
+  }
+
+  async getPsiProductReviews(productId: number): Promise<PsiReview[]> {
+    return Array.from(this.psiReviews.values())
+      .filter(r => r.productId === productId);
+  }
+
+  async getUserPsiReviews(userId: number): Promise<PsiReview[]> {
+    return Array.from(this.psiReviews.values())
+      .filter(r => r.userId === userId);
+  }
+
+  async updatePsiReview(id: number, reviewUpdate: Partial<InsertPsiReview>): Promise<PsiReview | undefined> {
+    const review = this.psiReviews.get(id);
+    if (!review) return undefined;
+    
+    const updatedReview: PsiReview = { 
+      ...review, 
+      ...reviewUpdate,
+      updatedAt: new Date()
+    };
+    this.psiReviews.set(id, updatedReview);
+    return updatedReview;
+  }
+
+  async deletePsiReview(id: number): Promise<void> {
+    this.psiReviews.delete(id);
+  }
+
+  async getApprovedPsiReviews(productId: number): Promise<PsiReview[]> {
+    return Array.from(this.psiReviews.values())
+      .filter(r => r.productId === productId && r.approved);
+  }
+
+  // PSI Search methods (basic implementation)
+  async createPsiSearch(insertSearch: InsertPsiSearch): Promise<PsiSearch> {
+    const id = this.psiSearchCurrentId++;
+    const search: PsiSearch = {
+      ...insertSearch,
+      id,
+      createdAt: new Date()
+    };
+    this.psiSearches.set(id, search);
+    return search;
+  }
+
+  async getUserPsiSearches(userId: number): Promise<PsiSearch[]> {
+    return Array.from(this.psiSearches.values())
+      .filter(s => s.userId === userId);
+  }
+
+  async getPopularPsiSearches(limit: number = 10): Promise<PsiSearch[]> {
+    return Array.from(this.psiSearches.values())
+      .sort((a, b) => (b.resultsCount || 0) - (a.resultsCount || 0))
+      .slice(0, limit);
   }
 }
 

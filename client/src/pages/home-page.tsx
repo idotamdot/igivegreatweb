@@ -1,7 +1,10 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import SiteHeader from "@/components/site-header";
 import MobileNav from "@/components/mobile-nav";
 import ConnectDialog from "@/components/connect-dialog";
+import { Button } from "@/components/ui/button";
+import { Search, Sparkles, Heart } from "lucide-react";
 
 export default function HomePage() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -38,10 +41,27 @@ export default function HomePage() {
         </div>
       </div>
       
-      <main className="flex-1 flex justify-center items-center">
+      <main className="flex-1 flex flex-col justify-center items-center space-y-8">
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-center px-4 text-white animate-pulse-slow site-title-glow font-mono">
           igivegreatweb.com
         </h1>
+        
+        {/* Product and Service Index Button */}
+        <div className="flex flex-col items-center space-y-4">
+          <Link to="/index">
+            <Button 
+              size="lg" 
+              className="bg-spring-gradient hover:bg-summer-gradient text-white text-xl px-12 py-6 rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-white/20 backdrop-blur-sm"
+            >
+              <Search className="w-6 h-6 mr-3" />
+              Product & Service Index
+              <Sparkles className="w-6 h-6 ml-3" />
+            </Button>
+          </Link>
+          <p className="text-white/80 text-center max-w-md text-sm">
+            "Index Instead of Intrude" - Find ethical products and services through seeking, not manipulation
+          </p>
+        </div>
       </main>
 
       <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />

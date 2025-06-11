@@ -118,6 +118,10 @@ export default function AdminDashboard() {
             <Image className="w-4 h-4 mr-2" />
             HOLO_GALLERY
           </TabsTrigger>
+          <TabsTrigger value="portfolio" className="text-orange-400 data-[state=active]:bg-orange-400/80 data-[state=active]:text-white terminal-text">
+            <Eye className="w-4 h-4 mr-2" />
+            NEURAL_PORTFOLIO
+          </TabsTrigger>
           <TabsTrigger value="settings" className="text-neon-blue data-[state=active]:bg-neon-blue/80 data-[state=active]:text-white terminal-text">
             <Terminal className="w-4 h-4 mr-2" />
             CONFIG
@@ -146,6 +150,10 @@ export default function AdminDashboard() {
         
         <TabsContent value="gallery" className="mt-6">
           <AdminGallery />
+        </TabsContent>
+
+        <TabsContent value="portfolio" className="mt-6">
+          <NeuralPortfolio />
         </TabsContent>
         
         <TabsContent value="settings" className="mt-6">

@@ -894,6 +894,10 @@ export async function registerRoutes(app: Express): Promise<void> {
     try {
       const { amount, serviceId, serviceName } = req.body;
       
+      if (!stripe) {
+        return res.status(500).json({ error: "Payment processing not configured" });
+      }
+      
       const paymentIntent = await stripe.paymentIntents.create({
         amount, // Amount should be in cents (e.g., 1499 for $14.99)
         currency: "usd",
@@ -1375,6 +1379,10 @@ export async function registerRoutes(app: Express): Promise<void> {
       }
       
       // Create a payment intent with Stripe
+      if (!stripe) {
+        return res.status(500).json({ error: "Payment processing not configured" });
+      }
+      
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(parseFloat(order.price.toString()) * 100), // Convert to cents
         currency: "usd",

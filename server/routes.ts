@@ -23,6 +23,16 @@ import {
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import Stripe from "stripe";
+import { 
+  createTables, 
+  seedData, 
+  getAIOperators, 
+  getBusinessMetrics, 
+  getServices, 
+  getClientProjects,
+  updateOperatorMetrics,
+  createProject 
+} from "./neon";
 
 // Stripe configuration - will be initialized when needed
 let stripe: Stripe | undefined;

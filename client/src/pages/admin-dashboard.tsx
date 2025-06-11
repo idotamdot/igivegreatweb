@@ -12,6 +12,9 @@ import QuantumDashboard from "@/components/QuantumDashboard";
 import HolographicAuth from "@/components/HolographicAuth";
 import NeuralMarketplace from "@/components/NeuralMarketplace";
 import NeuralPortfolio from "@/components/NeuralPortfolio";
+import QuantumClientOnboard from "@/components/QuantumClientOnboard";
+import NeuralProjectManager from "@/components/NeuralProjectManager";
+import QuantumAnalytics from "@/components/QuantumAnalytics";
 import { 
   Tabs, 
   TabsContent, 
@@ -122,6 +125,18 @@ export default function AdminDashboard() {
             <Eye className="w-4 h-4 mr-2" />
             NEURAL_PORTFOLIO
           </TabsTrigger>
+          <TabsTrigger value="clients" className="text-cyan-400 data-[state=active]:bg-cyan-400/80 data-[state=active]:text-white terminal-text">
+            <Users className="w-4 h-4 mr-2" />
+            CLIENT_ONBOARD
+          </TabsTrigger>
+          <TabsTrigger value="projects" className="text-emerald-400 data-[state=active]:bg-emerald-400/80 data-[state=active]:text-white terminal-text">
+            <Brain className="w-4 h-4 mr-2" />
+            PROJECT_MANAGER
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-indigo-400 data-[state=active]:bg-indigo-400/80 data-[state=active]:text-white terminal-text">
+            <Activity className="w-4 h-4 mr-2" />
+            QUANTUM_ANALYTICS
+          </TabsTrigger>
           <TabsTrigger value="settings" className="text-neon-blue data-[state=active]:bg-neon-blue/80 data-[state=active]:text-white terminal-text">
             <Terminal className="w-4 h-4 mr-2" />
             CONFIG
@@ -154,6 +169,18 @@ export default function AdminDashboard() {
 
         <TabsContent value="portfolio" className="mt-6">
           <NeuralPortfolio />
+        </TabsContent>
+
+        <TabsContent value="clients" className="mt-6">
+          <QuantumClientOnboard />
+        </TabsContent>
+
+        <TabsContent value="projects" className="mt-6">
+          <NeuralProjectManager />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="mt-6">
+          <QuantumAnalytics />
         </TabsContent>
         
         <TabsContent value="settings" className="mt-6">

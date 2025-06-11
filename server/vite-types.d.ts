@@ -4,20 +4,18 @@ import { Server as HttpsServer } from 'https';
 
 declare module 'vite' {
   interface ServerOptions {
-    middlewareMode?: boolean;
-    hmr?: {
-      server?: HttpServer | HttpsServer;
+    middlewareMode?: boolean | 'ssr' | 'html';
+    hmr?: boolean | {
+      server?: HttpServer | HttpsServer | any;
+      port?: number;
+      host?: string;
+      overlay?: boolean;
     };
-    allowedHosts?: true | string[] | undefined;
+    allowedHosts?: true | string[];
   }
-}
-
-// Global type overrides for server compatibility
-declare global {
-  namespace NodeJS {
-    interface Global {
-      setupVite: (app: any, server: HttpServer | HttpsServer) => Promise<void>;
-    }
+  
+  interface InlineConfig {
+    server?: ServerOptions;
   }
 }
 

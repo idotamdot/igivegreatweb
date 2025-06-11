@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { type Server } from "http";
+/// <reference path="./vite-types.d.ts" />
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -35,6 +36,7 @@ async function main() {
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
     } else {
+      // @ts-ignore: Server type compatibility handled by vite-types.d.ts
       await setupVite(app, server);
     }
 

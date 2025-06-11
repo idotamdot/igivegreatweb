@@ -6,7 +6,7 @@ declare module 'vite' {
   interface ServerOptions {
     middlewareMode?: boolean | 'ssr' | 'html';
     hmr?: boolean | {
-      server?: HttpServer | HttpsServer | any;
+      server?: HttpServer | HttpsServer;
       port?: number;
       host?: string;
       overlay?: boolean;
@@ -16,6 +16,13 @@ declare module 'vite' {
   
   interface InlineConfig {
     server?: ServerOptions;
+  }
+}
+
+// Extend the setupVite function type to accept HTTP servers
+declare global {
+  namespace Express {
+    interface Application {}
   }
 }
 

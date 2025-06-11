@@ -29,39 +29,13 @@ async function main() {
     // Register API routes
     await registerRoutes(app);
     
-    // Create server (HTTPS for development with Vite HMR, HTTP for production)
-    let server;
-    if (process.env.NODE_ENV === "production") {
-      server = createHttpServer(app);
-    } else {
-      // For development, create HTTPS server for Vite HMR compatibility
-      const fs = await import("fs");
-      const path = await import("path");
-      
-      // Create self-signed certificates for development
-      const sslOptions = {
-        key: `-----BEGIN PRIVATE KEY-----
-MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC7VJTUt9Us8cKB
-wEiOfH3GgmCyDRIf7Q==
------END PRIVATE KEY-----`,
-        cert: `-----BEGIN CERTIFICATE-----
-MIIDazCCAlOgAwIBAgIUJ8nN8+LKHLcgj8+DmXJp7UKJx5MwDQYJKoZIhvcNAQEL
-BQAwRTELMAkGA1UEBhMCQVUxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoM
-GEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yMzEwMDUxMzQ2MTdaFw0yNDEw
-MDQxMzQ2MTdaMEUxCzAJBgNVBAYTAkFVMRMwEQYDVQQIDApTb21lLVN0YXRlMSEw
-HwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEB
-AQUAA4IBDwAwggEKAoIBAQC7VJTUt9Us8cKBwEiOfH3GgmCyDRIf7Q==
------END CERTIFICATE-----`
-      };
-      
-      server = createHttpsServer(sslOptions, app);
-    }
+    // Create HTTP server
+    const server = createHttpServer(app);
     
     // Setup Vite in development or serve static files in production
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
     } else {
-      // @ts-ignore: Server type compatibility handled by vite-types.d.ts
       await setupVite(app, server);
     }
 

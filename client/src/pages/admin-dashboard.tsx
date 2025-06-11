@@ -17,6 +17,7 @@ import NeuralProjectManager from "@/components/NeuralProjectManager";
 import QuantumAnalytics from "@/components/QuantumAnalytics";
 import QuantumAIOperations from "@/components/QuantumAIOperations";
 import PasswordChangeForm from "@/components/PasswordChangeForm";
+import BusinessValuation from "@/components/BusinessValuation";
 import { 
   Tabs, 
   TabsContent, 
@@ -37,7 +38,8 @@ import {
   Terminal,
   Eye,
   Activity,
-  Bot
+  Bot,
+  DollarSign
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -91,6 +93,10 @@ export default function AdminDashboard() {
             <Bot className="w-4 h-4 mr-2" />
             AI_OPERATIONS
           </TabsTrigger>
+          <TabsTrigger value="valuation" className="text-yellow-400 data-[state=active]:bg-yellow-400/80 data-[state=active]:text-black terminal-text">
+            <DollarSign className="w-4 h-4 mr-2" />
+            BUSINESS_VALUATION
+          </TabsTrigger>
           <TabsTrigger value="clients" className="text-cyan-400 data-[state=active]:bg-cyan-400/80 data-[state=active]:text-white terminal-text">
             <Users className="w-4 h-4 mr-2" />
             CLIENT_ONBOARD
@@ -111,6 +117,10 @@ export default function AdminDashboard() {
         
         <TabsContent value="dashboard" className="mt-6">
           <QuantumAIOperations />
+        </TabsContent>
+
+        <TabsContent value="valuation" className="mt-6">
+          <BusinessValuation />
         </TabsContent>
 
         <TabsContent value="clients" className="mt-6">

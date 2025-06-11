@@ -11,6 +11,7 @@ import NeuralNavigation from "@/components/NeuralNavigation";
 import QuantumDashboard from "@/components/QuantumDashboard";
 import HolographicAuth from "@/components/HolographicAuth";
 import NeuralMarketplace from "@/components/NeuralMarketplace";
+import NeuralPortfolio from "@/components/NeuralPortfolio";
 import { 
   Tabs, 
   TabsContent, 

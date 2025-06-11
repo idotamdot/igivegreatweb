@@ -28,50 +28,50 @@ export default function HomePage() {
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-hologram glitch-effect terminal-text">
-              NEURAL_CORE
+              NEURAL_WEB_LABS
             </h1>
             
             <div className="space-y-3 mb-8">
               <div className="terminal-text text-cyber-green text-lg">
-                &gt;&gt; QUANTUM_ETHICS_ENGINE: ACTIVE
+                &gt;&gt; QUANTUM_WEB_ARCHITECTURE: ONLINE
               </div>
               <div className="terminal-text text-neon-pink text-lg">
-                &gt;&gt; NEURAL_NETWORK: SYNCHRONIZED
+                &gt;&gt; AI_ENHANCED_DEVELOPMENT: ACTIVE
               </div>
               <div className="terminal-text text-neon-blue text-lg">
-                &gt;&gt; SECURITY_MATRIX: MAXIMUM
+                &gt;&gt; NEURAL_CODING_MATRIX: INITIALIZED
               </div>
             </div>
 
             <div className="flex flex-wrap gap-3 justify-center mb-8">
               <Badge className="bg-cyber-green text-black neon-glow">
-                INDEX_NOT_INTRUDE
+                AI_POWERED_CODING
               </Badge>
               <Badge className="bg-neon-pink text-white neon-glow">
-                ETHICAL_AI
+                QUANTUM_HOSTING
               </Badge>
               <Badge className="bg-neon-blue text-white neon-glow">
-                QUANTUM_VERIFIED
+                NEURAL_OPTIMIZATION
               </Badge>
               <Badge className="bg-purple-400 text-white neon-glow">
-                ZERO_TRUST
+                CYBERSECURITY_MESH
               </Badge>
             </div>
           </div>
 
-          {/* Neural Access Points */}
+          {/* Neural Business Solutions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link to="/index">
+            <Link to="/services">
               <div className="card-cyber p-6 hover-lift cursor-pointer group">
-                <Database className="w-8 h-8 text-cyber-green mx-auto mb-4 neon-glow group-hover:scale-110 transition-transform" />
+                <Brain className="w-8 h-8 text-cyber-green mx-auto mb-4 neon-glow group-hover:scale-110 transition-transform" />
                 <h3 className="text-xl font-bold text-cyber-green terminal-text mb-2">
-                  QUANTUM_INDEX
+                  AI_WEB_DEVELOPMENT
                 </h3>
                 <p className="text-gray-300 terminal-text text-sm">
-                  Access the neural marketplace database
+                  Neural networks code your websites autonomously
                 </p>
                 <div className="mt-4 terminal-text text-xs text-neon-pink">
-                  &gt;&gt; NEURAL_ENTITIES_AVAILABLE
+                  &gt;&gt; CUSTOM_AI_CODING_AGENTS
                 </div>
               </div>
             </Link>
@@ -80,28 +80,28 @@ export default function HomePage() {
               <div className="card-neon p-6 hover-lift cursor-pointer group">
                 <Network className="w-8 h-8 text-neon-pink mx-auto mb-4 neon-glow group-hover:scale-110 transition-transform" />
                 <h3 className="text-xl font-bold text-neon-pink terminal-text mb-2">
-                  SERVICE_MESH
+                  QUANTUM_HOSTING
                 </h3>
                 <p className="text-gray-300 terminal-text text-sm">
-                  Neural-enhanced digital solutions
+                  Quantum-encrypted cloud infrastructure
                 </p>
                 <div className="mt-4 terminal-text text-xs text-cyber-green">
-                  &gt;&gt; QUANTUM_ENHANCED_SERVICES
+                  &gt;&gt; 99.999%_UPTIME_GUARANTEED
                 </div>
               </div>
             </Link>
 
-            <Link to="/admin">
+            <Link to="/services">
               <div className="card-hologram p-6 hover-lift cursor-pointer group">
                 <Shield className="w-8 h-8 text-hologram mx-auto mb-4 neon-glow group-hover:scale-110 transition-transform" />
                 <h3 className="text-xl font-bold text-hologram terminal-text mb-2">
-                  ADMIN_NEXUS
+                  CYBERSECURITY_MESH
                 </h3>
                 <p className="text-gray-300 terminal-text text-sm">
-                  Neural network control center
+                  Neural threat detection and prevention
                 </p>
                 <div className="mt-4 terminal-text text-xs text-neon-blue">
-                  &gt;&gt; AUTHORIZATION_REQUIRED
+                  &gt;&gt; ZERO_DAY_PROTECTION
                 </div>
               </div>
             </Link>

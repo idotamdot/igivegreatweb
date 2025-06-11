@@ -404,6 +404,7 @@ export const insertPsiProductSchema = createInsertSchema(psiProducts).pick({
   featured: true,
   tags: true,
   metaData: true,
+  createdBy: true,
 });
 
 export const insertPsiReviewSchema = createInsertSchema(psiReviews).pick({

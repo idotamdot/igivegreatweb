@@ -6,7 +6,7 @@ import AdminConnections from "./admin-connections";
 import AdminMenuLinks from "./admin-menu-links";
 import AdminGallery from "./admin-gallery";
 import AdminContent from "./admin-content";
-import CyberMatrix from "@/components/CyberMatrix";
+
 import NeuralNavigation from "@/components/NeuralNavigation";
 import QuantumDashboard from "@/components/QuantumDashboard";
 import HolographicAuth from "@/components/HolographicAuth";
@@ -63,7 +63,6 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-cyber-gradient cyber-grid">
-      <CyberMatrix />
       <NeuralNavigation />
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
@@ -105,30 +104,6 @@ export default function AdminDashboard() {
             <Bot className="w-4 h-4 mr-2" />
             AI_OPERATIONS
           </TabsTrigger>
-          <TabsTrigger value="quantum" className="text-neon-pink data-[state=active]:bg-neon-pink data-[state=active]:text-white terminal-text">
-            <Database className="w-4 h-4 mr-2" />
-            QUANTUM_OPS
-          </TabsTrigger>
-          <TabsTrigger value="auth" className="text-neon-blue data-[state=active]:bg-neon-blue data-[state=active]:text-white terminal-text">
-            <Shield className="w-4 h-4 mr-2" />
-            AUTH_MATRIX
-          </TabsTrigger>
-          <TabsTrigger value="marketplace" className="text-purple-400 data-[state=active]:bg-purple-400 data-[state=active]:text-white terminal-text">
-            <Network className="w-4 h-4 mr-2" />
-            NEURAL_MARKET
-          </TabsTrigger>
-          <TabsTrigger value="connections" className="text-cyber-green data-[state=active]:bg-cyber-green/80 data-[state=active]:text-black terminal-text">
-            <Users className="w-4 h-4 mr-2" />
-            CONNECTIONS
-          </TabsTrigger>
-          <TabsTrigger value="gallery" className="text-neon-pink data-[state=active]:bg-neon-pink/80 data-[state=active]:text-white terminal-text">
-            <Image className="w-4 h-4 mr-2" />
-            HOLO_GALLERY
-          </TabsTrigger>
-          <TabsTrigger value="portfolio" className="text-orange-400 data-[state=active]:bg-orange-400/80 data-[state=active]:text-white terminal-text">
-            <Eye className="w-4 h-4 mr-2" />
-            NEURAL_PORTFOLIO
-          </TabsTrigger>
           <TabsTrigger value="clients" className="text-cyan-400 data-[state=active]:bg-cyan-400/80 data-[state=active]:text-white terminal-text">
             <Users className="w-4 h-4 mr-2" />
             CLIENT_ONBOARD
@@ -141,38 +116,14 @@ export default function AdminDashboard() {
             <Activity className="w-4 h-4 mr-2" />
             QUANTUM_ANALYTICS
           </TabsTrigger>
-          <TabsTrigger value="settings" className="text-neon-blue data-[state=active]:bg-neon-blue/80 data-[state=active]:text-white terminal-text">
-            <Terminal className="w-4 h-4 mr-2" />
-            CONFIG
+          <TabsTrigger value="account" className="text-neon-blue data-[state=active]:bg-neon-blue/80 data-[state=active]:text-white terminal-text">
+            <Settings className="w-4 h-4 mr-2" />
+            ACCOUNT
           </TabsTrigger>
         </TabsList>
         
         <TabsContent value="dashboard" className="mt-6">
           <QuantumAIOperations />
-        </TabsContent>
-
-        <TabsContent value="quantum" className="mt-6">
-          <QuantumDashboard />
-        </TabsContent>
-
-        <TabsContent value="auth" className="mt-6">
-          <HolographicAuth />
-        </TabsContent>
-
-        <TabsContent value="marketplace" className="mt-6">
-          <NeuralMarketplace />
-        </TabsContent>
-        
-        <TabsContent value="connections" className="mt-6">
-          <AdminConnections />
-        </TabsContent>
-        
-        <TabsContent value="gallery" className="mt-6">
-          <AdminGallery />
-        </TabsContent>
-
-        <TabsContent value="portfolio" className="mt-6">
-          <NeuralPortfolio />
         </TabsContent>
 
         <TabsContent value="clients" className="mt-6">
@@ -187,23 +138,19 @@ export default function AdminDashboard() {
           <QuantumAnalytics />
         </TabsContent>
         
-        <TabsContent value="settings" className="mt-6">
-          <AdminContent />
-        </TabsContent>
-        
         <TabsContent value="account" className="mt-6">
           <div className="space-y-6">
-            <div className="card-winter p-6 rounded-xl">
-              <h2 className="text-xl mb-4 text-winter accent-winter">Account Settings</h2>
-              <p className="text-muted-foreground mb-6">Manage your admin account and preferences</p>
+            <div className="cyber-glass p-6 rounded-xl border border-cyber-green/20">
+              <h2 className="text-xl mb-4 text-cyber-green terminal-text">ACCOUNT_SETTINGS</h2>
+              <p className="text-gray-400 mb-6 terminal-text">Manage your owner account and neural configurations</p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="card-spring p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-spring mb-2">Profile Information</h3>
+                <div className="cyber-glass p-4 rounded-lg border border-neon-blue/20">
+                  <h3 className="text-lg font-semibold text-neon-blue terminal-text mb-2">OWNER_PROFILE</h3>
                   <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">Username: <span className="text-foreground font-medium">{user.username}</span></p>
-                    <p className="text-sm text-muted-foreground">Role: <span className="text-foreground font-medium">{user.role}</span></p>
-                    <p className="text-sm text-muted-foreground">Account Type: <span className="text-foreground font-medium">Administrator</span></p>
+                    <p className="text-sm text-gray-400 terminal-text">Username: <span className="text-cyber-green font-medium">{user.username}</span></p>
+                    <p className="text-sm text-gray-400 terminal-text">Role: <span className="text-neon-pink font-medium">{user.role}</span></p>
+                    <p className="text-sm text-gray-400 terminal-text">Access Level: <span className="text-purple-400 font-medium">QUANTUM_OWNER</span></p>
                   </div>
                 </div>
                 
@@ -211,30 +158,30 @@ export default function AdminDashboard() {
                   <PasswordChangeForm />
                 </div>
                 
-                <div className="card-winter p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-winter mb-2">Preferences</h3>
+                <div className="cyber-glass p-4 rounded-lg border border-purple-400/20">
+                  <h3 className="text-lg font-semibold text-purple-400 terminal-text mb-2">NEURAL_PREFERENCES</h3>
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Email Notifications</span>
+                      <span className="text-sm text-gray-400 terminal-text">AI_NOTIFICATIONS</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Dashboard Widgets</span>
+                      <span className="text-sm text-gray-400 terminal-text">QUANTUM_WIDGETS</span>
                       <Switch defaultChecked />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Auto-save</span>
+                      <span className="text-sm text-gray-400 terminal-text">AUTO_NEURAL_SAVE</span>
                       <Switch defaultChecked />
                     </div>
                   </div>
                 </div>
                 
-                <div className="bg-spring-gradient p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-2">System Information</h3>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <p>Last Login: Today at 10:00 AM</p>
-                    <p>Session Duration: 2 hours</p>
-                    <p>Dashboard Version: 2.1.0</p>
+                <div className="cyber-glass p-4 rounded-lg border border-cyber-green/20">
+                  <h3 className="text-lg font-semibold text-cyber-green terminal-text mb-2">SYSTEM_STATUS</h3>
+                  <div className="space-y-2 text-sm text-gray-400 terminal-text">
+                    <p>Last Neural Sync: <span className="text-cyber-green">ACTIVE</span></p>
+                    <p>Session Quantum Time: <span className="text-neon-blue">∞ HOURS</span></p>
+                    <p>Neural Web Labs Version: <span className="text-neon-pink">v3.0.QUANTUM</span></p>
                   </div>
                 </div>
               </div>

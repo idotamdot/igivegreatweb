@@ -33,39 +33,21 @@ export default function NeuralNavigation() {
   const navNodes: NavNode[] = [
     {
       id: 'core',
-      label: 'NEURAL_CORE',
+      label: 'NEURAL_WEB_LABS',
       path: '/',
       icon: Brain,
       status: 'online',
-      connections: ['index', 'upload', 'admin'],
-      description: 'Central neural processing hub'
-    },
-    {
-      id: 'index',
-      label: 'QUANTUM_INDEX',
-      path: '/index',
-      icon: Database,
-      status: 'processing',
-      connections: ['core', 'upload'],
-      description: 'Ethical entity database'
-    },
-    {
-      id: 'upload',
-      label: 'ENTITY_UPLOAD',
-      path: '/apply',
-      icon: Network,
-      status: 'standby',
-      connections: ['core', 'index'],
-      description: 'Business entity registration'
+      connections: ['admin', 'auth'],
+      description: 'Neural Web Labs homepage'
     },
     {
       id: 'admin',
-      label: 'ADMIN_NEXUS',
+      label: 'AI_OPERATIONS',
       path: '/admin',
       icon: Shield,
       status: 'online',
       connections: ['core'],
-      description: 'Administrative control panel'
+      description: 'Quantum AI Operations Center'
     },
     {
       id: 'auth',
@@ -75,15 +57,6 @@ export default function NeuralNavigation() {
       status: 'standby',
       connections: ['admin'],
       description: 'Authentication protocols'
-    },
-    {
-      id: 'services',
-      label: 'SERVICE_MESH',
-      path: '/services',
-      icon: Cpu,
-      status: 'online',
-      connections: ['core'],
-      description: 'Digital service offerings'
     }
   ];
 

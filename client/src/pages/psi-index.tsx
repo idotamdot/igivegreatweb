@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import SearchEnhancer from "@/components/SearchEnhancer";
 import BusinessRecommendation from "@/components/BusinessRecommendation";
+import EngagementAnalytics from "@/components/EngagementAnalytics";
+import SmartNotifications from "@/components/SmartNotifications";
 import { 
   Search, 
   Filter, 
@@ -304,6 +306,10 @@ export default function PSIIndex() {
           </Card>
         </footer>
       </div>
+
+      {/* Real-time Analytics & Smart Notifications */}
+      <EngagementAnalytics />
+      <SmartNotifications />
     </div>
   );
 }

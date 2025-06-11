@@ -257,17 +257,17 @@ export default function BusinessApplication() {
   });
 
   return (
-    <div className="min-h-screen bg-spring-gradient">
+    <div className="min-h-screen bg-cyber-gradient cyber-grid">
       <div className="container mx-auto px-4 py-8 max-w-4xl">
-        {/* Header */}
+        {/* Cyberpunk Header */}
         <header className="mb-8">
           <div className="flex items-center gap-4 mb-6">
-            <Link to="/" className="text-winter-pine hover:text-spring-fresh-green transition-colors">
+            <Link to="/" className="text-cyber-green hover:text-neon-pink transition-colors neon-glow">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div>
-              <h1 className="text-3xl font-bold text-spring">Add Your Business</h1>
-              <p className="text-winter-pine">Join our ethical directory of businesses</p>
+              <h1 className="text-3xl font-bold text-hologram glitch-effect terminal-text">NEURAL_ENTITY_UPLOAD</h1>
+              <p className="text-cyber-green terminal-text">&gt;&gt; Join the ethical network collective</p>
             </div>
           </div>
         </header>
@@ -275,14 +275,16 @@ export default function BusinessApplication() {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             
-            {/* Business Information */}
-            <Card className="card-spring">
+            {/* Neural Entity Information */}
+            <Card className="card-cyber">
               <CardHeader>
-                <CardTitle className="text-spring flex items-center gap-2">
+                <CardTitle className="text-neon-pink flex items-center gap-2 terminal-text">
                   <Building className="w-5 h-5" />
-                  Business Information
+                  ENTITY_DATA_INPUT
                 </CardTitle>
-                <CardDescription>Tell us about your business</CardDescription>
+                <CardDescription className="text-cyber-green terminal-text">
+                  &gt;&gt; Upload neural entity parameters
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <FormField

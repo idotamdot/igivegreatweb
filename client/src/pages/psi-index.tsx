@@ -93,36 +93,38 @@ export default function PSIIndex() {
   ];
 
   return (
-    <div className="min-h-screen bg-spring-gradient">
+    <div className="min-h-screen bg-cyber-gradient cyber-grid">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        {/* Header */}
+        {/* Cyberpunk Header */}
         <header className="text-center mb-12">
           <div className="flex items-center justify-between mb-6">
-            <Link to="/" className="text-winter-pine hover:text-spring-fresh-green transition-colors">
-              ← Back to Home
+            <Link to="/" className="text-cyber-green hover:text-neon-pink transition-colors terminal-text neon-glow">
+              &lt;&lt; NEURAL_NETWORK_HOME
             </Link>
             <div className="flex space-x-4">
-              <Button variant="outline" size="sm">
+              <Button variant="outline" size="sm" className="cyber-glass border-neon-blue text-neon-blue hover:bg-neon-blue/20">
                 <Users className="w-4 h-4 mr-2" />
-                Join Community
+                JOIN_COLLECTIVE
               </Button>
-              <Button size="sm" className="bg-winter-gradient">
+              <Button size="sm" className="bg-neon-gradient neon-glow">
                 <Heart className="w-4 h-4 mr-2" />
-                Add Listing
+                UPLOAD_ENTITY
               </Button>
             </div>
           </div>
           
-          <div className="card-spring max-w-4xl mx-auto p-8 rounded-2xl">
-            <h1 className="text-4xl font-bold text-spring mb-4">
-              The Ethical Index
+          <div className="card-cyber max-w-4xl mx-auto p-8 rounded-3xl hologram-effect">
+            <h1 className="text-4xl font-bold text-hologram mb-4 glitch-effect terminal-text">
+              THE NEURAL INDEX
             </h1>
-            <p className="text-xl text-winter-pine mb-6">
-              "Index Instead of Intrude" - Find products and services aligned with your values through seeking, not manipulation.
-            </p>
+            <div className="text-cyber-green mb-6 terminal-text space-y-2">
+              <div>&gt;&gt; SEEK_NOT_EXPLOIT PROTOCOL ACTIVE</div>
+              <div>&gt;&gt; QUANTUM_ETHICS_ENGINE: ONLINE</div>
+              <div>&gt;&gt; MANIPULATION_SHIELD: MAXIMUM</div>
+            </div>
             <div className="flex flex-wrap gap-2 justify-center">
-              <Badge className="bg-spring-fresh-green">No Behavioral Ads</Badge>
-              <Badge className="bg-summer-coral">Community Curated</Badge>
+              <Badge className="bg-cyber-green text-black neon-glow">NO_BEHAVIORAL_ADS</Badge>
+              <Badge className="bg-neon-pink text-white neon-glow">COMMUNITY_CURATED</Badge>
               <Badge className="bg-winter-pine">Transparency First</Badge>
               <Badge className="bg-spring-bloom-pink">Values Aligned</Badge>
             </div>

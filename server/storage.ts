@@ -1,5 +1,6 @@
 import { 
   users, connections, menuLinks, artworks, printSizes, artworkPrintSizes, printOrders, contentBlocks, dashboardWidgets, dashboardLayouts,
+  psiCategories, psiValues, psiProducts, psiProductValues, psiReviews, psiSearches,
   type User, type InsertUser, 
   type Connection, type InsertConnection, 
   type MenuLink, type InsertMenuLink,
@@ -9,7 +10,13 @@ import {
   type PrintOrder, type InsertPrintOrder,
   type ContentBlock, type InsertContentBlock,
   type DashboardWidget, type InsertDashboardWidget,
-  type DashboardLayout, type InsertDashboardLayout
+  type DashboardLayout, type InsertDashboardLayout,
+  type PsiCategory, type InsertPsiCategory,
+  type PsiValue, type InsertPsiValue,
+  type PsiProduct, type InsertPsiProduct,
+  type PsiProductValue,
+  type PsiReview, type InsertPsiReview,
+  type PsiSearch, type InsertPsiSearch
 } from "@shared/schema";
 import session from "express-session";
 import createMemoryStore from "memorystore";
@@ -96,6 +103,47 @@ export interface IStorage {
   getDashboardLayout(userId: number, role: string): Promise<DashboardLayout | undefined>;
   updateDashboardLayout(id: number, layout: Partial<InsertDashboardLayout>): Promise<DashboardLayout | undefined>;
   deleteDashboardLayout(id: number): Promise<void>;
+  
+  // PSI Category methods
+  createPsiCategory(category: InsertPsiCategory): Promise<PsiCategory>;
+  getAllPsiCategories(): Promise<PsiCategory[]>;
+  getPsiCategory(id: number): Promise<PsiCategory | undefined>;
+  updatePsiCategory(id: number, category: Partial<InsertPsiCategory>): Promise<PsiCategory | undefined>;
+  deletePsiCategory(id: number): Promise<void>;
+  getActivePsiCategories(): Promise<PsiCategory[]>;
+  
+  // PSI Value methods
+  createPsiValue(value: InsertPsiValue): Promise<PsiValue>;
+  getAllPsiValues(): Promise<PsiValue[]>;
+  getPsiValue(id: number): Promise<PsiValue | undefined>;
+  updatePsiValue(id: number, value: Partial<InsertPsiValue>): Promise<PsiValue | undefined>;
+  deletePsiValue(id: number): Promise<void>;
+  getActivePsiValues(): Promise<PsiValue[]>;
+  
+  // PSI Product methods
+  createPsiProduct(product: InsertPsiProduct): Promise<PsiProduct>;
+  getAllPsiProducts(includeInactive?: boolean): Promise<PsiProduct[]>;
+  getPsiProduct(id: number): Promise<PsiProduct | undefined>;
+  updatePsiProduct(id: number, product: Partial<InsertPsiProduct>): Promise<PsiProduct | undefined>;
+  deletePsiProduct(id: number): Promise<void>;
+  getFeaturedPsiProducts(): Promise<PsiProduct[]>;
+  getApprovedPsiProducts(): Promise<PsiProduct[]>;
+  getUserPsiProducts(userId: number): Promise<PsiProduct[]>;
+  searchPsiProducts(query: string, filters?: any): Promise<PsiProduct[]>;
+  getPsiProductsByCategory(categoryId: number): Promise<PsiProduct[]>;
+  
+  // PSI Review methods
+  createPsiReview(review: InsertPsiReview): Promise<PsiReview>;
+  getPsiProductReviews(productId: number): Promise<PsiReview[]>;
+  getUserPsiReviews(userId: number): Promise<PsiReview[]>;
+  updatePsiReview(id: number, review: Partial<InsertPsiReview>): Promise<PsiReview | undefined>;
+  deletePsiReview(id: number): Promise<void>;
+  getApprovedPsiReviews(productId: number): Promise<PsiReview[]>;
+  
+  // PSI Search methods
+  createPsiSearch(search: InsertPsiSearch): Promise<PsiSearch>;
+  getUserPsiSearches(userId: number): Promise<PsiSearch[]>;
+  getPopularPsiSearches(limit?: number): Promise<PsiSearch[]>;
   
   sessionStore: session.Store;
 }

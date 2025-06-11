@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, numeric, json, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, numeric, json, jsonb, varchar, decimal } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -237,3 +237,204 @@ export type DashboardWidget = typeof dashboardWidgets.$inferSelect;
 export type InsertDashboardWidget = z.infer<typeof insertDashboardWidgetSchema>;
 export type DashboardLayout = typeof dashboardLayouts.$inferSelect;
 export type InsertDashboardLayout = z.infer<typeof insertDashboardLayoutSchema>;
+
+// Product and Service Index (PSI) Tables
+export const psiCategories = pgTable("psi_categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  parentId: integer("parent_id"),
+  icon: text("icon"),
+  color: text("color"),
+  active: boolean("active").default(true),
+  order: integer("order").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const psiValues = pgTable("psi_values", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  icon: text("icon"),
+  color: text("color"),
+  active: boolean("active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const psiProducts = pgTable("psi_products", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description").notNull(),
+  shortDescription: text("short_description"),
+  categoryId: integer("category_id"),
+  createdBy: integer("created_by"),
+  
+  // Product details
+  price: numeric("price", { precision: 10, scale: 2 }),
+  currency: text("currency").default("USD"),
+  images: text("images").array(),
+  website: text("website"),
+  contactEmail: text("contact_email"),
+  contactPhone: text("contact_phone"),
+  
+  // Location info
+  location: text("location"),
+  latitude: numeric("latitude", { precision: 10, scale: 8 }),
+  longitude: numeric("longitude", { precision: 11, scale: 8 }),
+  shipsGlobally: boolean("ships_globally").default(false),
+  localOnly: boolean("local_only").default(false),
+  
+  // Ethical attributes
+  fairTrade: boolean("fair_trade").default(false),
+  organic: boolean("organic").default(false),
+  handmade: boolean("handmade").default(false),
+  biodegradable: boolean("biodegradable").default(false),
+  transparentBusiness: boolean("transparent_business").default(false),
+  noAds: boolean("no_ads").default(false),
+  openSource: boolean("open_source").default(false),
+  communitySupported: boolean("community_supported").default(false),
+  
+  // Quality and trust
+  verifiedSeller: boolean("verified_seller").default(false),
+  qualityScore: numeric("quality_score", { precision: 3, scale: 2 }).default("0"),
+  trustScore: numeric("trust_score", { precision: 3, scale: 2 }).default("0"),
+  
+  // Status
+  active: boolean("active").default(true),
+  featured: boolean("featured").default(false),
+  approved: boolean("approved").default(false),
+  
+  // Metadata
+  tags: text("tags").array(),
+  metaData: jsonb("meta_data"),
+  searchVector: text("search_vector"), // For full-text search
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const psiProductValues = pgTable("psi_product_values", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id"),
+  valueId: integer("value_id"),
+  verified: boolean("verified").default(false),
+  verifiedBy: integer("verified_by"),
+  verifiedAt: timestamp("verified_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const psiReviews = pgTable("psi_reviews", {
+  id: serial("id").primaryKey(),
+  productId: integer("product_id"),
+  userId: integer("user_id"),
+  
+  // Review content
+  rating: integer("rating").notNull(), // 1-5 stars
+  title: text("title"),
+  content: text("content").notNull(),
+  
+  // Review quality
+  helpfulVotes: integer("helpful_votes").default(0),
+  verifiedPurchase: boolean("verified_purchase").default(false),
+  
+  // Status
+  approved: boolean("approved").default(false),
+  flagged: boolean("flagged").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const psiSearches = pgTable("psi_searches", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id"),
+  query: text("query").notNull(),
+  intent: text("intent"), // Natural language description of what user is looking for
+  filters: jsonb("filters"),
+  resultsCount: integer("results_count").default(0),
+  clickedResults: integer("clicked_results").array(),
+  sessionId: text("session_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Insert schemas
+export const insertPsiCategorySchema = createInsertSchema(psiCategories).pick({
+  name: true,
+  description: true,
+  parentId: true,
+  icon: true,
+  color: true,
+  active: true,
+  order: true,
+});
+
+export const insertPsiValueSchema = createInsertSchema(psiValues).pick({
+  name: true,
+  description: true,
+  icon: true,
+  color: true,
+  active: true,
+});
+
+export const insertPsiProductSchema = createInsertSchema(psiProducts).pick({
+  name: true,
+  description: true,
+  shortDescription: true,
+  categoryId: true,
+  price: true,
+  currency: true,
+  images: true,
+  website: true,
+  contactEmail: true,
+  contactPhone: true,
+  location: true,
+  latitude: true,
+  longitude: true,
+  shipsGlobally: true,
+  localOnly: true,
+  fairTrade: true,
+  organic: true,
+  handmade: true,
+  biodegradable: true,
+  transparentBusiness: true,
+  noAds: true,
+  openSource: true,
+  communitySupported: true,
+  active: true,
+  featured: true,
+  tags: true,
+  metaData: true,
+});
+
+export const insertPsiReviewSchema = createInsertSchema(psiReviews).pick({
+  productId: true,
+  rating: true,
+  title: true,
+  content: true,
+  verifiedPurchase: true,
+});
+
+export const insertPsiSearchSchema = createInsertSchema(psiSearches).pick({
+  query: true,
+  intent: true,
+  filters: true,
+  sessionId: true,
+});
+
+// Types
+export type PsiCategory = typeof psiCategories.$inferSelect;
+export type InsertPsiCategory = z.infer<typeof insertPsiCategorySchema>;
+
+export type PsiValue = typeof psiValues.$inferSelect;
+export type InsertPsiValue = z.infer<typeof insertPsiValueSchema>;
+
+export type PsiProduct = typeof psiProducts.$inferSelect;
+export type InsertPsiProduct = z.infer<typeof insertPsiProductSchema>;
+
+export type PsiProductValue = typeof psiProductValues.$inferSelect;
+
+export type PsiReview = typeof psiReviews.$inferSelect;
+export type InsertPsiReview = z.infer<typeof insertPsiReviewSchema>;
+
+export type PsiSearch = typeof psiSearches.$inferSelect;
+export type InsertPsiSearch = z.infer<typeof insertPsiSearchSchema>;

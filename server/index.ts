@@ -36,7 +36,7 @@ async function main() {
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
     } else {
-      await setupVite(app, server);
+      await setupVite(app, server as any);
     }
 
     // Start the server

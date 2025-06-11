@@ -5,6 +5,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import SearchEnhancer from "@/components/SearchEnhancer";
+import BusinessRecommendation from "@/components/BusinessRecommendation";
 import { 
   Search, 
   Filter, 
@@ -253,53 +255,23 @@ export default function PSIIndex() {
           </div>
         </section>
 
-        {/* Featured Products */}
+        {/* Intelligent Business Recommendations */}
         <section className="mb-12">
-          <h2 className="text-2xl font-bold text-winter mb-6">Community Favorites</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProducts.map((product, index) => {
-              const seasonClass = index % 3 === 0 ? 'card-spring' : index % 3 === 1 ? 'card-summer' : 'card-winter';
-              
-              return (
-                <Card key={product.id} className={seasonClass}>
-                  <div className="aspect-video bg-white/20 rounded-t-lg flex items-center justify-center">
-                    <Sparkles className="w-12 h-12 text-white/60" />
-                  </div>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">{product.name}</CardTitle>
-                    <CardDescription className="text-sm">{product.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-lg font-bold">{product.price}</span>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm">{product.rating} ({product.reviews})</span>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                      <MapPin className="w-3 h-3" />
-                      {product.location}
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-1">
-                      {product.values.map(value => (
-                        <Badge key={value} variant="outline" className="text-xs">
-                          {value}
-                        </Badge>
-                      ))}
-                    </div>
-                    
-                    <Button className="w-full">
-                      Learn More
-                      <ExternalLink className="w-4 h-4 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-winter animate-slide-in-left">
+              {searchQuery ? `Results for "${searchQuery}"` : 'Featured Ethical Businesses'}
+            </h2>
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+              <span>Live recommendations</span>
+            </div>
           </div>
+          
+          <BusinessRecommendation
+            searchQuery={searchQuery}
+            selectedValues={selectedValues}
+            userLocation="Your Location"
+          />
         </section>
 
         {/* Philosophy Footer */}

@@ -6,6 +6,11 @@ import AdminConnections from "./admin-connections";
 import AdminMenuLinks from "./admin-menu-links";
 import AdminGallery from "./admin-gallery";
 import AdminContent from "./admin-content";
+import CyberMatrix from "@/components/CyberMatrix";
+import NeuralNavigation from "@/components/NeuralNavigation";
+import QuantumDashboard from "@/components/QuantumDashboard";
+import HolographicAuth from "@/components/HolographicAuth";
+import NeuralMarketplace from "@/components/NeuralMarketplace";
 import { 
   Tabs, 
   TabsContent, 
@@ -18,7 +23,13 @@ import {
   Link2, 
   Image, 
   FileText, 
-  Settings 
+  Settings,
+  Brain,
+  Shield,
+  Database,
+  Network,
+  Terminal,
+  Eye
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -43,7 +54,9 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-spring-gradient">
+    <div className="min-h-screen bg-cyber-gradient cyber-grid">
+      <CyberMatrix />
+      <NeuralNavigation />
       <div className="container mx-auto px-4 py-8">
         <header className="mb-8">
           <div className="flex justify-between items-center mb-6">
@@ -79,50 +92,62 @@ export default function AdminDashboard() {
         onValueChange={setActiveTab}
         className="space-y-4"
       >
-        <TabsList className="bg-white/30 backdrop-blur-md border-2 border-white/20 rounded-xl">
-          <TabsTrigger value="dashboard" className="text-winter-pine data-[state=active]:bg-spring-fresh-green data-[state=active]:text-white">
-            <Home className="w-4 h-4 mr-2" />
-            Dashboard
+        <TabsList className="cyber-glass backdrop-blur-md border-2 border-cyber-green/20 rounded-xl neon-border">
+          <TabsTrigger value="dashboard" className="text-cyber-green data-[state=active]:bg-cyber-green data-[state=active]:text-black terminal-text">
+            <Brain className="w-4 h-4 mr-2" />
+            NEURAL_CORE
           </TabsTrigger>
-          <TabsTrigger value="connections" className="text-winter-pine data-[state=active]:bg-summer-coral data-[state=active]:text-white">
+          <TabsTrigger value="quantum" className="text-neon-pink data-[state=active]:bg-neon-pink data-[state=active]:text-white terminal-text">
+            <Database className="w-4 h-4 mr-2" />
+            QUANTUM_OPS
+          </TabsTrigger>
+          <TabsTrigger value="auth" className="text-neon-blue data-[state=active]:bg-neon-blue data-[state=active]:text-white terminal-text">
+            <Shield className="w-4 h-4 mr-2" />
+            AUTH_MATRIX
+          </TabsTrigger>
+          <TabsTrigger value="marketplace" className="text-purple-400 data-[state=active]:bg-purple-400 data-[state=active]:text-white terminal-text">
+            <Network className="w-4 h-4 mr-2" />
+            NEURAL_MARKET
+          </TabsTrigger>
+          <TabsTrigger value="connections" className="text-cyber-green data-[state=active]:bg-cyber-green/80 data-[state=active]:text-black terminal-text">
             <Users className="w-4 h-4 mr-2" />
-            Connections
+            CONNECTIONS
           </TabsTrigger>
-          <TabsTrigger value="menu-links" className="text-winter-pine data-[state=active]:bg-winter-pine data-[state=active]:text-white">
-            <Link2 className="w-4 h-4 mr-2" />
-            Menu Links
-          </TabsTrigger>
-          <TabsTrigger value="gallery" className="text-winter-pine data-[state=active]:bg-spring-bloom-pink data-[state=active]:text-white">
+          <TabsTrigger value="gallery" className="text-neon-pink data-[state=active]:bg-neon-pink/80 data-[state=active]:text-white terminal-text">
             <Image className="w-4 h-4 mr-2" />
-            Gallery
+            HOLO_GALLERY
           </TabsTrigger>
-          <TabsTrigger value="content" className="text-winter-pine data-[state=active]:bg-summer-ocean data-[state=active]:text-white">
-            <FileText className="w-4 h-4 mr-2" />
-            Content
-          </TabsTrigger>
-          <TabsTrigger value="account" className="text-winter-pine data-[state=active]:bg-winter-berry data-[state=active]:text-white">
-            <Settings className="w-4 h-4 mr-2" />
-            Account
+          <TabsTrigger value="settings" className="text-neon-blue data-[state=active]:bg-neon-blue/80 data-[state=active]:text-white terminal-text">
+            <Terminal className="w-4 h-4 mr-2" />
+            CONFIG
           </TabsTrigger>
         </TabsList>
         
         <TabsContent value="dashboard" className="mt-6">
           <DashboardManager role={user.role} canReorder={true} />
         </TabsContent>
+
+        <TabsContent value="quantum" className="mt-6">
+          <QuantumDashboard />
+        </TabsContent>
+
+        <TabsContent value="auth" className="mt-6">
+          <HolographicAuth />
+        </TabsContent>
+
+        <TabsContent value="marketplace" className="mt-6">
+          <NeuralMarketplace />
+        </TabsContent>
         
         <TabsContent value="connections" className="mt-6">
           <AdminConnections />
-        </TabsContent>
-        
-        <TabsContent value="menu-links" className="mt-6">
-          <AdminMenuLinks />
         </TabsContent>
         
         <TabsContent value="gallery" className="mt-6">
           <AdminGallery />
         </TabsContent>
         
-        <TabsContent value="content" className="mt-6">
+        <TabsContent value="settings" className="mt-6">
           <AdminContent />
         </TabsContent>
         

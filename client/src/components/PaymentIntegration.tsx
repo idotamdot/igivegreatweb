@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   DollarSign,
   Wallet,
-  Bank,
+  Building2,
   Smartphone,
   Bitcoin,
   Settings,

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -51,14 +52,77 @@ interface AIDecision {
 }
 
 export default function QuantumAIOperations() {
+  const { data: aiOperators = [] } = useQuery({
+    queryKey: ['/api/neural/ai-operators'],
+  });
+
   const [quantumAIs, setQuantumAIs] = useState<QuantumAI[]>([]);
   const [aiDecisions, setAIDecisions] = useState<AIDecision[]>([]);
   const [systemAutonomy, setSystemAutonomy] = useState(87);
   const [overrideMode, setOverrideMode] = useState(false);
 
   useEffect(() => {
-    // Initialize Quantum AI Operators
-    const aiOperators: QuantumAI[] = [
+    if (aiOperators.length > 0) {
+      // Transform database AI operators to component format
+      const transformedAIs: QuantumAI[] = aiOperators.map((operator: any) => ({
+        id: `qai-${operator.id.toString().padStart(3, '0')}`,
+        name: operator.name,
+        role: getRoleFromName(operator.role),
+        status: 'online',
+        efficiency: Math.round(parseFloat(operator.efficiency_rating) * 100),
+        tasksCompleted: operator.tasks_completed,
+        currentTask: getCurrentTask(operator.role),
+        autonomyLevel: Math.round(parseFloat(operator.efficiency_rating) * 100),
+        lastDecision: getLastDecision(operator.role),
+        nextAction: getNextAction(operator.role)
+      }));
+      setQuantumAIs(transformedAIs);
+    }
+  }, [aiOperators]);
+
+  // Helper functions to map database data to UI expectations
+  const getRoleFromName = (role: string): QuantumAI['role'] => {
+    if (role.includes('Operations') || role.includes('Business')) return 'operations';
+    if (role.includes('Security') || role.includes('Defense')) return 'security';
+    if (role.includes('Client') || role.includes('Relations')) return 'client';
+    if (role.includes('Development') || role.includes('Lead')) return 'development';
+    if (role.includes('Market') || role.includes('Analysis')) return 'analytics';
+    return 'oversight';
+  };
+
+  const getCurrentTask = (role: string): string => {
+    if (role.includes('Operations')) return 'Optimizing neural network resource allocation';
+    if (role.includes('Security')) return 'Monitoring quantum encryption protocols';
+    if (role.includes('Client')) return 'Processing client interaction algorithms';
+    if (role.includes('Development')) return 'Compiling autonomous code generation';
+    if (role.includes('Infrastructure')) return 'Managing quantum server infrastructure';
+    if (role.includes('Market')) return 'Analyzing market trend patterns';
+    return 'Executing strategic oversight protocols';
+  };
+
+  const getLastDecision = (role: string): string => {
+    if (role.includes('Operations')) return 'Allocated quantum cores to high-priority projects';
+    if (role.includes('Security')) return 'Enhanced neural firewall configurations';
+    if (role.includes('Client')) return 'Approved automated client onboarding sequence';
+    if (role.includes('Development')) return 'Deployed neural code optimization patches';
+    if (role.includes('Infrastructure')) return 'Scaled quantum hosting infrastructure';
+    if (role.includes('Market')) return 'Updated predictive market algorithms';
+    return 'Executed strategic system optimization';
+  };
+
+  const getNextAction = (role: string): string => {
+    if (role.includes('Operations')) return 'Schedule quantum maintenance protocols';
+    if (role.includes('Security')) return 'Deploy advanced threat detection systems';
+    if (role.includes('Client')) return 'Initiate client satisfaction analysis';
+    if (role.includes('Development')) return 'Begin neural architecture upgrades';
+    if (role.includes('Infrastructure')) return 'Optimize quantum server performance';
+    if (role.includes('Market')) return 'Generate market expansion strategies';
+    return 'Monitor system-wide performance metrics';
+  };
+
+  useEffect(() => {
+    // Initialize mock decisions for demonstration
+    const mockDecisions: AIDecision[] = [
       {
         id: 'qai-001',
         name: 'NEXUS_OPERATIONS_AI',

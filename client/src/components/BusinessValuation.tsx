@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -41,14 +42,37 @@ interface BusinessMetrics {
 }
 
 export default function BusinessValuation() {
-  const [metrics, setMetrics] = useState<BusinessMetrics>({
-    currentValuation: 2850000,
-    projectedValuation12m: 8500000,
-    monthlyRevenue: 125000,
-    clientRetentionRate: 97.5,
-    profitMargin: 78.3,
-    marketShare: 0.8
+  const { data: businessMetrics = [] } = useQuery({
+    queryKey: ['/api/neural/business-metrics'],
   });
+
+  const [metrics, setMetrics] = useState<BusinessMetrics>({
+    currentValuation: 0,
+    projectedValuation12m: 0,
+    monthlyRevenue: 0,
+    clientRetentionRate: 0,
+    profitMargin: 0,
+    marketShare: 0
+  });
+
+  // Update metrics from database
+  useEffect(() => {
+    if (businessMetrics.length > 0) {
+      const metricsMap = businessMetrics.reduce((acc: any, metric: any) => {
+        acc[metric.metric_name] = parseFloat(metric.metric_value);
+        return acc;
+      }, {});
+
+      setMetrics({
+        currentValuation: metricsMap['Company Valuation'] || 0,
+        projectedValuation12m: (metricsMap['Company Valuation'] || 0) * 3, // Projected growth
+        monthlyRevenue: metricsMap['Monthly Revenue'] || 0,
+        clientRetentionRate: 97.5, // Static for now
+        profitMargin: metricsMap['Profit Margin'] || 0,
+        marketShare: 0.8 // Static for now
+      });
+    }
+  }, [businessMetrics]);
 
   const revenueStreams: RevenueStream[] = [
     {

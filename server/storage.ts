@@ -1313,8 +1313,14 @@ export class MemStorage implements IStorage {
   async createPsiCategory(insertCategory: InsertPsiCategory): Promise<PsiCategory> {
     const id = this.psiCategoryCurrentId++;
     const category: PsiCategory = {
-      ...insertCategory,
       id,
+      name: insertCategory.name,
+      color: insertCategory.color || null,
+      order: insertCategory.order || null,
+      active: insertCategory.active || null,
+      description: insertCategory.description || null,
+      parentId: insertCategory.parentId || null,
+      icon: insertCategory.icon || null,
       createdAt: new Date()
     };
     this.psiCategories.set(id, category);
@@ -1322,7 +1328,7 @@ export class MemStorage implements IStorage {
   }
 
   async getAllPsiCategories(): Promise<PsiCategory[]> {
-    return Array.from(this.psiCategories.values()).sort((a, b) => a.order - b.order);
+    return Array.from(this.psiCategories.values()).sort((a, b) => (a.order || 0) - (b.order || 0));
   }
 
   async getPsiCategory(id: number): Promise<PsiCategory | undefined> {
@@ -1506,8 +1512,14 @@ export class MemStorage implements IStorage {
   async createPsiSearch(insertSearch: InsertPsiSearch): Promise<PsiSearch> {
     const id = this.psiSearchCurrentId++;
     const search: PsiSearch = {
-      ...insertSearch,
       id,
+      userId: insertSearch.userId || null,
+      query: insertSearch.query,
+      intent: insertSearch.intent || null,
+      filters: insertSearch.filters || null,
+      resultsCount: 0,
+      clickedResults: [],
+      sessionId: insertSearch.sessionId || null,
       createdAt: new Date()
     };
     this.psiSearches.set(id, search);

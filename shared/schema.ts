@@ -415,6 +415,7 @@ export const insertPsiReviewSchema = createInsertSchema(psiReviews).pick({
 });
 
 export const insertPsiSearchSchema = createInsertSchema(psiSearches).pick({
+  userId: true,
   query: true,
   intent: true,
   filters: true,

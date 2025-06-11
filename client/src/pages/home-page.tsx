@@ -1,122 +1,158 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import SiteHeader from "@/components/site-header";
-import MobileNav from "@/components/mobile-nav";
-import ConnectDialog from "@/components/connect-dialog";
 import ParticleBackground from "@/components/ParticleBackground";
 import CyberMatrix from "@/components/CyberMatrix";
 import NeuralNavigation from "@/components/NeuralNavigation";
 import { Button } from "@/components/ui/button";
-import { Search, Sparkles, Heart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Search, Brain, Network, Shield, Zap, Database, Eye, Terminal } from "lucide-react";
 
 export default function HomePage() {
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [connectOpen, setConnectOpen] = useState(false);
-
   return (
     <div className="relative min-h-screen flex flex-col">
       <CyberMatrix />
       <ParticleBackground />
       <NeuralNavigation />
-      <SiteHeader 
-        onMenuClick={() => setMobileNavOpen(true)} 
-        onConnectClick={() => setConnectOpen(true)}
-      />
+      <SiteHeader />
       
-      {/* Menu Arrow Indicator */}
-      <div className="fixed top-20 left-5 flex items-center z-40 animate-pulse">
-        <div className="flex flex-col items-center">
-          <div className="w-6 h-10 mb-2 transform rotate-[225deg]">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              className="text-white menu-indicator-arrow animate-glow"
-            >
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-              <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-          </div>
-          <div className="text-white text-lg md:text-xl menu-indicator-text animate-glow">
-            see our work here
-          </div>
-        </div>
-      </div>
-      
-      {/* Cyberpunk Hero Section */}
-      <main className="flex-1 flex flex-col justify-center items-center space-y-12 bg-cyber-gradient cyber-grid relative">
-        {/* Data Stream Effects */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-px h-full bg-cyber-green opacity-30 data-stream" style={{animationDelay: '0s'}}></div>
-          <div className="absolute top-0 left-1/2 w-px h-full bg-neon-pink opacity-20 data-stream" style={{animationDelay: '1s'}}></div>
-          <div className="absolute top-0 left-3/4 w-px h-full bg-neon-blue opacity-25 data-stream" style={{animationDelay: '2s'}}></div>
-        </div>
+      <main className="flex-1 flex items-center justify-center px-4 pt-20">
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          {/* Neural Core Interface */}
+          <div className="cyber-glass p-8 rounded-3xl neon-border hologram-effect">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <Brain className="w-12 h-12 text-cyber-green neon-glow" />
+              <div className="h-8 w-px bg-cyber-green neon-glow"></div>
+              <Network className="w-12 h-12 text-neon-pink neon-glow" />
+              <div className="h-8 w-px bg-neon-pink neon-glow"></div>
+              <Shield className="w-12 h-12 text-neon-blue neon-glow" />
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-hologram glitch-effect terminal-text">
+              NEURAL_CORE
+            </h1>
+            
+            <div className="space-y-3 mb-8">
+              <div className="terminal-text text-cyber-green text-lg">
+                &gt;&gt; QUANTUM_ETHICS_ENGINE: ACTIVE
+              </div>
+              <div className="terminal-text text-neon-pink text-lg">
+                &gt;&gt; NEURAL_NETWORK: SYNCHRONIZED
+              </div>
+              <div className="terminal-text text-neon-blue text-lg">
+                &gt;&gt; SECURITY_MATRIX: MAXIMUM
+              </div>
+            </div>
 
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-center px-4 text-hologram font-mono neon-glow glitch-effect terminal-text">
-          igivegreatweb.com
-        </h1>
-        
-        {/* Cyberpunk Interface */}
-        <div className="flex flex-col items-center space-y-6 z-10">
-          <Link to="/index">
-            <Button 
-              size="lg" 
-              className="bg-neon-gradient hover:bg-hologram-gradient text-white text-xl px-16 py-8 rounded-3xl shadow-2xl btn-magnetic neon-glow cyber-glass border-2 border-neon-pink hover:border-neon-blue animate-float hologram-effect"
-            >
-              <Search className="w-6 h-6 mr-3 text-cyber-green" />
-              <span className="text-hologram font-bold">NEURAL INDEX</span>
-              <Sparkles className="w-6 h-6 ml-3 text-neon-blue" />
-            </Button>
-          </Link>
-          
-          <div className="cyber-glass p-6 rounded-2xl neon-border max-w-lg text-center">
-            <div className="text-cyber-green text-sm terminal-text leading-relaxed space-y-1">
-              <div>&gt;&gt; ETHICAL PROTOCOL ENGAGED</div>
-              <div>&gt;&gt; INDEX_MODE: SEEKING NOT EXPLOITING</div>
-              <div>&gt;&gt; BEHAVIORAL_ADS: DISABLED</div>
-              <div>&gt;&gt; MANIPULATION_SHIELD: ACTIVE</div>
+            <div className="flex flex-wrap gap-3 justify-center mb-8">
+              <Badge className="bg-cyber-green text-black neon-glow">
+                INDEX_NOT_INTRUDE
+              </Badge>
+              <Badge className="bg-neon-pink text-white neon-glow">
+                ETHICAL_AI
+              </Badge>
+              <Badge className="bg-neon-blue text-white neon-glow">
+                QUANTUM_VERIFIED
+              </Badge>
+              <Badge className="bg-purple-400 text-white neon-glow">
+                ZERO_TRUST
+              </Badge>
             </div>
           </div>
-          
-          {/* Neural Business Portal */}
-          <Link to="/apply">
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="cyber-glass hover:bg-neon-pink/20 text-neon-pink border-2 border-neon-pink hover:border-cyber-green px-8 py-4 rounded-2xl hover-lift neon-glow animate-scale-in hologram-effect"
-              style={{animationDelay: '0.4s'}}
-            >
-              <Heart className="w-5 h-5 mr-3 text-neon-pink" />
-              <span className="terminal-text">NEURAL_BUSINESS_UPLOAD</span>
-            </Button>
-          </Link>
-        </div>
 
-        {/* Holographic Status Display */}
-        <div className="absolute bottom-8 left-8 cyber-glass p-4 rounded-xl neon-border animate-fade-in-up">
-          <div className="terminal-text text-xs space-y-1">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-cyber-green rounded-full neon-glow"></div>
-              <span>NEURAL_NETWORK: ONLINE</span>
+          {/* Neural Access Points */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Link to="/index">
+              <div className="card-cyber p-6 hover-lift cursor-pointer group">
+                <Database className="w-8 h-8 text-cyber-green mx-auto mb-4 neon-glow group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold text-cyber-green terminal-text mb-2">
+                  QUANTUM_INDEX
+                </h3>
+                <p className="text-gray-300 terminal-text text-sm">
+                  Access the neural marketplace database
+                </p>
+                <div className="mt-4 terminal-text text-xs text-neon-pink">
+                  &gt;&gt; NEURAL_ENTITIES_AVAILABLE
+                </div>
+              </div>
+            </Link>
+
+            <Link to="/services">
+              <div className="card-neon p-6 hover-lift cursor-pointer group">
+                <Network className="w-8 h-8 text-neon-pink mx-auto mb-4 neon-glow group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold text-neon-pink terminal-text mb-2">
+                  SERVICE_MESH
+                </h3>
+                <p className="text-gray-300 terminal-text text-sm">
+                  Neural-enhanced digital solutions
+                </p>
+                <div className="mt-4 terminal-text text-xs text-cyber-green">
+                  &gt;&gt; QUANTUM_ENHANCED_SERVICES
+                </div>
+              </div>
+            </Link>
+
+            <Link to="/admin">
+              <div className="card-hologram p-6 hover-lift cursor-pointer group">
+                <Shield className="w-8 h-8 text-hologram mx-auto mb-4 neon-glow group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold text-hologram terminal-text mb-2">
+                  ADMIN_NEXUS
+                </h3>
+                <p className="text-gray-300 terminal-text text-sm">
+                  Neural network control center
+                </p>
+                <div className="mt-4 terminal-text text-xs text-neon-blue">
+                  &gt;&gt; AUTHORIZATION_REQUIRED
+                </div>
+              </div>
+            </Link>
+          </div>
+
+          {/* Neural Search Interface */}
+          <div className="cyber-glass p-6 rounded-2xl neon-border">
+            <div className="flex items-center gap-4 mb-4">
+              <Search className="w-6 h-6 text-cyber-green neon-glow" />
+              <span className="terminal-text text-cyber-green">NEURAL_SEARCH_PROTOCOL</span>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-neon-blue rounded-full neon-glow"></div>
-              <span>ETHICS_ENGINE: ACTIVE</span>
+            <div className="flex gap-3">
+              <div className="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Enter quantum search parameters..."
+                  className="w-full px-4 py-3 bg-gray-900/50 border border-cyber-green/30 rounded-lg text-cyber-green terminal-text placeholder-gray-500 focus:border-cyber-green focus:outline-none"
+                />
+              </div>
+              <Button className="bg-neon-gradient neon-glow terminal-text">
+                <Zap className="w-4 h-4 mr-2" />
+                EXECUTE
+              </Button>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-neon-pink rounded-full neon-glow"></div>
-              <span>QUANTUM_INDEX: READY</span>
+          </div>
+
+          {/* Neural Status Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="cyber-glass p-4 rounded-lg text-center">
+              <Eye className="w-6 h-6 text-cyber-green mx-auto mb-2 neon-glow" />
+              <div className="text-lg font-bold text-cyber-green">24/7</div>
+              <div className="text-xs terminal-text text-gray-400">MONITORING</div>
+            </div>
+            <div className="cyber-glass p-4 rounded-lg text-center">
+              <Terminal className="w-6 h-6 text-neon-pink mx-auto mb-2 neon-glow" />
+              <div className="text-lg font-bold text-neon-pink">99.9%</div>
+              <div className="text-xs terminal-text text-gray-400">UPTIME</div>
+            </div>
+            <div className="cyber-glass p-4 rounded-lg text-center">
+              <Shield className="w-6 h-6 text-neon-blue mx-auto mb-2 neon-glow" />
+              <div className="text-lg font-bold text-neon-blue">256</div>
+              <div className="text-xs terminal-text text-gray-400">BIT_ENCRYPTION</div>
+            </div>
+            <div className="cyber-glass p-4 rounded-lg text-center">
+              <Brain className="w-6 h-6 text-purple-400 mx-auto mb-2 neon-glow" />
+              <div className="text-lg font-bold text-purple-400">AI</div>
+              <div className="text-xs terminal-text text-gray-400">ENHANCED</div>
             </div>
           </div>
         </div>
       </main>
-
-      <MobileNav open={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
-      <ConnectDialog open={connectOpen} onOpenChange={setConnectOpen} />
     </div>
   );
 }

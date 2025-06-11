@@ -159,6 +159,12 @@ export class MemStorage implements IStorage {
   private contentBlocks: Map<number, ContentBlock>;
   private dashboardWidgets: Map<number, DashboardWidget>;
   private dashboardLayouts: Map<number, DashboardLayout>;
+  private psiCategories: Map<number, PsiCategory>;
+  private psiValues: Map<number, PsiValue>;
+  private psiProducts: Map<number, PsiProduct>;
+  private psiProductValues: Map<number, PsiProductValue>;
+  private psiReviews: Map<number, PsiReview>;
+  private psiSearches: Map<number, PsiSearch>;
   
   private userCurrentId: number;
   private connectionCurrentId: number;
@@ -170,6 +176,12 @@ export class MemStorage implements IStorage {
   private contentBlockCurrentId: number;
   private dashboardWidgetCurrentId: number;
   private dashboardLayoutCurrentId: number;
+  private psiCategoryCurrentId: number;
+  private psiValueCurrentId: number;
+  private psiProductCurrentId: number;
+  private psiProductValueCurrentId: number;
+  private psiReviewCurrentId: number;
+  private psiSearchCurrentId: number;
   
   sessionStore: session.Store;
 

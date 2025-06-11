@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import SiteHeader from "@/components/site-header";
 import MobileNav from "@/components/mobile-nav";
 import ConnectDialog from "@/components/connect-dialog";
+import ParticleBackground from "@/components/ParticleBackground";
 import { Button } from "@/components/ui/button";
 import { Search, Sparkles, Heart } from "lucide-react";
 
@@ -12,6 +13,7 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
+      <ParticleBackground />
       <SiteHeader 
         onMenuClick={() => setMobileNavOpen(true)} 
         onConnectClick={() => setConnectOpen(true)}
@@ -47,18 +49,18 @@ export default function HomePage() {
         </h1>
         
         {/* Product and Service Index Button */}
-        <div className="flex flex-col items-center space-y-4">
+        <div className="flex flex-col items-center space-y-4 animate-fade-in-up">
           <Link to="/index">
             <Button 
               size="lg" 
-              className="bg-spring-gradient hover:bg-summer-gradient text-white text-xl px-12 py-6 rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 border-2 border-white/20 backdrop-blur-sm"
+              className="bg-spring-gradient hover:bg-summer-gradient text-white text-xl px-12 py-6 rounded-2xl shadow-2xl btn-magnetic hover-glow border-2 border-white/20 backdrop-blur-sm animate-float"
             >
               <Search className="w-6 h-6 mr-3" />
               Product & Service Index
               <Sparkles className="w-6 h-6 ml-3" />
             </Button>
           </Link>
-          <p className="text-white/80 text-center max-w-md text-sm">
+          <p className="text-white/90 text-center max-w-md text-sm animate-fade-in-up" style={{animationDelay: '0.2s'}}>
             "Index Instead of Intrude" - Find ethical products and services through seeking, not manipulation
           </p>
           
@@ -67,7 +69,8 @@ export default function HomePage() {
             <Button 
               variant="outline" 
               size="sm"
-              className="bg-white/10 hover:bg-white/20 text-white border-white/30 hover:border-white/50 px-6 py-3 rounded-xl backdrop-blur-sm transition-all duration-300"
+              className="glass-card hover:bg-white/20 text-white border-white/40 hover:border-white/60 px-6 py-3 rounded-xl hover-lift animate-scale-in"
+              style={{animationDelay: '0.4s'}}
             >
               <Heart className="w-4 h-4 mr-2" />
               Add Your Business Here

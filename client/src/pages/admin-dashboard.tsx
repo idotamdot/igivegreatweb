@@ -15,6 +15,7 @@ import NeuralPortfolio from "@/components/NeuralPortfolio";
 import QuantumClientOnboard from "@/components/QuantumClientOnboard";
 import NeuralProjectManager from "@/components/NeuralProjectManager";
 import QuantumAnalytics from "@/components/QuantumAnalytics";
+import QuantumAIOperations from "@/components/QuantumAIOperations";
 import { 
   Tabs, 
   TabsContent, 
@@ -34,7 +35,8 @@ import {
   Network,
   Terminal,
   Eye,
-  Activity
+  Activity,
+  Bot
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -99,8 +101,8 @@ export default function AdminDashboard() {
       >
         <TabsList className="cyber-glass backdrop-blur-md border-2 border-cyber-green/20 rounded-xl neon-border">
           <TabsTrigger value="dashboard" className="text-cyber-green data-[state=active]:bg-cyber-green data-[state=active]:text-black terminal-text">
-            <Brain className="w-4 h-4 mr-2" />
-            NEURAL_CORE
+            <Bot className="w-4 h-4 mr-2" />
+            AI_OPERATIONS
           </TabsTrigger>
           <TabsTrigger value="quantum" className="text-neon-pink data-[state=active]:bg-neon-pink data-[state=active]:text-white terminal-text">
             <Database className="w-4 h-4 mr-2" />
@@ -145,7 +147,7 @@ export default function AdminDashboard() {
         </TabsList>
         
         <TabsContent value="dashboard" className="mt-6">
-          <DashboardManager role={user.role} canReorder={true} />
+          <QuantumAIOperations />
         </TabsContent>
 
         <TabsContent value="quantum" className="mt-6">

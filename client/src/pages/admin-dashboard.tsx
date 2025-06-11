@@ -16,6 +16,7 @@ import QuantumClientOnboard from "@/components/QuantumClientOnboard";
 import NeuralProjectManager from "@/components/NeuralProjectManager";
 import QuantumAnalytics from "@/components/QuantumAnalytics";
 import QuantumAIOperations from "@/components/QuantumAIOperations";
+import PasswordChangeForm from "@/components/PasswordChangeForm";
 import { 
   Tabs, 
   TabsContent, 
@@ -206,19 +207,8 @@ export default function AdminDashboard() {
                   </div>
                 </div>
                 
-                <div className="card-summer p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-summer mb-2">Security Settings</h3>
-                  <div className="space-y-3">
-                    <Button variant="outline" className="w-full">
-                      Change Password
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                      Update Email
-                    </Button>
-                    <Button variant="outline" className="w-full">
-                      Manage Sessions
-                    </Button>
-                  </div>
+                <div className="w-full">
+                  <PasswordChangeForm />
                 </div>
                 
                 <div className="card-winter p-4 rounded-lg">

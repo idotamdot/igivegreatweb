@@ -32,6 +32,7 @@ export interface IStorage {
   getAllUsers(): Promise<User[]>;
   deleteUser(id: number): Promise<void>;
   updateOwnerCredentials(username: string, password: string): Promise<User>;
+  updateUserPassword(id: number, hashedPassword: string): Promise<void>;
   
   // Connection methods
   createConnection(connection: InsertConnection): Promise<Connection>;
@@ -733,6 +734,16 @@ export class MemStorage implements IStorage {
     this.users.set(ownerUser.id, ownerUser);
     
     return ownerUser;
+  }
+
+  async updateUserPassword(id: number, hashedPassword: string): Promise<void> {
+    const user = this.users.get(id);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    
+    user.password = hashedPassword;
+    this.users.set(id, user);
   }
   
   async createConnection(insertConnection: InsertConnection): Promise<Connection> {

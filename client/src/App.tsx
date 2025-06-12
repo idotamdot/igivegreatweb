@@ -19,6 +19,7 @@ import ArtworkDetail from "@/pages/artwork-detail";
 import CheckoutOrder from "@/pages/checkout-order";
 import CryptoCheckout from "@/pages/crypto-checkout";
 import OrdersPage from "@/pages/orders-page";
+import InvoicingDashboard from "@/pages/invoicing-dashboard";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
 // Temporarily commenting out protected route for development
@@ -46,6 +47,7 @@ function Router() {
       <Route path="/artwork/:id" component={ArtworkDetail} />
       <Route path="/checkout/:id" component={CheckoutOrder} />
       <Route path="/orders" component={OrdersPage} />
+      <Route path="/invoicing" component={InvoicingDashboard} />
       
       {/* Admin gallery management routes */}
       <Route path="/admin-gallery-management" component={AdminGalleryManagement} />

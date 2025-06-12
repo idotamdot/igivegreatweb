@@ -1739,5 +1739,127 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Enterprise Invoicing Routes
+  
+  // Get all enterprise clients
+  app.get("/api/enterprises", async (req, res) => {
+    try {
+      const enterprises = await getEnterprises();
+      res.json(enterprises);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Create new enterprise client
+  app.post("/api/enterprises", async (req, res) => {
+    try {
+      const enterpriseData = req.body;
+      
+      if (!enterpriseData.name || !enterpriseData.email || !enterpriseData.contact_person || !enterpriseData.address) {
+        return res.status(400).json({ message: "Missing required enterprise fields" });
+      }
+
+      const enterprise = await createEnterprise(enterpriseData);
+      res.json(enterprise);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get all invoices
+  app.get("/api/invoices", async (req, res) => {
+    try {
+      const invoices = await getInvoices();
+      res.json(invoices);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get invoice by ID with line items
+  app.get("/api/invoices/:id", async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      if (isNaN(invoiceId)) {
+        return res.status(400).json({ message: "Invalid invoice ID" });
+      }
+
+      const invoiceData = await getInvoiceById(invoiceId);
+      if (!invoiceData.invoice) {
+        return res.status(404).json({ message: "Invoice not found" });
+      }
+
+      res.json(invoiceData);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Create new invoice
+  app.post("/api/invoices", async (req, res) => {
+    try {
+      const { invoiceData, lineItems } = req.body;
+      
+      if (!invoiceData.enterprise_id || !invoiceData.amount || !invoiceData.total_amount || !invoiceData.description) {
+        return res.status(400).json({ message: "Missing required invoice fields" });
+      }
+
+      // Create the invoice
+      const invoice = await createInvoice(invoiceData);
+      
+      // Add line items if provided
+      if (lineItems && lineItems.length > 0) {
+        for (const lineItem of lineItems) {
+          await addInvoiceLineItem({
+            ...lineItem,
+            invoice_id: invoice.id
+          });
+        }
+      }
+
+      res.json(invoice);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Update invoice status
+  app.patch("/api/invoices/:id/status", async (req, res) => {
+    try {
+      const invoiceId = parseInt(req.params.id);
+      const { status, paymentData } = req.body;
+      
+      if (isNaN(invoiceId) || !status) {
+        return res.status(400).json({ message: "Invalid invoice ID or status" });
+      }
+
+      const updatedInvoice = await updateInvoiceStatus(invoiceId, status, paymentData);
+      res.json(updatedInvoice);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get payment plans
+  app.get("/api/payment-plans", async (req, res) => {
+    try {
+      const paymentPlans = await getPaymentPlans();
+      res.json(paymentPlans);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get invoice statistics
+  app.get("/api/invoices/stats", async (req, res) => {
+    try {
+      const stats = await getInvoiceStats();
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // Routes registered successfully - no server creation needed for Vercel
 }

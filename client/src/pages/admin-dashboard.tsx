@@ -109,6 +109,10 @@ export default function AdminDashboard() {
             <Activity className="w-4 h-4 mr-2" />
             QUANTUM_ANALYTICS
           </TabsTrigger>
+          <TabsTrigger value="invoicing" className="text-orange-400 data-[state=active]:bg-orange-400/80 data-[state=active]:text-white terminal-text">
+            <FileText className="w-4 h-4 mr-2" />
+            ENTERPRISE_INVOICING
+          </TabsTrigger>
           <TabsTrigger value="account" className="text-neon-blue data-[state=active]:bg-neon-blue/80 data-[state=active]:text-white terminal-text">
             <Settings className="w-4 h-4 mr-2" />
             ACCOUNT

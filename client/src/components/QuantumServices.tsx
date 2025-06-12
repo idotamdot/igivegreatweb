@@ -301,13 +301,31 @@ export default function QuantumServices() {
                 </div>
 
                 {/* Neural Action Buttons */}
-                <div className="flex gap-2">
-                  <Button className="flex-1 bg-neon-gradient neon-glow terminal-text">
-                    <Zap className="w-4 h-4 mr-2" />
-                    DEPLOY_SERVICE
-                  </Button>
-                  <Button variant="outline" className="border-cyber-green text-cyber-green hover:bg-cyber-green/20">
-                    <Eye className="w-4 h-4" />
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <Button 
+                      className="flex-1 bg-neon-gradient neon-glow terminal-text"
+                      onClick={() => navigate(`/checkout?service=${service.id}&amount=${service.pricing.pro}&name=${encodeURIComponent(service.name)}`)}
+                    >
+                      <Zap className="w-4 h-4 mr-2" />
+                      DEPLOY_SERVICE
+                    </Button>
+                    <Button variant="outline" className="border-cyber-green text-cyber-green hover:bg-cyber-green/20">
+                      <Eye className="w-4 h-4" />
+                    </Button>
+                  </div>
+                  
+                  {/* Crypto Payment Option for Tech Clients */}
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-orange-500/50 text-orange-400 hover:bg-orange-500/10 terminal-text text-xs"
+                    onClick={() => navigate(`/crypto-checkout?service=${service.id}&email=tech-client@example.com`)}
+                  >
+                    <Bitcoin className="w-3 h-3 mr-2" />
+                    PAY_WITH_CRYPTO
+                    <Badge className="ml-2 bg-orange-500/20 text-orange-400 text-xs">
+                      BTC/ETH/USDC
+                    </Badge>
                   </Button>
                 </div>
               </CardContent>

@@ -441,3 +441,167 @@ export type InsertPsiReview = z.infer<typeof insertPsiReviewSchema>;
 
 export type PsiSearch = typeof psiSearches.$inferSelect;
 export type InsertPsiSearch = z.infer<typeof insertPsiSearchSchema>;
+
+// Enterprise Invoicing Schema
+export const enterprises = pgTable("enterprises", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  contactPerson: text("contact_person").notNull(),
+  phone: text("phone"),
+  address: text("address").notNull(),
+  taxId: text("tax_id"),
+  industry: text("industry"),
+  companySize: text("company_size"), // small, medium, large, enterprise
+  billingCycle: text("billing_cycle").notNull().default("monthly"), // monthly, quarterly, annual
+  paymentTerms: integer("payment_terms").notNull().default(30), // days
+  discountRate: numeric("discount_rate", { precision: 5, scale: 2 }).default("0"), // percentage
+  status: text("status").notNull().default("active"), // active, suspended, terminated
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const invoices = pgTable("invoices", {
+  id: serial("id").primaryKey(),
+  invoiceNumber: text("invoice_number").notNull().unique(),
+  enterpriseId: integer("enterprise_id").references(() => enterprises.id).notNull(),
+  
+  // Invoice details
+  issueDate: timestamp("issue_date").defaultNow().notNull(),
+  dueDate: timestamp("due_date").notNull(),
+  amount: numeric("amount", { precision: 12, scale: 2 }).notNull(),
+  taxAmount: numeric("tax_amount", { precision: 12, scale: 2 }).default("0"),
+  discountAmount: numeric("discount_amount", { precision: 12, scale: 2 }).default("0"),
+  totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).notNull(),
+  currency: text("currency").notNull().default("USD"),
+  
+  // Status and payment
+  status: text("status").notNull().default("draft"), // draft, sent, viewed, paid, overdue, cancelled
+  paymentMethod: text("payment_method"), // wire, ach, crypto, check
+  paymentDate: timestamp("payment_date"),
+  paymentReference: text("payment_reference"),
+  
+  // Content
+  description: text("description").notNull(),
+  notes: text("notes"),
+  terms: text("terms"),
+  
+  // Metadata
+  sentAt: timestamp("sent_at"),
+  viewedAt: timestamp("viewed_at"),
+  remindersSent: integer("reminders_sent").default(0),
+  lastReminderAt: timestamp("last_reminder_at"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const invoiceLineItems = pgTable("invoice_line_items", {
+  id: serial("id").primaryKey(),
+  invoiceId: integer("invoice_id").references(() => invoices.id).notNull(),
+  
+  // Line item details
+  description: text("description").notNull(),
+  serviceType: text("service_type").notNull(), // ai-development, quantum-hosting, cybersecurity, consulting
+  quantity: numeric("quantity", { precision: 10, scale: 2 }).notNull().default("1"),
+  unitPrice: numeric("unit_price", { precision: 10, scale: 2 }).notNull(),
+  totalPrice: numeric("total_price", { precision: 10, scale: 2 }).notNull(),
+  
+  // Project reference
+  projectId: integer("project_id"),
+  billingPeriodStart: timestamp("billing_period_start"),
+  billingPeriodEnd: timestamp("billing_period_end"),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const paymentPlans = pgTable("payment_plans", {
+  id: serial("id").primaryKey(),
+  enterpriseId: integer("enterprise_id").references(() => enterprises.id).notNull(),
+  
+  // Plan details
+  name: text("name").notNull(),
+  totalAmount: numeric("total_amount", { precision: 12, scale: 2 }).notNull(),
+  installments: integer("installments").notNull(),
+  installmentAmount: numeric("installment_amount", { precision: 12, scale: 2 }).notNull(),
+  frequency: text("frequency").notNull(), // monthly, quarterly
+  
+  // Status
+  status: text("status").notNull().default("active"), // active, completed, cancelled
+  currentInstallment: integer("current_installment").default(1),
+  nextPaymentDate: timestamp("next_payment_date").notNull(),
+  
+  // Metadata
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  autoCharge: boolean("auto_charge").default(false),
+  
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Insert schemas
+export const insertEnterpriseSchema = createInsertSchema(enterprises).pick({
+  name: true,
+  email: true,
+  contactPerson: true,
+  phone: true,
+  address: true,
+  taxId: true,
+  industry: true,
+  companySize: true,
+  billingCycle: true,
+  paymentTerms: true,
+  discountRate: true,
+});
+
+export const insertInvoiceSchema = createInsertSchema(invoices).pick({
+  enterpriseId: true,
+  dueDate: true,
+  amount: true,
+  taxAmount: true,
+  discountAmount: true,
+  totalAmount: true,
+  currency: true,
+  description: true,
+  notes: true,
+  terms: true,
+});
+
+export const insertInvoiceLineItemSchema = createInsertSchema(invoiceLineItems).pick({
+  invoiceId: true,
+  description: true,
+  serviceType: true,
+  quantity: true,
+  unitPrice: true,
+  totalPrice: true,
+  projectId: true,
+  billingPeriodStart: true,
+  billingPeriodEnd: true,
+});
+
+export const insertPaymentPlanSchema = createInsertSchema(paymentPlans).pick({
+  enterpriseId: true,
+  name: true,
+  totalAmount: true,
+  installments: true,
+  installmentAmount: true,
+  frequency: true,
+  nextPaymentDate: true,
+  startDate: true,
+  endDate: true,
+  autoCharge: true,
+});
+
+// Types
+export type Enterprise = typeof enterprises.$inferSelect;
+export type InsertEnterprise = z.infer<typeof insertEnterpriseSchema>;
+
+export type Invoice = typeof invoices.$inferSelect;
+export type InsertInvoice = z.infer<typeof insertInvoiceSchema>;
+
+export type InvoiceLineItem = typeof invoiceLineItems.$inferSelect;
+export type InsertInvoiceLineItem = z.infer<typeof insertInvoiceLineItemSchema>;
+
+export type PaymentPlan = typeof paymentPlans.$inferSelect;
+export type InsertPaymentPlan = z.infer<typeof insertPaymentPlanSchema>;

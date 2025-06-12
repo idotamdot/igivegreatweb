@@ -43,6 +43,7 @@ import {
   getInvoiceStats
 } from "./neon";
 import { cryptoPaymentService, type CryptoPaymentRequest } from "./crypto-payments";
+import { googleCloudAI } from "./google-cloud-ai";
 
 // Stripe configuration - will be initialized when needed
 let stripe: Stripe | undefined;

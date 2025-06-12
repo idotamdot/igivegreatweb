@@ -1,17 +1,13 @@
 import { Storage } from '@google-cloud/storage';
 import { Logging } from '@google-cloud/logging';
 
-// Note: Google Cloud AI Platform integration ready for production deployment
-// Requires GOOGLE_APPLICATION_CREDENTIALS environment variable
-
+// Neural Web Labs Advanced AI Intelligence System
 export class GoogleCloudAIService {
-  private predictionClient: aiplatform.v1.PredictionServiceClient;
-  private endpointClient: aiplatform.v1.EndpointServiceClient;
-  private storage: Storage;
-  private logging: Logging;
-  private monitoring: Monitoring;
+  private storage: Storage | null = null;
+  private logging: Logging | null = null;
   private projectId: string;
   private location: string;
+  private isCloudEnabled: boolean;
 
   constructor() {
     this.projectId = process.env.GOOGLE_CLOUD_PROJECT_ID || 'neural-web-labs';

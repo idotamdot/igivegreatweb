@@ -18,6 +18,7 @@ import QuantumAnalytics from "@/components/QuantumAnalytics";
 import QuantumAIOperations from "@/components/QuantumAIOperations";
 import PasswordChangeForm from "@/components/PasswordChangeForm";
 import BusinessValuation from "@/components/BusinessValuation";
+import NeuralAIDashboard from "@/components/NeuralAIDashboard";
 import { 
   Tabs, 
   TabsContent, 
@@ -113,6 +114,10 @@ export default function AdminDashboard() {
             <FileText className="w-4 h-4 mr-2" />
             ENTERPRISE_INVOICING
           </TabsTrigger>
+          <TabsTrigger value="neural" className="text-cyan-400 data-[state=active]:bg-cyan-400/80 data-[state=active]:text-white terminal-text">
+            <Brain className="w-4 h-4 mr-2" />
+            NEURAL_AI
+          </TabsTrigger>
           <TabsTrigger value="account" className="text-neon-blue data-[state=active]:bg-neon-blue/80 data-[state=active]:text-white terminal-text">
             <Settings className="w-4 h-4 mr-2" />
             ACCOUNT
@@ -157,6 +162,10 @@ export default function AdminDashboard() {
               </Link>
             </div>
           </div>
+        </TabsContent>
+
+        <TabsContent value="neural" className="mt-6">
+          <NeuralAIDashboard />
         </TabsContent>
         
         <TabsContent value="account" className="mt-6">

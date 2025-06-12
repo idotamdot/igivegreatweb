@@ -43,7 +43,7 @@ import {
   getInvoiceStats
 } from "./neon";
 import { cryptoPaymentService, type CryptoPaymentRequest } from "./crypto-payments";
-import { googleCloudAI } from "./google-cloud-ai";
+import { neuralAI } from "./neural-ai-service";
 
 // Stripe configuration - will be initialized when needed
 let stripe: Stripe | undefined;
@@ -162,6 +162,54 @@ export async function registerRoutes(app: Express): Promise<void> {
     } catch (error) {
       console.error("Error updating operator metrics:", error);
       res.status(500).json({ error: "Failed to update operator metrics" });
+    }
+  });
+
+  // Neural AI autonomous decision endpoint
+  app.post("/api/neural/predict-action", async (req, res) => {
+    try {
+      const inputData = req.body;
+      const prediction = await neuralAI.predictAutonomousAction(inputData);
+      res.json(prediction);
+    } catch (error) {
+      console.error("Neural prediction error:", error);
+      res.status(500).json({ error: "Neural prediction failed" });
+    }
+  });
+
+  // Neural AI business insights endpoint
+  app.post("/api/neural/business-insights", async (req, res) => {
+    try {
+      const data = req.body;
+      const insights = await neuralAI.generateBusinessInsights(data);
+      res.json(insights);
+    } catch (error) {
+      console.error("Business insights generation error:", error);
+      res.status(500).json({ error: "Business insights generation failed" });
+    }
+  });
+
+  // Neural pattern adaptation endpoint
+  app.post("/api/neural/adapt-patterns/:operatorId", async (req, res) => {
+    try {
+      const operatorId = req.params.operatorId;
+      const performanceData = req.body;
+      const adaptations = await neuralAI.adaptNeuralPatterns(operatorId, performanceData);
+      res.json(adaptations);
+    } catch (error) {
+      console.error("Neural adaptation error:", error);
+      res.status(500).json({ error: "Neural adaptation failed" });
+    }
+  });
+
+  // Market analysis endpoint
+  app.get("/api/neural/market-analysis", async (req, res) => {
+    try {
+      const analysis = await neuralAI.analyzeMarketConditions();
+      res.json(analysis);
+    } catch (error) {
+      console.error("Market analysis error:", error);
+      res.status(500).json({ error: "Market analysis failed" });
     }
   });
 

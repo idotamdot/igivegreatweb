@@ -33,6 +33,7 @@ import {
   updateOperatorMetrics,
   createProject 
 } from "./neon";
+import { cryptoPaymentService, type CryptoPaymentRequest } from "./crypto-payments";
 
 // Stripe configuration - will be initialized when needed
 let stripe: Stripe | undefined;
@@ -1679,6 +1680,51 @@ export async function registerRoutes(app: Express): Promise<void> {
       
       await storage.deleteContentBlock(contentBlockId);
       res.status(200).json({ message: "Content block deleted successfully" });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ==================== CRYPTO PAYMENT ROUTES ====================
+  
+  // Create crypto payment address
+  app.post("/api/crypto/create-payment", async (req, res) => {
+    try {
+      const paymentRequest: CryptoPaymentRequest = req.body;
+      
+      // Validate required fields
+      if (!paymentRequest.amount || !paymentRequest.currency || !paymentRequest.clientEmail) {
+        return res.status(400).json({ message: "Missing required payment fields" });
+      }
+
+      const result = await cryptoPaymentService.createPaymentAddress(paymentRequest);
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Verify crypto payment
+  app.post("/api/crypto/verify-payment", async (req, res) => {
+    try {
+      const { paymentId, walletAddress } = req.body;
+      
+      if (!paymentId || !walletAddress) {
+        return res.status(400).json({ message: "Missing payment verification data" });
+      }
+
+      const isVerified = await cryptoPaymentService.verifyPayment(paymentId, walletAddress);
+      res.json({ verified: isVerified, paymentId });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Get crypto exchange rates
+  app.get("/api/crypto/exchange-rates", async (req, res) => {
+    try {
+      const rates = await cryptoPaymentService.getExchangeRates();
+      res.json(rates);
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }

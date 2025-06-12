@@ -15,8 +15,11 @@ import {
   Terminal,
   Code,
   Server,
-  CloudLightning
+  CloudLightning,
+  Bitcoin,
+  Coins
 } from 'lucide-react';
+import { useLocation } from 'wouter';
 
 interface QuantumService {
   id: string;
@@ -38,6 +41,7 @@ export default function QuantumServices() {
   const [services, setServices] = useState<QuantumService[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [networkActivity, setNetworkActivity] = useState(95);
+  const [, navigate] = useLocation();
 
   useEffect(() => {
     // Initialize revolutionary quantum services

@@ -50,6 +50,10 @@ export default function ServicesPage() {
   const handleSelectService = (service: Service) => {
     navigate(`/checkout?service=${service.id}&amount=${service.price}&name=${encodeURIComponent(service.name)}`);
   };
+
+  const handleCryptoPayment = (service: Service) => {
+    navigate(`/crypto-checkout?service=${service.id}&email=client@example.com`);
+  };
   
   if (isLoading) {
     return (

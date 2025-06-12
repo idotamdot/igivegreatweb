@@ -17,6 +17,7 @@ import Checkout from "@/pages/checkout";
 import GalleryPage from "@/pages/gallery-page";
 import ArtworkDetail from "@/pages/artwork-detail";
 import CheckoutOrder from "@/pages/checkout-order";
+import CryptoCheckout from "@/pages/crypto-checkout";
 import OrdersPage from "@/pages/orders-page";
 import NotFound from "@/pages/not-found";
 import { AuthProvider } from "@/hooks/use-auth";
@@ -39,6 +40,7 @@ function Router() {
       {/* Services and checkout routes */}
       <Route path="/services" component={ServicesPage} />
       <Route path="/checkout" component={Checkout} />
+      <Route path="/crypto-checkout" component={CryptoCheckout} />
       {/* Gallery and artwork routes */}
       <Route path="/gallery" component={GalleryPage} />
       <Route path="/artwork/:id" component={ArtworkDetail} />

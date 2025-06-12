@@ -139,6 +139,26 @@ export default function AdminDashboard() {
           <QuantumAnalytics />
         </TabsContent>
         
+        <TabsContent value="invoicing" className="mt-6">
+          <div className="space-y-6">
+            <div className="cyber-glass p-6 rounded-lg border border-orange-400/20 neon-border">
+              <h2 className="text-2xl font-bold text-orange-400 terminal-text mb-4 neon-glow">
+                ENTERPRISE_INVOICING_SYSTEM
+              </h2>
+              <p className="text-gray-300 terminal-text mb-6">
+                Advanced contract management for large enterprise clients with automated billing cycles, 
+                payment tracking, and comprehensive financial reporting.
+              </p>
+              <Link href="/invoicing">
+                <Button className="bg-orange-gradient neon-glow terminal-text hover-lift">
+                  <FileText className="w-4 h-4 mr-2" />
+                  ACCESS_INVOICING_DASHBOARD
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </TabsContent>
+        
         <TabsContent value="account" className="mt-6">
           <div className="space-y-6">
             <div className="cyber-glass p-6 rounded-xl border border-cyber-green/20">

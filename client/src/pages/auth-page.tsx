@@ -54,9 +54,9 @@ export default function AuthPage() {
   // Get the role from URL query parameter if present
   const params = new URLSearchParams(window.location.search);
   const roleParam = params.get('role');
-  const initialRole = ['admin', 'staff', 'client'].includes(roleParam || '') 
+  const initialRole = ['operator', 'client'].includes(roleParam || '') 
     ? roleParam as string 
-    : 'staff';
+    : 'operator';
   
   const [activeTab, setActiveTab] = useState<string>(`${initialRole}-login`);
   const [selectedRole, setSelectedRole] = useState<string>(initialRole);
@@ -96,10 +96,9 @@ export default function AuthPage() {
   // Helper function to determine which role is being used for login
   function getCurrentLoginRole() {
     switch(activeTab) {
-      case 'admin-login': return 'Admin';
-      case 'staff-login': return 'Staff';
+      case 'operator-login': return 'AI Operator';
       case 'client-login': return 'Client';
-      default: return 'Staff';
+      default: return 'Neural Web Labs';
     }
   }
 
@@ -256,7 +255,7 @@ export default function AuthPage() {
                       className="w-full"
                       disabled={loginMutation.isPending}
                     >
-                      {loginMutation.isPending ? "logging in..." : "login to client area"}
+                      {loginMutation.isPending ? "initializing quantum access..." : "access client portal"}
                     </GlowButton>
                   </form>
                 </Form>

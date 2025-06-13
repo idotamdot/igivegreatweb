@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -24,14 +25,43 @@ import {
 } from "lucide-react";
 
 export default function NeuralCommandCenter() {
-  const [systemStatus] = useState({
-    aiOperators: 6,
-    activeProjects: 12,
-    monthlyRevenue: 125000,
-    threatsBlocked: 3518,
-    clientSatisfaction: 98.7,
-    systemUptime: 99.97
+  // Fetch real AI operator data
+  const { data: aiOperators, isLoading: operatorsLoading } = useQuery({
+    queryKey: ['/neural/ai-operators'],
   });
+
+  // Fetch business metrics
+  const { data: businessMetrics, isLoading: metricsLoading } = useQuery({
+    queryKey: ['/neural/business-metrics'],
+  });
+
+  // Fetch client projects
+  const { data: clientProjects, isLoading: projectsLoading } = useQuery({
+    queryKey: ['/neural/client-projects'],
+  });
+
+  // Calculate dynamic system status from real data
+  const systemStatus = {
+    aiOperators: (aiOperators as any[])?.length || 0,
+    activeProjects: ((clientProjects as any[]) || []).filter((p: any) => p.status === 'active').length,
+    monthlyRevenue: ((businessMetrics as any[]) || [])[0]?.monthly_revenue || 0,
+    threatsBlocked: ((businessMetrics as any[]) || [])[0]?.threats_blocked || 0,
+    clientSatisfaction: ((businessMetrics as any[]) || [])[0]?.client_satisfaction || 0,
+    systemUptime: ((businessMetrics as any[]) || [])[0]?.system_uptime || 0
+  };
+
+  const isLoading = operatorsLoading || metricsLoading || projectsLoading;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-neon-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="terminal-text text-neon-blue">INITIALIZING_NEURAL_NETWORKS...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">

@@ -52,6 +52,8 @@ function Router() {
       <Route path="/orders" component={OrdersPage} />
       <Route path="/invoicing" component={InvoicingDashboard} />
       <Route path="/neural" component={NeuralCommandCenter} />
+      <Route path="/neural-command-center" component={NeuralCommandCenter} />
+      <Route path="/quantum-services" component={ServicesPage} />
       
       {/* Admin gallery management routes */}
       <Route path="/admin-gallery-management" component={AdminGalleryManagement} />

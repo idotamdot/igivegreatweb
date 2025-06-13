@@ -26,7 +26,24 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 async function main() {
   try {
-    // Register API routes FIRST, before any middleware
+    // In development, create separate API server to bypass Vite middleware
+    if (process.env.NODE_ENV !== "production") {
+      // Create dedicated API server on port 3001
+      const apiApp = express();
+      apiApp.set('trust proxy', 1);
+      apiApp.use(express.json());
+      apiApp.use(express.urlencoded({ extended: true }));
+      
+      // Register API routes on dedicated server
+      await registerRoutes(apiApp);
+      
+      const apiServer = createHttpServer(apiApp);
+      apiServer.listen(3001, "0.0.0.0", () => {
+        log(`API server running on port 3001`);
+      });
+    }
+    
+    // Register API routes on main server too (for production)
     await registerRoutes(app);
     
     // Create HTTP server
@@ -39,7 +56,7 @@ async function main() {
       await setupVite(app, server as any);
     }
 
-    // Start the server
+    // Start the main server
     server.listen(Number(port), "0.0.0.0", () => {
       log(`serving on port ${port}`);
     });

@@ -35,90 +35,45 @@ interface NeuralMetric {
 }
 
 export default function NeuralAIDashboard() {
-  const [aiOperators, setAiOperators] = useState<AIOperator[]>([]);
+  // Fetch real AI operator data from database
+  const { data: aiOperatorsData, isLoading } = useQuery({
+    queryKey: ['/neural/ai-operators'],
+  });
+
   const [neuralMetrics, setNeuralMetrics] = useState<NeuralMetric[]>([]);
   const [systemLoad, setSystemLoad] = useState(0);
-  const [totalTasks, setTotalTasks] = useState(0);
+
+  // Transform database data to component format
+  const aiOperators: AIOperator[] = ((aiOperatorsData as any[]) || []).map((op: any) => ({
+    id: op.id?.toString() || '',
+    name: op.name || '',
+    role: op.role || '',
+    status: op.status === 'active' ? 'active' : 'idle',
+    efficiency: parseFloat(op.efficiency_rating || '0') * 100,
+    tasksCompleted: op.tasks_completed || 0,
+    neuralNetworkType: op.neural_network_type || '',
+    currentTask: `Processing Neural Task ${op.id}`
+  }));
+
+  const totalTasks = aiOperators.reduce((sum, op) => sum + op.tasksCompleted, 0);
 
   useEffect(() => {
-    // Initialize AI operators
-    const operators: AIOperator[] = [
-      {
-        id: 'aria-7',
-        name: 'ARIA-7',
-        role: 'Quantum Code Generation',
-        status: 'active',
-        efficiency: 94.7,
-        tasksCompleted: 847,
-        neuralNetworkType: 'Transformer-GPT-Quantum',
-        currentTask: 'Building Quantum Trading Platform'
-      },
-      {
-        id: 'cipher-9',
-        name: 'CIPHER-9',
-        role: 'Cybersecurity Intelligence',
-        status: 'processing',
-        efficiency: 98.2,
-        tasksCompleted: 1247,
-        neuralNetworkType: 'Adversarial Defense Network',
-        currentTask: 'Threat Vector Analysis'
-      },
-      {
-        id: 'nexus-3',
-        name: 'NEXUS-3',
-        role: 'Data Analytics & AI/ML',
-        status: 'active',
-        efficiency: 91.8,
-        tasksCompleted: 623,
-        neuralNetworkType: 'Recurrent Neural Network',
-        currentTask: 'Biotech Data Processing'
-      },
-      {
-        id: 'vortex-1',
-        name: 'VORTEX-1',
-        role: 'High-Performance Computing',
-        status: 'active',
-        efficiency: 96.4,
-        tasksCompleted: 456,
-        neuralNetworkType: 'Convolutional Neural Network',
-        currentTask: 'Aerospace Simulation Engine'
-      },
-      {
-        id: 'echo-5',
-        name: 'ECHO-5',
-        role: 'Client Acquisition & CRM',
-        status: 'processing',
-        efficiency: 89.3,
-        tasksCompleted: 734,
-        neuralNetworkType: 'Graph Neural Network',
-        currentTask: 'Lead Qualification Analysis'
-      },
-      {
-        id: 'pulse-4',
-        name: 'PULSE-4',
-        role: 'Financial Optimization',
-        status: 'idle',
-        efficiency: 92.7,
-        tasksCompleted: 512,
-        neuralNetworkType: 'Long Short-Term Memory',
-        currentTask: 'Market Sentiment Analysis'
-      }
-    ];
+    if (!isLoading && aiOperators.length > 0) {
+      // Generate neural metrics based on real AI operator data
+      const avgEfficiency = aiOperators.reduce((sum, op) => sum + op.efficiency, 0) / aiOperators.length;
+      const metrics: NeuralMetric[] = [
+        { name: 'Neural Efficiency', value: avgEfficiency, target: 95.0, trend: 'up', status: 'optimal' },
+        { name: 'Task Completion Rate', value: 98.7, target: 99.0, trend: 'up', status: 'optimal' },
+        { name: 'System Uptime', value: 99.97, target: 99.99, trend: 'stable', status: 'optimal' },
+        { name: 'Learning Acceleration', value: 87.4, target: 90.0, trend: 'up', status: 'warning' },
+        { name: 'Resource Optimization', value: 96.8, target: 97.0, trend: 'up', status: 'optimal' },
+        { name: 'Error Rate', value: 0.03, target: 0.01, trend: 'down', status: 'warning' }
+      ];
 
-    const metrics: NeuralMetric[] = [
-      { name: 'Neural Efficiency', value: 94.2, target: 95.0, trend: 'up', status: 'optimal' },
-      { name: 'Task Completion Rate', value: 98.7, target: 99.0, trend: 'up', status: 'optimal' },
-      { name: 'System Uptime', value: 99.97, target: 99.99, trend: 'stable', status: 'optimal' },
-      { name: 'Learning Acceleration', value: 87.4, target: 90.0, trend: 'up', status: 'warning' },
-      { name: 'Resource Optimization', value: 96.8, target: 97.0, trend: 'up', status: 'optimal' },
-      { name: 'Error Rate', value: 0.03, target: 0.01, trend: 'down', status: 'warning' }
-    ];
-
-    setAiOperators(operators);
-    setNeuralMetrics(metrics);
-    setSystemLoad(73.4);
-    setTotalTasks(operators.reduce((sum, op) => sum + op.tasksCompleted, 0));
-  }, []);
+      setNeuralMetrics(metrics);
+      setSystemLoad(Math.min(95, avgEfficiency + Math.random() * 10));
+    }
+  }, [isLoading, aiOperators]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -158,6 +113,17 @@ export default function NeuralAIDashboard() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center p-8">
+          <div className="w-12 h-12 border-4 border-neon-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="terminal-text text-neon-blue">LOADING_NEURAL_OPERATORS...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Neural System Overview */}
@@ -169,7 +135,7 @@ export default function NeuralAIDashboard() {
               <Network className="w-5 h-5 text-neon-blue" />
             </div>
             <p className="terminal-text text-2xl font-bold text-neon-blue mb-2">
-              {systemLoad}%
+              {systemLoad.toFixed(1)}%
             </p>
             <Progress value={systemLoad} className="h-2" />
           </CardContent>
@@ -182,7 +148,7 @@ export default function NeuralAIDashboard() {
               <Brain className="w-5 h-5 text-cyber-green" />
             </div>
             <p className="terminal-text text-2xl font-bold text-cyber-green">
-              {aiOperators.filter(op => op.status === 'active' || op.status === 'processing').length}/6
+              {aiOperators.filter(op => op.status === 'active').length}/{aiOperators.length}
             </p>
           </CardContent>
         </Card>
@@ -190,7 +156,7 @@ export default function NeuralAIDashboard() {
         <Card className="card-hologram">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="terminal-text text-gray-400 text-sm">TASKS_COMPLETED</h3>
+              <h3 className="terminal-text text-gray-400 text-sm">TOTAL_TASKS</h3>
               <Zap className="w-5 h-5 text-hologram" />
             </div>
             <p className="terminal-text text-2xl font-bold text-hologram">
@@ -201,107 +167,99 @@ export default function NeuralAIDashboard() {
       </div>
 
       {/* AI Operators Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {aiOperators.map((operator) => (
           <Card key={operator.id} className="card-hologram">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="terminal-text text-white text-lg">
-                  {operator.name}
-                </CardTitle>
-                <Badge className={`${getStatusColor(operator.status)} terminal-text flex items-center space-x-1`}>
-                  {getStatusIcon(operator.status)}
-                  <span>{operator.status.toUpperCase()}</span>
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-r from-neon-blue to-cyber-green rounded-lg flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="terminal-text text-white text-lg">
+                      {operator.name}
+                    </CardTitle>
+                    <p className="terminal-text text-gray-400 text-sm">
+                      {operator.role}
+                    </p>
+                  </div>
+                </div>
+                <Badge className={`${getStatusColor(operator.status)} terminal-text`}>
+                  <div className="flex items-center space-x-1">
+                    {getStatusIcon(operator.status)}
+                    <span>{operator.status.toUpperCase()}</span>
+                  </div>
                 </Badge>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="terminal-text text-gray-400 text-sm">ROLE</p>
-                  <p className="terminal-text text-sm text-gray-300">{operator.role}</p>
+                  <p className="terminal-text text-gray-400 text-xs">EFFICIENCY</p>
+                  <p className="terminal-text text-lg font-bold text-neon-blue">
+                    {operator.efficiency.toFixed(1)}%
+                  </p>
+                  <Progress value={operator.efficiency} className="h-1 mt-1" />
                 </div>
-                
                 <div>
-                  <p className="terminal-text text-gray-400 text-sm">NEURAL_NETWORK</p>
-                  <p className="terminal-text text-xs text-neon-blue">{operator.neuralNetworkType}</p>
+                  <p className="terminal-text text-gray-400 text-xs">TASKS_COMPLETED</p>
+                  <p className="terminal-text text-lg font-bold text-cyber-green">
+                    {operator.tasksCompleted.toLocaleString()}
+                  </p>
                 </div>
-                
-                <div>
-                  <p className="terminal-text text-gray-400 text-sm">CURRENT_TASK</p>
-                  <p className="terminal-text text-xs text-gray-300">{operator.currentTask}</p>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="terminal-text text-gray-400 text-sm">EFFICIENCY</p>
-                    <p className="terminal-text text-lg font-bold text-cyber-green">
-                      {operator.efficiency}%
-                    </p>
-                  </div>
-                  <div>
-                    <p className="terminal-text text-gray-400 text-sm">TASKS</p>
-                    <p className="terminal-text text-lg font-bold text-hologram">
-                      {operator.tasksCompleted}
-                    </p>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm terminal-text text-gray-400 mb-1">
-                    <span>Performance</span>
-                    <span>{operator.efficiency}%</span>
-                  </div>
-                  <Progress value={operator.efficiency} className="h-2" />
-                </div>
+              </div>
+              
+              <div>
+                <p className="terminal-text text-gray-400 text-xs mb-1">NEURAL_NETWORK</p>
+                <p className="terminal-text text-hologram text-sm">
+                  {operator.neuralNetworkType}
+                </p>
+              </div>
+              
+              <div>
+                <p className="terminal-text text-gray-400 text-xs mb-1">CURRENT_TASK</p>
+                <p className="terminal-text text-white text-sm">
+                  {operator.currentTask}
+                </p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Neural Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {neuralMetrics.map((metric, index) => (
-          <Card key={index} className="card-hologram">
-            <CardContent className="p-6">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <p className="terminal-text text-gray-400 text-sm">
-                    {metric.name.toUpperCase()}
-                  </p>
-                  <div className="flex items-center space-x-1">
-                    {getTrendIcon(metric.trend)}
-                    <span className={`terminal-text text-xs ${getMetricStatusColor(metric.status)}`}>
-                      {metric.status.toUpperCase()}
-                    </span>
-                  </div>
+      {/* Neural Metrics Dashboard */}
+      <Card className="card-hologram">
+        <CardHeader>
+          <CardTitle className="terminal-text text-white">NEURAL_METRICS_MATRIX</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {neuralMetrics.map((metric, index) => (
+              <div key={index} className="bg-black/30 p-4 rounded-lg border border-gray-700">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="terminal-text text-gray-400 text-xs">
+                    {metric.name.toUpperCase().replace(/ /g, '_')}
+                  </h4>
+                  {getTrendIcon(metric.trend)}
                 </div>
-                
-                <div className="flex items-center justify-between">
-                  <p className="terminal-text text-2xl font-bold text-cyber-green">
-                    {metric.name === 'Error Rate' ? `${metric.value}%` : `${metric.value}%`}
-                  </p>
+                <div className="flex items-center justify-between mb-2">
+                  <span className={`terminal-text text-xl font-bold ${getMetricStatusColor(metric.status)}`}>
+                    {metric.value.toFixed(1)}{metric.name === 'Error Rate' ? '' : '%'}
+                  </span>
+                  <span className="terminal-text text-gray-500 text-sm">
+                    /{metric.target}{metric.name === 'Error Rate' ? '' : '%'}
+                  </span>
                 </div>
-                
-                <div>
-                  <div className="flex justify-between text-sm terminal-text text-gray-400 mb-1">
-                    <span>Target</span>
-                    <span>{metric.name === 'Error Rate' ? `${metric.target}%` : `${metric.target}%`}</span>
-                  </div>
-                  <Progress 
-                    value={metric.name === 'Error Rate' ? 
-                      Math.max(0, 100 - (metric.value / metric.target) * 100) : 
-                      (metric.value / metric.target) * 100
-                    } 
-                    className="h-2" 
-                  />
-                </div>
+                <Progress 
+                  value={metric.name === 'Error Rate' ? (1 - metric.value) * 100 : (metric.value / metric.target) * 100} 
+                  className="h-1" 
+                />
               </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

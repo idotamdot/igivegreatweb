@@ -21,6 +21,7 @@ import CryptoCheckout from "@/pages/crypto-checkout";
 import OrdersPage from "@/pages/orders-page";
 import InvoicingDashboard from "@/pages/invoicing-dashboard";
 import NotFound from "@/pages/not-found";
+import NeuralCommandCenter from "@/pages/neural-command-center";
 import { AuthProvider } from "@/hooks/use-auth";
 // Temporarily commenting out protected route for development
 // import { ProtectedRoute } from "@/lib/protected-route";
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/checkout/:id" component={CheckoutOrder} />
       <Route path="/orders" component={OrdersPage} />
       <Route path="/invoicing" component={InvoicingDashboard} />
+      <Route path="/neural" component={NeuralCommandCenter} />
       
       {/* Admin gallery management routes */}
       <Route path="/admin-gallery-management" component={AdminGalleryManagement} />

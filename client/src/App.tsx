@@ -26,6 +26,8 @@ import { AuthProvider } from "@/hooks/use-auth";
 // Temporarily commenting out protected route for development
 // import { ProtectedRoute } from "@/lib/protected-route";
 import { ThemeProvider } from "@/components/theme-provider";
+import OnboardingTutorial from "@/components/OnboardingTutorial";
+import { useOnboarding } from "@/hooks/useOnboarding";
 
 function Router() {
   return (

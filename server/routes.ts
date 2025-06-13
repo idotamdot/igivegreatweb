@@ -79,8 +79,8 @@ export async function registerRoutes(app: Express): Promise<void> {
     console.log("Database already initialized or error:", error);
   }
 
-  // Neural Web Labs API endpoints
-  app.get("/api/neural/ai-operators", async (req, res) => {
+  // Neural Web Labs API endpoints - both /api/neural/* and /api/* for compatibility
+  app.get(["/api/neural/ai-operators", "/api/ai-operators"], async (req, res) => {
     try {
       const operators = await getAIOperators();
       res.json(operators);
@@ -90,7 +90,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get("/api/neural/business-metrics", async (req, res) => {
+  app.get(["/api/neural/business-metrics", "/api/business-metrics"], async (req, res) => {
     try {
       const metrics = await getBusinessMetrics();
       res.json(metrics);
@@ -100,7 +100,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get("/api/neural/services", async (req, res) => {
+  app.get(["/api/neural/services", "/api/services"], async (req, res) => {
     try {
       const services = await getServices();
       res.json(services);
@@ -110,7 +110,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get("/api/neural/client-projects", async (req, res) => {
+  app.get(["/api/neural/client-projects", "/api/client-projects", "/api/projects"], async (req, res) => {
     try {
       const projects = await getClientProjects();
       res.json(projects);

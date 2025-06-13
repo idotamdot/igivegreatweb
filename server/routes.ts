@@ -1,24 +1,19 @@
 import type { Express } from "express";
 import { storage } from "./storage";
-import { setupAuth } from "./auth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { 
-  insertConnectionSchema, 
-  insertMenuLinkSchema, 
-  insertArtworkSchema,
-  insertPrintSizeSchema,
-  insertArtworkPrintSizeSchema,
-  insertPrintOrderSchema,
-  insertContentBlockSchema,
-  insertDashboardWidgetSchema,
-  insertDashboardLayoutSchema,
-  type InsertMenuLink,
-  type InsertArtwork,
-  type InsertPrintSize,
-  type InsertArtworkPrintSize,
-  type InsertPrintOrder,
-  type InsertContentBlock,
-  type InsertDashboardWidget,
-  type InsertDashboardLayout,
+  insertAIOperatorSchema,
+  insertProjectSchema,
+  insertEnterpriseSchema,
+  insertInvoiceSchema,
+  insertInvoiceLineItemSchema,
+  insertPaymentPlanSchema,
+  type InsertAIOperator,
+  type InsertProject,
+  type InsertEnterprise,
+  type InsertInvoice,
+  type InsertInvoiceLineItem,
+  type InsertPaymentPlan,
 } from "@shared/schema";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";

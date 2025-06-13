@@ -123,11 +123,10 @@ export default function AuthPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Tabs defaultValue="staff-login" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3 mb-4">
-                <TabsTrigger value="admin-login">admin</TabsTrigger>
-                <TabsTrigger value="staff-login">staff</TabsTrigger>
-                <TabsTrigger value="client-login">client</TabsTrigger>
+            <Tabs defaultValue="operator-login" value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="operator-login">AI Operator</TabsTrigger>
+                <TabsTrigger value="client-login">Client</TabsTrigger>
               </TabsList>
               
               <div className="mb-6">
@@ -149,15 +148,14 @@ export default function AuthPage() {
                 )}
               </div>
               
-              {/* Admin Login Tab */}
-              <TabsContent value="admin-login">
+              {/* AI Operator Login Tab */}
+              <TabsContent value="operator-login">
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <div className="bg-gray-900 rounded-md p-4 mb-4">
-                      <p className="text-amber-400 mb-2">admin account</p>
+                      <p className="text-cyber-green mb-2">AI Operator Access</p>
                       <p className="text-gray-400 text-sm">
-                        The admin account has full access to all system features including approving menu links,
-                        managing staff accounts, and configuring site settings.
+                        Quantum neural network operators with full access to autonomous business systems, revenue optimization, and neural command center.
                       </p>
                     </div>
                     <FormField
@@ -200,76 +198,22 @@ export default function AuthPage() {
                       className="w-full"
                       disabled={loginMutation.isPending}
                     >
-                      {loginMutation.isPending ? "logging in..." : "login to admin"}
+                      {loginMutation.isPending ? "accessing neural networks..." : "access operator portal"}
                     </GlowButton>
                   </form>
                 </Form>
               </TabsContent>
               
-              {/* Staff Login Tab */}
-              <TabsContent value="staff-login">
-                <Form {...loginForm}>
-                  <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-                    <div className="bg-gray-900 rounded-md p-4 mb-4">
-                      <p className="text-blue-400 mb-2">staff account</p>
-                      <p className="text-gray-400 text-sm">
-                        Staff accounts can create and manage menu links, content, and submissions that require admin approval.
-                      </p>
-                    </div>
-                    <FormField
-                      control={loginForm.control}
-                      name="username"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>username</FormLabel>
-                          <FormControl>
-                            <Input 
-                              placeholder="enter your username" 
-                              className="bg-gray-900 text-white border-gray-700" 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={loginForm.control}
-                      name="password"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>password</FormLabel>
-                          <FormControl>
-                            <Input 
-                              type="password" 
-                              placeholder="enter your password" 
-                              className="bg-gray-900 text-white border-gray-700" 
-                              {...field} 
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <GlowButton 
-                      type="submit" 
-                      className="w-full"
-                      disabled={loginMutation.isPending}
-                    >
-                      {loginMutation.isPending ? "logging in..." : "login to staff portal"}
-                    </GlowButton>
-                  </form>
-                </Form>
-              </TabsContent>
+
               
               {/* Client Login Tab */}
               <TabsContent value="client-login">
                 <Form {...loginForm}>
                   <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                     <div className="bg-gray-900 rounded-md p-4 mb-4">
-                      <p className="text-green-400 mb-2">client account</p>
+                      <p className="text-blue-400 mb-2">Client Portal</p>
                       <p className="text-gray-400 text-sm">
-                        Client accounts can access their projects, view files, check order status, and communicate with staff.
+                        Access your autonomous projects, track quantum revenue optimization, and monitor AI operator progress in real-time.
                       </p>
                     </div>
                     <FormField

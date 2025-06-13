@@ -17,6 +17,26 @@ interface ServiceDetails {
 }
 
 const serviceDetails: Record<string, ServiceDetails> = {
+  'quantum-neural-networks': {
+    id: 'quantum-neural-networks',
+    name: 'Quantum Neural Networks',
+    price: 2999,
+    description: 'Advanced quantum-enhanced neural network architectures for next-generation AI applications',
+    features: [
+      'Quantum entanglement-based learning',
+      'Superposition state processing',
+      'Quantum error correction',
+      'Exponential speedup algorithms',
+      'Quantum-classical hybrid models'
+    ],
+    techSpecs: [
+      'Qiskit & Cirq integration',
+      'IBM Quantum & Google Quantum AI',
+      'Quantum volume optimization',
+      'NISQ device compatibility',
+      'Real-time quantum monitoring'
+    ]
+  },
   'autonomous-ai': {
     id: 'autonomous-ai',
     name: 'Autonomous AI Development',
@@ -109,12 +129,44 @@ export default function CryptoCheckout() {
     const params = new URLSearchParams(location.split('?')[1] || '');
     const service = params.get('service');
     const email = params.get('email');
+    const amount = params.get('amount');
+    const name = params.get('name');
     
-    if (service && serviceDetails[service]) {
-      setServiceId(service);
+    if (service) {
+      // If service exists in our details, use it
+      if (serviceDetails[service]) {
+        setServiceId(service);
+      } else {
+        // Create dynamic service from URL params
+        const dynamicService: ServiceDetails = {
+          id: service,
+          name: name || 'Custom Neural Service',
+          price: amount ? parseInt(amount) : 999,
+          description: 'Advanced neural network service deployment',
+          features: [
+            'Quantum-enhanced processing',
+            'Real-time neural optimization',
+            'Autonomous system management',
+            'Advanced AI integration',
+            'Secure deployment protocol'
+          ],
+          techSpecs: [
+            'Neural network architecture',
+            'Quantum processing integration',
+            'Distributed computing',
+            'Real-time monitoring',
+            'Scalable infrastructure'
+          ]
+        };
+        serviceDetails[service] = dynamicService;
+        setServiceId(service);
+      }
     }
+    
     if (email) {
       setClientEmail(email);
+    } else {
+      setClientEmail('neural.client@quantumlabs.ai');
     }
   }, [location]);
 

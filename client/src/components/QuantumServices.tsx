@@ -305,7 +305,7 @@ export default function QuantumServices() {
                   <div className="flex gap-2">
                     <Button 
                       className="flex-1 bg-neon-gradient neon-glow terminal-text"
-                      onClick={() => navigate(`/checkout?service=${service.id}&amount=${service.pricing.pro}&name=${encodeURIComponent(service.name)}`)}
+                      onClick={() => navigate(`/crypto-checkout?service=${service.id}&amount=${service.pricing.pro}&name=${encodeURIComponent(service.name)}`)}
                     >
                       <Zap className="w-4 h-4 mr-2" />
                       DEPLOY_SERVICE

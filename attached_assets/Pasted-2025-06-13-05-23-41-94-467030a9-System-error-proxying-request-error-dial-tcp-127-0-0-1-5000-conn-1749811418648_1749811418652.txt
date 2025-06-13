@@ -1,0 +1,97 @@
+2025-06-13 05:23:41.94
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:41.97
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:42.17
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:42.64
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:43.50
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:43.97
+467030a9
+User
+> rest-express@1.0.0 start
+2025-06-13 05:23:43.97
+467030a9
+User
+> NODE_ENV=production node dist/index.js
+2025-06-13 05:23:44.58
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:46.07
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:46.14
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:47.25
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:47.64
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:48.19
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:48.62
+467030a9
+User
+Neural AI Service initialized with workload-identity authentication
+2025-06-13 05:23:48.63
+467030a9
+User
+Warning: connect.session() MemoryStore is not
+2025-06-13 05:23:48.63
+467030a9
+User
+designed for a production environment, as it will leak
+2025-06-13 05:23:48.63
+467030a9
+User
+memory, and will not scale past a single process.
+2025-06-13 05:23:49.26
+467030a9
+System
+error proxying request error=dial tcp 127.0.0.1:5000: connect: connection refused
+2025-06-13 05:23:49.43
+467030a9
+User
+Database tables created successfully
+2025-06-13 05:23:49.82
+467030a9
+User
+Database seeded with initial data
+2025-06-13 05:23:49.82
+467030a9
+User
+Neural Web Labs database initialized successfully
+2025-06-13 05:23:49.83
+467030a9
+User
+Warning: connect.session() MemoryStore is not
+2025-06-13 05:23:49.83
+467030a9
+User
+designed for a production environment, as it will leak
+2025-06-13 05:23:49.83
+467030a9
+User
+memory, and will not scale past a single process.
+2025-06-13 05:23:49.92

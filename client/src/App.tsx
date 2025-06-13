@@ -22,6 +22,7 @@ import OrdersPage from "@/pages/orders-page";
 import InvoicingDashboard from "@/pages/invoicing-dashboard";
 import NotFound from "@/pages/not-found";
 import NeuralCommandCenter from "@/pages/neural-command-center";
+import Login from "@/pages/Login";
 import { AuthProvider } from "@/hooks/use-auth";
 // Temporarily commenting out protected route for development
 // import { ProtectedRoute } from "@/lib/protected-route";
@@ -33,6 +34,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={HomePage} />
+      <Route path="/login" component={Login} />
       <Route path="/auth" component={AuthPage} />
       {/* Temporarily bypassing authentication for development */}
       <Route path="/admin" component={AdminDashboard} />

@@ -137,15 +137,15 @@ export default function CryptoCheckout() {
       if (serviceDetails[service]) {
         setServiceId(service);
       } else {
-        // Create dynamic service from URL params
+        // Create dynamic service from URL params or database
         const dynamicService: ServiceDetails = {
           id: service,
-          name: name || 'Custom Neural Service',
+          name: name || service.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Custom Neural Service',
           price: amount ? parseInt(amount) : 999,
-          description: 'Advanced neural network service deployment',
+          description: `Advanced ${name || service} service with neural network integration`,
           features: [
             'Quantum-enhanced processing',
-            'Real-time neural optimization',
+            'Real-time neural optimization', 
             'Autonomous system management',
             'Advanced AI integration',
             'Secure deployment protocol'
@@ -158,6 +158,22 @@ export default function CryptoCheckout() {
             'Scalable infrastructure'
           ]
         };
+        
+        // Map common service types to better descriptions
+        if (service.includes('ai-web-dev') || service.includes('web-development')) {
+          dynamicService.name = 'AI Autonomous Web Development';
+          dynamicService.description = 'Neural networks design, code, and deploy your websites completely autonomously using advanced AI agents.';
+          dynamicService.price = amount ? parseInt(amount) : 7999;
+        } else if (service.includes('quantum-hosting') || service.includes('hosting')) {
+          dynamicService.name = 'Quantum Cloud Infrastructure';
+          dynamicService.description = 'Quantum-encrypted hosting with neural load balancing and predictive scaling.';
+          dynamicService.price = amount ? parseInt(amount) : 799;
+        } else if (service.includes('cybersecurity') || service.includes('security')) {
+          dynamicService.name = 'Neural Cybersecurity Mesh';
+          dynamicService.description = 'AI-powered threat detection with quantum-level security protocols.';
+          dynamicService.price = amount ? parseInt(amount) : 1999;
+        }
+        
         serviceDetails[service] = dynamicService;
         setServiceId(service);
       }

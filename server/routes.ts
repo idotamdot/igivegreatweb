@@ -1779,7 +1779,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   // ==================== CRYPTO PAYMENT ROUTES ====================
   
   // Create crypto payment address
-  app.post("/api/crypto/create-payment", async (req, res) => {
+  app.post(["/api/crypto/create-payment", "/crypto/payment"], async (req, res) => {
     try {
       const paymentRequest: CryptoPaymentRequest = req.body;
       

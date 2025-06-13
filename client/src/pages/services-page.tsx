@@ -68,6 +68,47 @@ export default function ServicesPage() {
       </div>
     );
   }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-cyber-gradient cyber-grid">
+        <CyberMatrix />
+        <NeuralNavigation />
+        <div className="container mx-auto py-10 px-4 sm:px-6 min-h-screen">
+          <div className="mb-6 pt-10">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-1 cyber-glass border-cyber-green text-cyber-green hover:bg-cyber-green/20 terminal-text neon-glow" 
+              onClick={() => navigate("/")}
+            >
+              <ArrowLeft className="h-4 w-4" /> &lt;&lt; NEURAL_CORE
+            </Button>
+          </div>
+          
+          <div className="text-center">
+            <div className="cyber-glass p-8 rounded-3xl neon-border border-red-500/50">
+              <h1 className="text-3xl font-bold mb-4 text-red-400 terminal-text">
+                NEURAL_SERVICES_ERROR
+              </h1>
+              <div className="text-cyber-green mb-6 terminal-text">
+                &gt;&gt; SERVICE_DATABASE_CONNECTION: FAILED
+              </div>
+              <p className="text-gray-300 terminal-text mb-6">
+                Neural service matrix temporarily offline. Using quantum backup systems...
+              </p>
+              <Button 
+                onClick={() => window.location.reload()}
+                className="bg-red-500 hover:bg-red-600 text-white terminal-text"
+              >
+                RECONNECT_NEURAL_MATRIX
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="min-h-screen bg-cyber-gradient cyber-grid">

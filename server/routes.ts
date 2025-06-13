@@ -724,4 +724,94 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ message: "Failed to fetch infrastructure data" });
     }
   });
+
+  app.get("/api/services", async (req, res) => {
+    try {
+      const services = [
+        {
+          id: "neural-web-development",
+          name: "Neural Web Development",
+          description: "AI-powered web application development with quantum optimization and neural network integration",
+          price: 15000,
+          features: [
+            "Autonomous code generation",
+            "Real-time performance optimization",
+            "Neural security protocols",
+            "Quantum database integration",
+            "AI-driven testing automation"
+          ]
+        },
+        {
+          id: "blockchain-defi-platform",
+          name: "Blockchain DeFi Platform",
+          description: "Decentralized finance platform with smart contracts and autonomous trading algorithms",
+          price: 25000,
+          features: [
+            "Smart contract development",
+            "Automated trading algorithms",
+            "Multi-chain compatibility",
+            "Security audit integration",
+            "Yield optimization protocols"
+          ]
+        },
+        {
+          id: "ai-mobile-application",
+          name: "AI Mobile Application",
+          description: "Intelligent mobile app with machine learning capabilities and predictive analytics",
+          price: 18000,
+          features: [
+            "Cross-platform development",
+            "AI-powered user experience",
+            "Predictive analytics engine",
+            "Real-time data processing",
+            "Biometric authentication"
+          ]
+        },
+        {
+          id: "quantum-infrastructure",
+          name: "Quantum Infrastructure",
+          description: "Next-generation cloud infrastructure with quantum computing integration",
+          price: 35000,
+          features: [
+            "Quantum-enhanced processing",
+            "Auto-scaling architecture",
+            "Advanced security protocols",
+            "Real-time monitoring",
+            "Global edge deployment"
+          ]
+        },
+        {
+          id: "neural-analytics-dashboard",
+          name: "Neural Analytics Dashboard",
+          description: "Advanced business intelligence platform with AI-driven insights and predictions",
+          price: 22000,
+          features: [
+            "Real-time data visualization",
+            "Predictive modeling",
+            "Automated reporting",
+            "Custom AI algorithms",
+            "Multi-source integration"
+          ]
+        },
+        {
+          id: "cybersecurity-sentinel",
+          name: "Cybersecurity Sentinel",
+          description: "AI-powered cybersecurity system with threat detection and autonomous response",
+          price: 28000,
+          features: [
+            "Threat detection AI",
+            "Autonomous response system",
+            "Neural behavior analysis",
+            "Real-time monitoring",
+            "Compliance automation"
+          ]
+        }
+      ];
+
+      res.json(services);
+    } catch (error) {
+      console.error("Error fetching services:", error);
+      res.status(500).json({ message: "Failed to fetch services" });
+    }
+  });
 }

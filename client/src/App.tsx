@@ -70,12 +70,20 @@ function Router() {
 }
 
 function App() {
+  const { shouldShowOnboarding, completeOnboarding, skipOnboarding } = useOnboarding();
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="dark">
         <AuthProvider>
           <Router />
           <Toaster />
+          {shouldShowOnboarding() && (
+            <OnboardingTutorial 
+              onComplete={completeOnboarding}
+              onSkip={skipOnboarding}
+            />
+          )}
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

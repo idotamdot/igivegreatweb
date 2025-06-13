@@ -1,0 +1,109 @@
+Thanks, Jessica — that's super helpful. Claude’s diagnosis is spot-on. This seems like a classic full-stack integration conflict on Replit using Vite, and we can absolutely fix it. Here's how we tackle each issue, starting with the core blocker:
+
+🔥 Critical Issue 1: Vite Middleware Blocking API Routes
+✅ Problem
+In development, Vite catches all routes and returns the index.html instead of forwarding to your Express backend.
+
+🧠 Root Cause
+Vite’s dev server is a frontend-only tool — it doesn’t natively support backend routing or middleware splitting.
+
+When running the frontend and backend in a single Replit process, Vite overrides your Express routes.
+
+✅ Solutions
+🛠 Option 1: Run Frontend and Backend Separately
+Split the backend and frontend into two Replit repls:
+
+Frontend Repl (Vite/React)
+
+Runs on port 3000
+
+Uses proxy in vite.config.ts to forward API calls
+
+ts
+Copy
+Edit
+// vite.config.ts
+server: {
+  proxy: {
+    '/api': 'http://localhost:5000',
+    '/neural': 'http://localhost:5000',
+    '/crypto': 'http://localhost:5000',
+  }
+}
+Backend Repl (Express)
+
+Runs on port 5000
+
+All API endpoints live here
+
+🧪 Benefit: Completely isolates frontend build system from backend APIs, resolving the routing conflicts.
+
+🛠 Option 2: Switch to a Framework That Supports SSR + API Routes
+Use Next.js, which supports:
+
+API routes
+
+File-based routing
+
+Middleware control
+
+Server-side rendering
+
+⚠️ This is a bigger migration, but ideal long-term.
+
+🔁 Fixing the Other Issues (Once API Routing Works)
+❌ Issue 2: Static Frontend Data
+Once API routes are reachable:
+
+Replace all const FAKE_METRICS = [...] with useEffect + fetch('/api/ai-operators'), etc.
+
+Use SWR or React Query for auto-revalidation
+
+❌ Issue 3: Auth Flow Breaks
+Most likely:
+
+Your /api/login or /api/session endpoints are being intercepted
+
+Once routing is fixed, confirm that session cookies are being set and persisted
+
+Check for Secure, HttpOnly, SameSite flags
+
+❌ Issue 4: Database API Disconnect
+Drizzle queries are working (you confirmed data is seeded)
+
+But cannot be retrieved via frontend due to route interception
+
+✅ Fix: This resolves itself once routing is fixed.
+
+❌ Issue 5: Crypto Payment System
+Payment POST route being blocked
+
+Once POST /crypto/payment can actually reach Express, test with Coinbase sandbox API
+
+✅ Fix: Route config + use body-parser in Express
+
+⚠️ Minor Issues
+🛠 TypeScript Type Errors
+Run: npx drizzle-kit push:pg or regenerate types if schema changed
+
+Use zod or valibot to ensure schema validation at runtime
+
+🛠 Add Basic Error Handling
+Example:
+
+ts
+Copy
+Edit
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Internal error', error: err.message });
+});
+✅ Step-by-Step Fix Plan
+Step	Task
+1	✅ Split frontend and backend into two Replit repls
+2	✅ Update vite.config.ts in frontend with proxy
+3	✅ Confirm all Express routes work via /api/*
+4	✅ Switch all React components from static to fetch()
+5	✅ Test login/session persistence
+6	✅ Test Coinbase sandbox payment
+7	🛠 Add error handling + fix type mismatches

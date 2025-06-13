@@ -26,18 +26,18 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 async function main() {
   try {
-    // Create HTTP server first
+    // Register API routes FIRST, before any middleware
+    await registerRoutes(app);
+    
+    // Create HTTP server
     const server = createHttpServer(app);
     
-    // Setup Vite in development or serve static files in production BEFORE API routes
+    // Setup Vite in development or serve static files in production
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
     } else {
       await setupVite(app, server as any);
     }
-    
-    // Register API routes AFTER Vite setup so they take precedence
-    await registerRoutes(app);
 
     // Start the server
     server.listen(Number(port), "0.0.0.0", () => {

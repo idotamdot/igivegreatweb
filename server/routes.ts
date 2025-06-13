@@ -79,8 +79,46 @@ export async function registerRoutes(app: Express): Promise<void> {
     console.log("Database already initialized or error:", error);
   }
 
-  // Neural Web Labs API endpoints - both /api/neural/* and /api/* for compatibility
-  app.get(["/api/neural/ai-operators", "/api/ai-operators"], async (req, res) => {
+  // Comprehensive API status endpoint
+  app.get("/api-status", async (req, res) => {
+    try {
+      const endpoints = [
+        { path: "/neural/ai-operators", status: "active", description: "AI Operators data" },
+        { path: "/neural/business-metrics", status: "active", description: "Business metrics" },
+        { path: "/neural/services", status: "active", description: "Available services" },
+        { path: "/neural/client-projects", status: "active", description: "Client projects" },
+        { path: "/crypto/payment", status: "active", description: "Crypto payment processing" },
+        { path: "/crypto/rates", status: "active", description: "Exchange rates" }
+      ];
+
+      // Test database connection
+      let dbStatus = "unknown";
+      try {
+        const operators = await getAIOperators();
+        dbStatus = operators ? "connected" : "error";
+      } catch (error) {
+        dbStatus = "disconnected";
+      }
+
+      res.json({
+        status: "Neural Web Labs API Online",
+        timestamp: new Date().toISOString(),
+        database: dbStatus,
+        endpoints: endpoints,
+        version: "1.0.0",
+        environment: process.env.NODE_ENV || "development"
+      });
+    } catch (error) {
+      res.status(500).json({ 
+        status: "API Error", 
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+
+  // Neural Web Labs API endpoints - using /neural prefix to avoid Vite conflicts
+  app.get(["/neural/ai-operators", "/api/neural/ai-operators", "/api/ai-operators"], async (req, res) => {
     try {
       const operators = await getAIOperators();
       res.json(operators);

@@ -128,7 +128,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get(["/api/neural/business-metrics", "/api/business-metrics"], async (req, res) => {
+  app.get(["/neural/business-metrics", "/api/neural/business-metrics", "/api/business-metrics"], async (req, res) => {
     try {
       const metrics = await getBusinessMetrics();
       res.json(metrics);
@@ -148,7 +148,7 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
-  app.get(["/api/neural/client-projects", "/api/client-projects", "/api/projects"], async (req, res) => {
+  app.get(["/neural/client-projects", "/api/neural/client-projects", "/api/client-projects", "/api/projects"], async (req, res) => {
     try {
       const projects = await getClientProjects();
       res.json(projects);

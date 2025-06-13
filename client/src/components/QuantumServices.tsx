@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { 
   Brain, 
   Network, 
@@ -41,6 +42,7 @@ export default function QuantumServices() {
   const [services, setServices] = useState<QuantumService[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [networkActivity, setNetworkActivity] = useState(95);
+  const [previewService, setPreviewService] = useState<QuantumService | null>(null);
   const [, navigate] = useLocation();
 
   useEffect(() => {
@@ -310,7 +312,11 @@ export default function QuantumServices() {
                       <Zap className="w-4 h-4 mr-2" />
                       DEPLOY_SERVICE
                     </Button>
-                    <Button variant="outline" className="border-cyber-green text-cyber-green hover:bg-cyber-green/20">
+                    <Button 
+                      variant="outline" 
+                      className="border-cyber-green text-cyber-green hover:bg-cyber-green/20"
+                      onClick={() => setPreviewService(service)}
+                    >
                       <Eye className="w-4 h-4" />
                     </Button>
                   </div>
@@ -363,6 +369,102 @@ export default function QuantumServices() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Service Preview Dialog */}
+      <Dialog open={!!previewService} onOpenChange={(open) => !open && setPreviewService(null)}>
+        <DialogContent className="max-w-2xl bg-black/95 border-cyber-green/30">
+          <DialogHeader>
+            <DialogTitle className="text-cyber-green terminal-text flex items-center gap-2">
+              {previewService?.icon && <previewService.icon className="w-6 h-6" />}
+              {previewService?.name}
+            </DialogTitle>
+            <DialogDescription className="text-gray-300">
+              {previewService?.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {previewService && (
+            <div className="space-y-6">
+              {/* Service Badges */}
+              <div className="flex gap-2">
+                {previewService.quantum_enhanced && (
+                  <Badge className="bg-purple-400 text-white neon-glow">
+                    QUANTUM_ENHANCED
+                  </Badge>
+                )}
+                {previewService.ai_powered && (
+                  <Badge className="bg-cyber-green text-black neon-glow">
+                    AI_POWERED
+                  </Badge>
+                )}
+              </div>
+
+              {/* Features List */}
+              <div>
+                <h3 className="text-cyber-green terminal-text mb-3">NEURAL_FEATURES:</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {previewService.features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2 text-sm text-gray-300">
+                      <div className="w-2 h-2 bg-cyber-green rounded-full neon-glow"></div>
+                      {feature}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pricing Tiers */}
+              <div>
+                <h3 className="text-cyber-green terminal-text mb-3">PRICING_MATRIX:</h3>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="cyber-glass p-4 border-cyber-green/30">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-400 terminal-text">STARTER</div>
+                      <div className="text-xl font-bold text-cyber-green">${previewService.pricing.starter.toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <div className="cyber-glass p-4 border-cyber-green/50 bg-cyber-green/10">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-400 terminal-text">PRO</div>
+                      <div className="text-xl font-bold text-cyber-green">${previewService.pricing.pro.toLocaleString()}</div>
+                    </div>
+                  </div>
+                  <div className="cyber-glass p-4 border-cyber-green/30">
+                    <div className="text-center">
+                      <div className="text-sm text-gray-400 terminal-text">ENTERPRISE</div>
+                      <div className="text-xl font-bold text-cyber-green">{previewService.pricing.enterprise}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-4">
+                <Button 
+                  className="flex-1 bg-neon-gradient neon-glow terminal-text"
+                  onClick={() => {
+                    navigate(`/crypto-checkout?service=${previewService.id}&amount=${previewService.pricing.pro}&name=${encodeURIComponent(previewService.name)}`);
+                    setPreviewService(null);
+                  }}
+                >
+                  <Zap className="w-4 h-4 mr-2" />
+                  DEPLOY_SERVICE
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="border-orange-500/50 text-orange-400 hover:bg-orange-500/10"
+                  onClick={() => {
+                    navigate(`/crypto-checkout?service=${previewService.id}&email=tech-client@example.com`);
+                    setPreviewService(null);
+                  }}
+                >
+                  <Bitcoin className="w-4 h-4 mr-2" />
+                  PAY_CRYPTO
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

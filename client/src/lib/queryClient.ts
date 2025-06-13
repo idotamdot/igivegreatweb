@@ -9,11 +9,7 @@ async function throwIfResNotOk(res: Response) {
 
 // Direct server connection to bypass Vite middleware
 const getServerURL = () => {
-  // In development, use dedicated API server on port 3001
-  if (import.meta.env.DEV) {
-    return 'http://localhost:3001';
-  }
-  // In production, use current origin
+  // Use current origin to avoid CORS issues
   return window.location.origin;
 };
 

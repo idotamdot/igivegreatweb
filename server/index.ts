@@ -26,39 +26,7 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
 async function main() {
   try {
-    // In development, create separate API server to bypass Vite middleware
-    if (process.env.NODE_ENV !== "production") {
-      // Create dedicated API server on port 3001
-      const apiApp = express();
-      apiApp.set('trust proxy', 1);
-      
-      // Enable CORS for cross-origin requests from frontend
-      apiApp.use((req, res, next) => {
-        res.header('Access-Control-Allow-Origin', 'http://localhost:5000');
-        res.header('Access-Control-Allow-Credentials', 'true');
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        
-        if (req.method === 'OPTIONS') {
-          res.sendStatus(200);
-        } else {
-          next();
-        }
-      });
-      
-      apiApp.use(express.json());
-      apiApp.use(express.urlencoded({ extended: true }));
-      
-      // Register API routes on dedicated server
-      await registerRoutes(apiApp);
-      
-      const apiServer = createHttpServer(apiApp);
-      apiServer.listen(3001, "0.0.0.0", () => {
-        log(`API server running on port 3001`);
-      });
-    }
-    
-    // Register API routes on main server too (for production)
+    // Register API routes FIRST to ensure they take precedence
     await registerRoutes(app);
     
     // Create HTTP server
@@ -68,6 +36,25 @@ async function main() {
     if (process.env.NODE_ENV === "production") {
       serveStatic(app);
     } else {
+      // In development, add middleware to bypass Vite for API routes
+      app.use('/neural/*', (req, res, next) => {
+        // Skip Vite middleware for neural endpoints
+        if (req.originalUrl.startsWith('/neural/')) {
+          next('route');
+        } else {
+          next();
+        }
+      });
+      
+      app.use('/api/*', (req, res, next) => {
+        // Skip Vite middleware for API endpoints  
+        if (req.originalUrl.startsWith('/api/')) {
+          next('route');
+        } else {
+          next();
+        }
+      });
+      
       await setupVite(app, server as any);
     }
 

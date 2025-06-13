@@ -93,6 +93,15 @@ export default function NeuralNavigation() {
       status: 'processing',
       connections: ['quantum-workspace', 'ai-generator'],
       description: 'Real-time performance analytics'
+    },
+    {
+      id: 'deployment-pipeline',
+      label: 'DEPLOY_PIPELINE',
+      path: '/deployment-pipeline',
+      icon: Database,
+      status: 'online',
+      connections: ['neural-analytics', 'quantum-workspace'],
+      description: 'Autonomous deployment automation'
     }
   ];
 

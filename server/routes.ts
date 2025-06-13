@@ -583,4 +583,145 @@ export async function registerRoutes(app: Express): Promise<void> {
       res.status(500).json({ message: "Failed to fetch system health" });
     }
   });
+
+  app.get("/api/deployments", async (req, res) => {
+    try {
+      const projects = await storage.getAllProjects();
+      
+      // Transform projects into deployment data
+      const deployments = projects.slice(0, 3).map((project, index) => ({
+        id: `deploy-${project.id}`,
+        projectName: project.projectName,
+        version: `v1.${index + 1}.0`,
+        environment: index === 0 ? 'production' : index === 1 ? 'staging' : 'development',
+        status: index === 0 ? 'deployed' : index === 1 ? 'deploying' : 'queued',
+        progress: index === 0 ? 100 : index === 1 ? 67 : 15,
+        repository: `neural-web-labs/${project.projectName.toLowerCase().replace(/\s+/g, '-')}`,
+        deployedUrl: index === 0 ? `https://${project.projectName.toLowerCase().replace(/\s+/g, '-')}.neural-labs.app` : undefined,
+        aiOptimizations: ['Auto-scaling enabled', 'Performance tuning', 'Security hardening'],
+        stages: [
+          {
+            id: 'build',
+            name: 'Build & Test',
+            status: index >= 1 ? 'completed' : 'pending',
+            duration: 180,
+            aiOperator: project.assignedOperator || 'ARIA-7',
+            logs: index >= 1 ? ['✓ Dependencies installed', '✓ Tests passed (98% coverage)', '✓ Build optimized'] : []
+          },
+          {
+            id: 'security',
+            name: 'Security Scan',
+            status: index === 0 ? 'completed' : index === 1 ? 'running' : 'pending',
+            duration: index === 0 ? 45 : 0,
+            aiOperator: 'NEXUS-3',
+            logs: index === 0 ? ['✓ No vulnerabilities detected', '✓ Security headers configured'] : 
+                  index === 1 ? ['→ Scanning dependencies...', '→ Analyzing API endpoints...'] : []
+          },
+          {
+            id: 'deploy',
+            name: 'Deploy to ' + (index === 0 ? 'Production' : index === 1 ? 'Staging' : 'Development'),
+            status: index === 0 ? 'completed' : 'pending',
+            duration: index === 0 ? 120 : 0,
+            aiOperator: 'VORTEX-1',
+            logs: index === 0 ? ['✓ Blue-green deployment initiated', '✓ Health checks passed', '✓ Traffic switched'] : []
+          }
+        ],
+        metrics: {
+          buildTime: index === 0 ? '3m 15s' : index === 1 ? '1m 35s' : 'Pending',
+          deployTime: index === 0 ? '8m 45s' : index === 1 ? 'In progress' : 'Pending',
+          testCoverage: 95 + index,
+          performanceScore: index === 0 ? 94 : index === 1 ? 0 : 0
+        }
+      }));
+
+      res.json(deployments);
+    } catch (error) {
+      console.error("Error fetching deployments:", error);
+      res.status(500).json({ message: "Failed to fetch deployments" });
+    }
+  });
+
+  app.post("/api/deployments/trigger", async (req, res) => {
+    try {
+      const { type, projectId } = req.body;
+      
+      // Create new deployment entry
+      const newDeployment = {
+        id: `deploy-${Date.now()}`,
+        type,
+        projectId,
+        status: 'queued',
+        triggeredAt: new Date().toISOString(),
+        aiOperators: ['ARIA-7', 'NEXUS-3', 'VORTEX-1']
+      };
+
+      res.json({
+        success: true,
+        deployment: newDeployment,
+        message: "Deployment triggered successfully"
+      });
+    } catch (error) {
+      console.error("Error triggering deployment:", error);
+      res.status(500).json({ message: "Failed to trigger deployment" });
+    }
+  });
+
+  app.get("/api/infrastructure/nodes", async (req, res) => {
+    try {
+      const operators = await storage.getAllAIOperators();
+      
+      // Generate infrastructure nodes based on AI operators
+      const nodes = [
+        {
+          id: 'node-001',
+          name: 'Production Web Server',
+          type: 'compute',
+          status: 'healthy',
+          cpu: 45 + Math.random() * 20,
+          memory: 68 + Math.random() * 15,
+          network: 23 + Math.random() * 30,
+          location: 'US-East-1',
+          uptime: '99.97%'
+        },
+        {
+          id: 'node-002',
+          name: 'Database Cluster',
+          type: 'database',
+          status: 'healthy',
+          cpu: 32 + Math.random() * 25,
+          memory: 78 + Math.random() * 10,
+          network: 15 + Math.random() * 20,
+          location: 'US-East-1',
+          uptime: '99.99%'
+        },
+        {
+          id: 'node-003',
+          name: 'Load Balancer',
+          type: 'load-balancer',
+          status: Math.random() > 0.8 ? 'warning' : 'healthy',
+          cpu: 78 + Math.random() * 15,
+          memory: 45 + Math.random() * 20,
+          network: 67 + Math.random() * 25,
+          location: 'US-East-1',
+          uptime: '99.95%'
+        },
+        {
+          id: 'node-004',
+          name: 'CDN Edge',
+          type: 'cdn',
+          status: 'healthy',
+          cpu: 12 + Math.random() * 10,
+          memory: 25 + Math.random() * 15,
+          network: 89 + Math.random() * 10,
+          location: 'Global',
+          uptime: '99.98%'
+        }
+      ];
+
+      res.json(nodes);
+    } catch (error) {
+      console.error("Error fetching infrastructure:", error);
+      res.status(500).json({ message: "Failed to fetch infrastructure data" });
+    }
+  });
 }

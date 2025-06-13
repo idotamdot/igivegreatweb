@@ -42,6 +42,7 @@ function Router() {
       <Route path="/quantum-workspace" component={QuantumWorkspace} />
       <Route path="/ai-generator" component={AIProjectGenerator} />
       <Route path="/neural-analytics" component={NeuralAnalytics} />
+      <Route path="/deployment-pipeline" component={DeploymentPipeline} />
       <Route path="/auth" component={AuthPage} />
       {/* Temporarily bypassing authentication for development */}
       <Route path="/admin" component={AdminDashboard} />

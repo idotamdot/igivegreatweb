@@ -251,4 +251,94 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.get("/api/health", (req, res) => {
     res.json({ status: "healthy", timestamp: new Date().toISOString() });
   });
+
+  // Authentication endpoints
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      // For Neural Web Labs demo, accept any credentials
+      // In production, this would validate against the database
+      if (username && password) {
+        const user = {
+          id: "demo-user-" + Date.now(),
+          username,
+          role: "user",
+          neural_access: true
+        };
+        
+        // Store user in session
+        (req.session as any).user = user;
+        
+        res.json({ 
+          success: true, 
+          user,
+          message: "Neural matrix connection established"
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          message: "Username and password required" 
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Neural matrix connection failed" 
+      });
+    }
+  });
+
+  app.post("/api/auth/register", async (req, res) => {
+    try {
+      const { username, email, password } = req.body;
+      
+      // For Neural Web Labs demo, accept any valid registration
+      if (username && email && password) {
+        const user = {
+          id: "demo-user-" + Date.now(),
+          username,
+          email,
+          role: "user",
+          neural_access: true,
+          created_at: new Date().toISOString()
+        };
+        
+        // Store user in session
+        (req.session as any).user = user;
+        
+        res.json({ 
+          success: true, 
+          user,
+          message: "Neural profile created successfully"
+        });
+      } else {
+        res.status(400).json({ 
+          success: false, 
+          message: "Username, email, and password required" 
+        });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      res.status(500).json({ 
+        success: false, 
+        message: "Neural profile creation failed" 
+      });
+    }
+  });
+
+  app.post("/api/auth/logout", (req, res) => {
+    (req.session as any).user = null;
+    res.json({ success: true, message: "Neural matrix disconnected" });
+  });
+
+  app.get("/api/auth/user", (req, res) => {
+    const user = (req.session as any).user;
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(401).json({ message: "No active neural connection" });
+    }
+  });
 }

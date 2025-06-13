@@ -57,6 +57,15 @@ export default function NeuralNavigation() {
       status: 'standby',
       connections: ['admin'],
       description: 'Authentication protocols'
+    },
+    {
+      id: 'login',
+      label: 'NEURAL_LOGIN',
+      path: '/login',
+      icon: Terminal,
+      status: 'online',
+      connections: ['core'],
+      description: 'Neural matrix access portal'
     }
   ];
 

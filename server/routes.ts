@@ -1796,7 +1796,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Verify crypto payment
-  app.post("/api/crypto/verify-payment", async (req, res) => {
+  app.post(["/api/crypto/verify-payment", "/crypto/verify"], async (req, res) => {
     try {
       const { paymentId, walletAddress } = req.body;
       
@@ -1812,7 +1812,7 @@ export async function registerRoutes(app: Express): Promise<void> {
   });
 
   // Get crypto exchange rates
-  app.get("/api/crypto/exchange-rates", async (req, res) => {
+  app.get(["/api/crypto/exchange-rates", "/crypto/rates"], async (req, res) => {
     try {
       const rates = await cryptoPaymentService.getExchangeRates();
       res.json(rates);

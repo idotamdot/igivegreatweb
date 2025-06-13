@@ -66,6 +66,33 @@ export default function NeuralNavigation() {
       status: 'online',
       connections: ['core'],
       description: 'Neural matrix access portal'
+    },
+    {
+      id: 'quantum-workspace',
+      label: 'QUANTUM_WORKSPACE',
+      path: '/quantum-workspace',
+      icon: Cpu,
+      status: 'processing',
+      connections: ['core', 'admin'],
+      description: 'Advanced quantum operations center'
+    },
+    {
+      id: 'ai-generator',
+      label: 'AI_PROJECT_GEN',
+      path: '/ai-generator',
+      icon: Activity,
+      status: 'online',
+      connections: ['quantum-workspace', 'admin'],
+      description: 'Autonomous project generation system'
+    },
+    {
+      id: 'neural-analytics',
+      label: 'NEURAL_ANALYTICS',
+      path: '/neural-analytics',
+      icon: Globe,
+      status: 'processing',
+      connections: ['quantum-workspace', 'ai-generator'],
+      description: 'Real-time performance analytics'
     }
   ];
 

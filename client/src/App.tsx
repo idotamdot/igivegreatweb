@@ -25,6 +25,8 @@ import NeuralCommandCenter from "@/pages/neural-command-center";
 import Login from "@/pages/Login";
 import QuantumWorkspace from "@/pages/QuantumWorkspace";
 import AIProjectGenerator from "@/pages/AIProjectGenerator";
+import NeuralAnalytics from "@/pages/NeuralAnalytics";
+import DeploymentPipeline from "@/pages/DeploymentPipeline";
 import { AuthProvider } from "@/hooks/use-auth";
 // Temporarily commenting out protected route for development
 // import { ProtectedRoute } from "@/lib/protected-route";
@@ -39,6 +41,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/quantum-workspace" component={QuantumWorkspace} />
       <Route path="/ai-generator" component={AIProjectGenerator} />
+      <Route path="/neural-analytics" component={NeuralAnalytics} />
       <Route path="/auth" component={AuthPage} />
       {/* Temporarily bypassing authentication for development */}
       <Route path="/admin" component={AdminDashboard} />

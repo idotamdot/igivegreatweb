@@ -175,7 +175,12 @@ export default function OnboardingTutorial({ onComplete, onSkip }: OnboardingPro
   const handleNavigateToComponent = () => {
     const step = onboardingSteps[currentStep];
     if (step.nextStep && step.isInteractive) {
-      navigate(step.nextStep);
+      // For quantum services step, show preview dialog instead of navigation
+      if (step.id === 3) {
+        setShowPreview(true);
+      } else {
+        navigate(step.nextStep);
+      }
     }
   };
 
@@ -352,6 +357,121 @@ export default function OnboardingTutorial({ onComplete, onSkip }: OnboardingPro
           </div>
         </div>
       </DialogContent>
+
+      {/* Service Preview Dialog */}
+      {showPreview && (
+        <Dialog open={showPreview} onOpenChange={setShowPreview}>
+          <DialogContent className="max-w-3xl bg-black/95 border-cyber-green/30">
+            <DialogHeader>
+              <DialogTitle className="text-cyber-green terminal-text flex items-center gap-3">
+                <Layers className="w-6 h-6 neon-glow" />
+                QUANTUM_SERVICE_PREVIEW
+              </DialogTitle>
+              <DialogDescription className="text-gray-400">
+                Experience our AI-powered web development service in action
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-6">
+              {/* Service Overview */}
+              <Card className="card-cyber">
+                <CardHeader>
+                  <CardTitle className="text-hologram terminal-text text-lg flex items-center gap-2">
+                    <Bot className="w-5 h-5" />
+                    Neural Web Development Suite
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="cyber-glass p-4 border-cyber-green/20">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Code className="w-4 h-4 text-cyber-green" />
+                        <span className="text-cyber-green terminal-text text-sm font-semibold">AI_CODING</span>
+                      </div>
+                      <p className="text-gray-300 text-xs">Autonomous code generation with 99.7% accuracy</p>
+                    </div>
+                    <div className="cyber-glass p-4 border-purple-400/20">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Database className="w-4 h-4 text-purple-400" />
+                        <span className="text-purple-400 terminal-text text-sm font-semibold">QUANTUM_DB</span>
+                      </div>
+                      <p className="text-gray-300 text-xs">Neural database optimization and scaling</p>
+                    </div>
+                    <div className="cyber-glass p-4 border-blue-400/20">
+                      <div className="flex items-center gap-3 mb-2">
+                        <Shield className="w-4 h-4 text-blue-400" />
+                        <span className="text-blue-400 terminal-text text-sm font-semibold">CYBER_SECURITY</span>
+                      </div>
+                      <p className="text-gray-300 text-xs">Advanced threat detection and prevention</p>
+                    </div>
+                  </div>
+
+                  {/* Pricing Matrix */}
+                  <div className="border-t border-cyber-green/20 pt-4">
+                    <h4 className="text-cyber-green terminal-text text-sm font-semibold mb-3">PRICING_MATRIX</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="cyber-glass p-3 border-cyber-green/10">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300 text-xs">Basic Web App</span>
+                          <span className="text-cyber-green terminal-text text-sm">$2,499</span>
+                        </div>
+                      </div>
+                      <div className="cyber-glass p-3 border-purple-400/10">
+                        <div className="flex justify-between items-center">
+                          <span className="text-gray-300 text-xs">Enterprise Solution</span>
+                          <span className="text-purple-400 terminal-text text-sm">$9,999</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Live Demo Simulation */}
+                  <div className="border-t border-cyber-green/20 pt-4">
+                    <h4 className="text-cyber-green terminal-text text-sm font-semibold mb-3">LIVE_DEMO_SIMULATION</h4>
+                    <div className="cyber-glass p-4 border-cyber-green/10">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-cyber-green rounded-full neon-glow animate-pulse"></div>
+                          <span className="text-gray-300 text-xs">AI Operator ARIA-7 analyzing requirements...</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full neon-glow animate-pulse"></div>
+                          <span className="text-gray-300 text-xs">Neural network generating optimized code structure...</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full neon-glow animate-pulse"></div>
+                          <span className="text-gray-300 text-xs">Quantum database schema deployed successfully</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 justify-end">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setShowPreview(false)}
+                  className="border-gray-600 text-gray-300"
+                >
+                  Close Preview
+                </Button>
+                <Button 
+                  className="bg-neon-gradient neon-glow terminal-text"
+                  onClick={() => {
+                    setShowPreview(false);
+                    navigate('/crypto-checkout/web-app');
+                  }}
+                >
+                  <CreditCard className="w-4 h-4 mr-2" />
+                  Deploy Service
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Dialog>
   );
 }

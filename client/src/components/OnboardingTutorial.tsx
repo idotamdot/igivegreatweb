@@ -22,7 +22,10 @@ import {
   Database,
   Lock,
   Eye,
-  ChevronRight
+  ChevronRight,
+  CreditCard,
+  Bot,
+  Layers
 } from 'lucide-react';
 import { useLocation } from 'wouter';
 
@@ -51,6 +54,7 @@ export default function OnboardingTutorial({ onComplete, onSkip }: OnboardingPro
   const [isTyping, setIsTyping] = useState(false);
   const [typedText, setTypedText] = useState('');
   const [networkPulse, setNetworkPulse] = useState(0);
+  const [showPreview, setShowPreview] = useState(false);
   const [, navigate] = useLocation();
 
   const onboardingSteps: OnboardingStep[] = [

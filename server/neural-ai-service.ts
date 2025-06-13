@@ -1,11 +1,27 @@
 // Neural Web Labs Advanced AI Intelligence System
 export class NeuralAIService {
   private projectId: string;
+  private location: string;
   private isCloudEnabled: boolean;
+  private authMethod: 'service-account' | 'workload-identity' | 'local';
 
   constructor() {
     this.projectId = process.env.GOOGLE_CLOUD_PROJECT_ID || 'neural-web-labs';
-    this.isCloudEnabled = !!(process.env.GOOGLE_APPLICATION_CREDENTIALS && process.env.GOOGLE_CLOUD_PROJECT_ID);
+    this.location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
+    
+    // Determine authentication method
+    if (process.env.GOOGLE_CLOUD_WORKLOAD_IDENTITY_PROVIDER && process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_EMAIL) {
+      this.authMethod = 'workload-identity';
+      this.isCloudEnabled = true;
+    } else if (process.env.GOOGLE_APPLICATION_CREDENTIALS && process.env.GOOGLE_CLOUD_PROJECT_ID) {
+      this.authMethod = 'service-account';
+      this.isCloudEnabled = true;
+    } else {
+      this.authMethod = 'local';
+      this.isCloudEnabled = false;
+    }
+
+    console.log(`Neural AI Service initialized with ${this.authMethod} authentication`);
   }
 
   // Advanced neural network prediction for autonomous AI decision making

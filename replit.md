@@ -116,6 +116,8 @@ Changelog:
 - June 13, 2025: Activated neural network performance metrics with live efficiency tracking
 - June 13, 2025: Fixed "service not found" error by implementing crypto payment route aliases
 - June 13, 2025: Enhanced service selection flow with dynamic service mapping and error handling
+- June 13, 2025: Fixed non-functional service preview button with comprehensive preview dialog system
+- June 13, 2025: Completed quantum service selection workflow with seamless preview-to-payment integration
 ```
 
 ## User Preferences

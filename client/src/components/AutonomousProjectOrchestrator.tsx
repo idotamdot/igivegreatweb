@@ -4,12 +4,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Code, 
-  Rocket, 
-  GitBranch, 
-  Database, 
-  Cloud, 
+import {
+  Code,
+  Rocket,
+  GitBranch,
+  Database,
+  Cloud,
   TestTube,
   Shield,
   Cpu,
@@ -198,7 +198,7 @@ export function AutonomousProjectOrchestrator() {
 
   const initiateNewProject = async () => {
     setIsInitiating(true);
-    
+
     // Simulate autonomous project initiation
     setTimeout(() => {
       const newProject: AutonomousProject = {
@@ -222,7 +222,7 @@ export function AutonomousProjectOrchestrator() {
           security: 98.8
         }
       };
-      
+
       setAutonomousProjects(prev => [...prev, newProject]);
       setTotalProjectValue(prev => prev + newProject.estimatedValue);
       setActiveProjects(prev => prev + 1);
@@ -232,19 +232,19 @@ export function AutonomousProjectOrchestrator() {
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case 'analysis': return 'bg-blue-600';
-      case 'design': return 'bg-purple-600';
-      case 'development': return 'bg-orange-600';
-      case 'testing': return 'bg-yellow-600';
-      case 'deployment': return 'bg-green-600';
-      case 'maintenance': return 'bg-gray-600';
+      case 'analysis': return 'bg-blue-600'; // Keep for distinct stage colors
+      case 'design': return 'bg-purple-600'; // Keep for distinct stage colors
+      case 'development': return 'bg-orange-600'; // Keep for distinct stage colors
+      case 'testing': return 'bg-yellow-600'; // Keep for distinct stage colors
+      case 'deployment': return 'bg-green-600'; // Keep for distinct stage colors
+      case 'maintenance': return 'bg-gray-600'; // Keep for distinct stage colors
       default: return 'bg-gray-600';
     }
   };
 
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
-      case 'simple': return 'text-green-400';
+      case 'simple': return 'text-cyber-green';
       case 'moderate': return 'text-yellow-400';
       case 'complex': return 'text-orange-400';
       case 'enterprise': return 'text-red-400';
@@ -253,14 +253,16 @@ export function AutonomousProjectOrchestrator() {
   };
 
   const getTypeIcon = (type: string) => {
+    const iconColor = "text-neon-blue"; // A consistent color from your palette
+
     switch (type) {
-      case 'web-app': return <Code className="w-4 h-4" />;
-      case 'mobile-app': return <Cpu className="w-4 h-4" />;
-      case 'api': return <Database className="w-4 h-4" />;
-      case 'blockchain': return <GitBranch className="w-4 h-4" />;
-      case 'ai-model': return <Brain className="w-4 h-4" />;
-      case 'infrastructure': return <Cloud className="w-4 h-4" />;
-      default: return <Code className="w-4 h-4" />;
+      case 'web-app': return <Code className={`w-4 h-4 ${iconColor}`} />;
+      case 'mobile-app': return <Cpu className={`w-4 h-4 ${iconColor}`} />;
+      case 'api': return <Database className={`w-4 h-4 ${iconColor}`} />;
+      case 'blockchain': return <GitBranch className={`w-4 h-4 ${iconColor}`} />;
+      case 'ai-model': return <Brain className={`w-4 h-4 ${iconColor}`} />;
+      case 'infrastructure': return <Cloud className={`w-4 h-4 ${iconColor}`} />;
+      default: return <Code className={`w-4 h-4 ${iconColor}`} />;
     }
   };
 
@@ -268,7 +270,7 @@ export function AutonomousProjectOrchestrator() {
     <div className="space-y-6">
       {/* Autonomous Orchestration Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="card-hologram">
+        <Card className="cyber-glass"> {/* Applied cyber-glass from your CSS */}
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -282,7 +284,7 @@ export function AutonomousProjectOrchestrator() {
           </CardContent>
         </Card>
 
-        <Card className="card-hologram">
+        <Card className="cyber-glass"> {/* Applied cyber-glass from your CSS */}
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -296,7 +298,7 @@ export function AutonomousProjectOrchestrator() {
           </CardContent>
         </Card>
 
-        <Card className="card-hologram">
+        <Card className="cyber-glass"> {/* Applied cyber-glass from your CSS */}
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -310,15 +312,16 @@ export function AutonomousProjectOrchestrator() {
           </CardContent>
         </Card>
 
-        <Card className="card-hologram">
+        <Card className="cyber-glass"> {/* Applied cyber-glass from your CSS */}
           <CardContent className="p-6">
-            <Button 
+            <Button
               onClick={initiateNewProject}
               disabled={isInitiating}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-pink-600 hover:to-purple-600 terminal-text"
+              // Using custom gradient and magnetic effect from provided CSS
+              className="w-full bg-neon-gradient hover:bg-neon-gradient btn-magnetic terminal-text"
             >
               {isInitiating ? 'INITIATING...' : 'NEW_PROJECT'}
-              <Zap className="w-4 h-4 ml-2" />
+              <Zap className="w-4 h-4 ml-2 neon-glow" /> {/* Added neon-glow to Zap icon */}
             </Button>
           </CardContent>
         </Card>
@@ -334,7 +337,7 @@ export function AutonomousProjectOrchestrator() {
         <TabsContent value="projects" className="space-y-4">
           <div className="grid gap-4">
             {autonomousProjects.map((project) => (
-              <Card key={project.id} className="card-hologram">
+              <Card key={project.id} className="cyber-glass"> {/* Applied cyber-glass from your CSS */}
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -385,7 +388,7 @@ export function AutonomousProjectOrchestrator() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between text-sm terminal-text text-gray-400">
                       <span>Progress</span>
@@ -440,17 +443,17 @@ export function AutonomousProjectOrchestrator() {
         <TabsContent value="pipelines" className="space-y-4">
           <div className="grid gap-4">
             {deploymentPipelines.map((pipeline, index) => (
-              <Card key={index} className="card-hologram">
+              <Card key={index} className="cyber-glass"> {/* Applied cyber-glass from your CSS */}
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Rocket className="w-5 h-5 text-neon-blue" />
+                      <Rocket className="w-5 h-5 text-neon-blue neon-glow" /> {/* Added neon-glow */}
                       <CardTitle className="terminal-text text-white">
                         {autonomousProjects.find(p => p.id === pipeline.projectId)?.name || 'Unknown Project'}
                       </CardTitle>
                     </div>
                     <Badge className={`terminal-text ${
-                      pipeline.status === 'success' ? 'bg-cyber-green' :
+                      pipeline.status === 'success' ? 'bg-green-600' : // Keep distinct Tailwind colors for status
                       pipeline.status === 'running' ? 'bg-neon-blue' :
                       pipeline.status === 'failed' ? 'bg-red-600' : 'bg-gray-600'
                     }`}>
@@ -474,7 +477,7 @@ export function AutonomousProjectOrchestrator() {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div>
                       <p className="terminal-text text-gray-400 text-sm mb-2">AI_ACTIONS</p>
                       <div className="space-y-1">
@@ -498,7 +501,7 @@ export function AutonomousProjectOrchestrator() {
         <TabsContent value="metrics" className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {orchestrationMetrics.map((metric, index) => (
-              <Card key={index} className="card-hologram">
+              <Card key={index} className="cyber-glass"> {/* Applied cyber-glass from your CSS */}
                 <CardContent className="p-6">
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
@@ -506,13 +509,13 @@ export function AutonomousProjectOrchestrator() {
                         {metric.name.toUpperCase()}
                       </p>
                       <Badge className={`terminal-text ${
-                        metric.impact === 'high' ? 'bg-red-600' :
+                        metric.impact === 'high' ? 'bg-red-600' : // Keep distinct Tailwind colors for status
                         metric.impact === 'medium' ? 'bg-yellow-600' : 'bg-green-600'
                       }`}>
                         {metric.impact.toUpperCase()}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <p className="terminal-text text-2xl font-bold text-cyber-green">
                         {metric.name.includes('Speed') ? metric.value : `${metric.value}%`}
@@ -527,7 +530,7 @@ export function AutonomousProjectOrchestrator() {
                         </span>
                       </div>
                     </div>
-                    
+
                     <div>
                       <div className="flex justify-between text-sm terminal-text text-gray-400 mb-1">
                         <span>Target</span>

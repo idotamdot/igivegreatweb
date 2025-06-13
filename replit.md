@@ -120,6 +120,8 @@ Changelog:
 - June 13, 2025: Completed quantum service selection workflow with seamless preview-to-payment integration
 - June 13, 2025: Implemented immersive onboarding experience with futuristic tutorial walkthrough
 - June 13, 2025: Added neural network background animations and interactive step-by-step guidance system
+- June 13, 2025: Enhanced tutorial with functional preview button showing live service demonstrations
+- June 13, 2025: Added quantum service preview dialog with AI coding features, pricing matrix, and deployment simulation
 ```
 
 ## User Preferences

@@ -603,10 +603,10 @@ export async function registerRoutes(app: Express): Promise<void> {
           {
             id: 'build',
             name: 'Build & Test',
-            status: index >= 1 ? 'completed' : 'pending',
+            status: index === 0 ? 'completed' : index === 1 ? 'completed' : 'pending',
             duration: 180,
             aiOperator: project.assignedOperator || 'ARIA-7',
-            logs: index >= 1 ? ['✓ Dependencies installed', '✓ Tests passed (98% coverage)', '✓ Build optimized'] : []
+            logs: index <= 1 ? ['✓ Dependencies installed', '✓ Tests passed (98% coverage)', '✓ Build optimized'] : []
           },
           {
             id: 'security',
